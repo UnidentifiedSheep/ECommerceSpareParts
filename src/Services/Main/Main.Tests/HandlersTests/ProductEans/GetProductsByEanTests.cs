@@ -1,9 +1,9 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Products.Queries.GetProductsByEan;
-using Main.Entities.Product;
+using FluentValidation.TestHelper;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Queries.GetProductsByEan;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -11,8 +11,8 @@ namespace Tests.HandlersTests.ProductEans;
 
 public class GetProductsByEanTests : IntegrationTest
 {
-	public GetProductsByEanTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProductEanTestContext>();
+	public GetProductsByEanTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProductEanTestContext>();
 
 	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
 
@@ -21,7 +21,7 @@ public class GetProductsByEanTests : IntegrationTest
 	{
 		var existing = TestContext.ProductEans.First();
 		var otherProducts = TestContext.ProductTestContext.Products.Skip(3).Take(2).ToArray();
-		Context.ProductEans.AddRange(otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean)));
+		Context.Set<ProductEan>().AddRange(otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean)));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var expectedIds = otherProducts.Select(x => x.Id).Append(existing.ProductId).Order().ToArray();
@@ -45,11 +45,10 @@ public class GetProductsByEanTests : IntegrationTest
 
 		result.Products.Should().BeEmpty();
 	}
-
-
 }
 
-public class GetProductsByEanValidationTests : ValidationTest<GetProductsByEanValidation, GetProductsByEanQuery>
+public class
+	GetProductsByEanValidationTests : ValidationTest<GetProductsByEanValidation, GetProductsByEanQuery>
 {
 	[Theory]
 	[InlineData(null)]

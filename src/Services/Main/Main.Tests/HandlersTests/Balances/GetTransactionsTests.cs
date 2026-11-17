@@ -1,14 +1,13 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Balance.GetTransactions;
-using Main.Entities.Balance;
-using Main.Entities.Organization;
-using Main.Enums.Balances;
+using FluentValidation.TestHelper;
+using Main.Entities;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Balance;
 
@@ -17,9 +16,7 @@ namespace Tests.HandlersTests.Balances;
 public class GetTransactionsTests : IntegrationTest
 {
 	public GetTransactionsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<BalanceTestContext>();
-	}
+		=> RegisterBasicContext<BalanceTestContext>();
 
 	private BalanceTestContext TestContext => GetContext<BalanceTestContext>();
 
@@ -31,7 +28,7 @@ public class GetTransactionsTests : IntegrationTest
 		var result = await Mediator.Send(GetQuery(senderId), CancellationToken);
 
 		result.Transactions.Should().ContainSingle();
-		result.Transactions[0].Sender.Id.Should().Be(senderId);
+		result.Transactions[0].SenderId.Should().Be(senderId);
 	}
 
 	[Fact]
@@ -42,7 +39,7 @@ public class GetTransactionsTests : IntegrationTest
 		var result = await Mediator.Send(GetQuery(receiverId: receiverId), CancellationToken);
 
 		result.Transactions.Should().ContainSingle();
-		result.Transactions[0].Receiver.Id.Should().Be(receiverId);
+		result.Transactions[0].ReceiverId.Should().Be(receiverId);
 	}
 
 	[Fact]
@@ -140,7 +137,7 @@ public class GetTransactionsTests : IntegrationTest
 			CancellationToken);
 
 		result.Transactions.Should().NotBeEmpty();
-		result.Transactions.Should().OnlyContain(x => x.Sender.Id == userId || x.Receiver.Id == userId);
+		result.Transactions.Should().OnlyContain(x => x.SenderId == userId || x.ReceiverId == userId);
 	}
 
 	[Fact]
@@ -180,7 +177,6 @@ public class GetTransactionsTests : IntegrationTest
 	}
 
 
-
 	private GetTransactionsQuery GetQuery(
 		Guid? senderId = null,
 		Guid? receiverId = null,
@@ -192,8 +188,7 @@ public class GetTransactionsTests : IntegrationTest
 		bool skipReversed = false,
 		Guid? cursorId = null,
 		DateTime? cursorDate = null)
-	{
-		return new GetTransactionsQuery(
+		=> new(
 			new RangeModel<DateTime>(rangeStart, rangeEnd),
 			currencyId,
 			senderId,
@@ -203,7 +198,6 @@ public class GetTransactionsTests : IntegrationTest
 				(cursorId ?? Guid.Empty, cursorDate ?? DateTime.MinValue),
 				size),
 			skipReversed);
-	}
 
 	private async Task<IReadOnlyList<Transaction>> AddTransactions(params DateTime[] dates)
 	{
@@ -228,12 +222,15 @@ public class GetTransactionsTests : IntegrationTest
 
 	private async Task<Transaction> ReverseSeedTransaction()
 	{
-		var transaction = await Context.Transactions.FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
+		var transaction =
+			await Context.Set<Transaction>().FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
 
-		var senderBalance = await Context.UserBalances.FirstAsync(x =>
-			x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
-			x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
+		var senderBalance = await Context.Set<OrganizationBalance>()
+			.FirstAsync(x =>
+				x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
+		var receiverBalance = await Context.Set<OrganizationBalance>()
+			.FirstAsync(x =>
+				x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
 
 		transaction.Reverse(TestContext.Users[0].Id);
 		transaction.Apply(senderBalance, receiverBalance);
@@ -247,10 +244,12 @@ public class GetTransactionsTests : IntegrationTest
 		var sender = TestContext.Users[0];
 		var receiver = TestContext.Users[1];
 		var currency = TestContext.Currencies[0];
-		var senderBalance = await Context.UserBalances.FirstAsync(x =>
-			x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
-			x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
+		var senderBalance = await Context.Set<OrganizationBalance>()
+			.FirstAsync(x =>
+				x.OrganizationId == sender.Id && x.CurrencyId == currency.Id);
+		var receiverBalance = await Context.Set<OrganizationBalance>()
+			.FirstAsync(x =>
+				x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id);
 		var senderProfile = await Context
 			.Set<OrganizationFinancialProfile>()
 			.FirstAsync(x => x.OrganizationId == sender.Id);
@@ -291,7 +290,8 @@ public class GetTransactionsValidationTests : ValidationTest<GetTransactionsVali
 	{
 		var result = await ValidateAsync(GetQuery());
 		result.ShouldHaveValidationErrorFor("")
-			.WithErrorCode(Main.Entities.TransactionSenderOrReceiverRequiredMessage.Instance.MessageKey).Only();
+			.WithErrorCode(TransactionSenderOrReceiverRequiredMessage.Instance.MessageKey)
+			.Only();
 	}
 
 	private static GetTransactionsQuery GetQuery(
@@ -305,8 +305,7 @@ public class GetTransactionsValidationTests : ValidationTest<GetTransactionsVali
 		bool skipReversed = false,
 		Guid? cursorId = null,
 		DateTime? cursorDate = null)
-	{
-		return new GetTransactionsQuery(
+		=> new(
 			new RangeModel<DateTime>(rangeStart, rangeEnd),
 			currencyId,
 			senderId,
@@ -316,7 +315,6 @@ public class GetTransactionsValidationTests : ValidationTest<GetTransactionsVali
 				(cursorId ?? Guid.Empty, cursorDate ?? DateTime.MinValue),
 				size),
 			skipReversed);
-	}
 
 
 	[Fact]

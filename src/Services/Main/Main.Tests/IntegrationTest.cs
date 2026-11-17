@@ -1,16 +1,15 @@
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Context;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 
 namespace Tests;
 
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
-	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
+	: IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, UnifiedDbContext>
 {
 	private TestEnvironmentLease _environmentLease = null!;
 	protected IMediator Mediator { get; private set; } = null!;
@@ -38,7 +37,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 			new TransactionalAttribute(),
 			() => base.InitializeBasicContexts());
 
-		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
+		DiscardPendingDomainEvents();
 	}
 
 	public override async ValueTask DisposeAsync()
@@ -47,5 +46,4 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 		using var scope = Scope;
 		await ResetDataStoresAsync();
 	}
-
 }

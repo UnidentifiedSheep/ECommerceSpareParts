@@ -20,6 +20,9 @@ public sealed class EntityHistory : Entity<EntityHistory, Guid>, ILinqEntity<Ent
 	public Guid? ActorId { get; private set; }
 	public DateTime OccurredAt { get; private set; }
 	public Guid ChangeSetId { get; private set; }
+	public static Expression<Func<EntityHistory, Guid>> GetKeySelector() => history => history.Id;
+	public static Expression<Func<EntityHistory, bool>> GetEqualityExpression(Guid key)
+		=> history => history.Id == key;
 
 	public static EntityHistory Create(
 		string entityType,
@@ -75,6 +78,4 @@ public sealed class EntityHistory : Entity<EntityHistory, Guid>, ILinqEntity<Ent
 	}
 
 	public override Guid GetId() => Id;
-	public static Expression<Func<EntityHistory, Guid>> GetKeySelector() => history => history.Id;
-	public static Expression<Func<EntityHistory, bool>> GetEqualityExpression(Guid key) => history => history.Id == key;
 }

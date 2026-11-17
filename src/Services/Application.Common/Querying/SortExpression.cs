@@ -25,7 +25,10 @@ public sealed record SortExpression(string Field, bool Descending = false, strin
 		if (argument is not null && string.IsNullOrWhiteSpace(argument))
 			throw new ArgumentException("Sort argument must not be empty.", nameof(value));
 
-		return new SortExpression(field, direction == "desc", argument);
+		return new SortExpression(
+			field,
+			direction == "desc",
+			argument);
 	}
 
 	public static implicit operator SortExpression(string value) => Parse(value);

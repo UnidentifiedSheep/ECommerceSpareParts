@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>false</IsPackable>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+        <Using Include="Notification"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Test.Common\Test.Common.csproj"/>
+        <ProjectReference Include="..\..\Modules\Notifications\Notifications.Abstractions\Notifications.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Modules\Notifications\Notifications.Application\Notifications.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

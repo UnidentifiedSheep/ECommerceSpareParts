@@ -1,36 +1,55 @@
-using System.Reflection;
 using Abstractions;
 using Api.Common;
-using Api.Common.Consumers;
-using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
-using Application.Common.Consumer;
+using Application.Common.Host;
 using Cache;
+using Cache.OneTimeTokens;
 using Carter;
 using Contracts.Job;
-using Contracts.Producer;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
-using Main.Api.EndPoints.Products;
+using Main.Api.EndPoints;
 using Main.Api.GraphQl;
-using Main.Application;
-using Main.Application.Configs;
-using Main.Application.Consumers;
-using Main.Cache;
-using Main.Persistence;
-using Main.Persistence.Context;
+using Main.Api.Jobs;
+using Main.Modules.Analytics;
+using Main.Modules.Balance;
+using Main.Modules.Cart;
+using Main.Modules.Currency;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Application.Consumers;
+using Main.Modules.Documents;
+using Main.Modules.Identity;
+using Main.Modules.Jobs;
+using Main.Modules.Notifications;
+using Main.Modules.Notifications.Application.Delivery.Extensions;
+using Main.Modules.Order;
+using Main.Modules.Organization;
+using Main.Modules.Platform;
+using Main.Modules.Platform.Application.Consumer;
+using Main.Modules.Product;
+using Main.Modules.Product.Application.Consumers;
+using Main.Modules.Product.Application.Events;
+using Main.Modules.Purchase;
+using Main.Modules.Sale;
+using Main.Modules.Storage;
+using Main.Modules.Suppliers;
+using Main.Modules.Uploads;
 using MassTransit;
+using Persistence.Common;
+using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Application.Consumers;
+using Pricing.Application.Events;
+using Pricing.Module;
 using RabbitMq.Extensions;
 using S3;
-using Security;
 using Security.Extensions;
 using ZiggyCreatures.Caching.Fusion.Backplane;
-using Global = Main.Application.Global;
 
 const string serviceName = "Main";
 var builder = WebApplication.CreateBuilder(args);
@@ -60,16 +79,38 @@ builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
 builder.Services.AddSignalR();
 
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+builder.Services.AddModule<ProductModule>(builder.Configuration);
+builder.Services.AddModule<IdentityModule>(builder.Configuration);
+builder.Services.AddModule<PurchaseModule>(builder.Configuration);
+builder.Services.AddModule<SaleModule>(builder.Configuration);
+builder.Services.AddModule<AnalyticsModule>(builder.Configuration);
+builder.Services.AddModule<BalanceModule>(builder.Configuration);
+builder.Services.AddModule<CartModule>(builder.Configuration);
+builder.Services.AddModule<DocumentsModule>(builder.Configuration);
+builder.Services.AddModule<JobsModule>(builder.Configuration);
+builder.Services.AddModule<PlatformModule>(builder.Configuration);
+builder.Services.AddModule<SuppliersModule>(builder.Configuration);
+builder.Services.AddModule<UploadsModule>(builder.Configuration);
+builder.Services.AddModule<NotificationsModule>(builder.Configuration);
+builder.Services.AddModule<OrderModule>(builder.Configuration);
+builder.Services.AddModule<OrganizationModule>(builder.Configuration);
+builder.Services.AddModule<StorageModule>(builder.Configuration);
+builder.Services.AddModule<PricingModule>(builder.Configuration);
+
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-	x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+	x.AddConsumers(
+	[
+		.. builder.Services.GetModuleCatalog().ConsumerAssemblies
+	]);
 	x.AddConsumer<BackplaneConsumer>();
 	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();
 
-	x.AddEntityFrameworkOutbox<DContext>(o =>
+	x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
 	{
 		o.UsePostgres();
 		o.UseBusOutbox();
@@ -91,44 +132,41 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 				ep.ConfigureConsumer<BackplaneConsumer>(context);
 				ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
+				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
+				ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
 				ep.Bind<BackplaneMessage>();
 				ep.Bind<ProducerLookupChangedEvent>();
+				ep.Bind<CurrencyRateChangedEvent>();
+				ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				ep
 					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
 					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
-			});
-
-		cfg.ReceiveEndpoint(
-			"main-queue",
-			ep =>
-			{
-				ep.Durable = true;
-
-				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-				ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
 			});
 	});
 });
 
 builder
 	.Services
-	.AddPersistenceLayer()
+	.AddPersistenceCore()
+	.AddRelationsPersistence()
 	.AddCacheLayer("main")
-	.AddApplicationCache()
+	.AddOneTimeTokens()
 	.AddJsonSigner()
 	.AddSecretEncryptor()
 	.AddFullSecurityLayer()
 	.AddEComAuth(builder.Configuration)
 	.AddCommonLayer()
 	.AddS3()
-	.AddApplicationLayer(builder.Configuration)
 	.AddExchangeRates()
-	.AddMainNotifications();
+	.UseEmailNotifications();
 
 builder.Services.AddCarter(
-	new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly, typeof(JobEndPoints).Assembly),
+	new DependencyContextAssemblyCatalog(
+		typeof(AuthEndPoints).Assembly,
+		typeof(JobEndPoints).Assembly),
 	c => c.WithEmptyValidators());
 
 builder.Services.AddGraphQlServices(serviceName);

@@ -1,5 +1,5 @@
-using Main.Entities.Product;
-using Main.Persistence.Context;
+using Main.Entities.Product.Product;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -7,8 +7,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class ProductMeasurementsTestContext(DContext context, ProductTestContext productContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class ProductMeasurementsTestContext(UnifiedDbContext context, ProductTestContext productContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public IReadOnlyCollection<ProductSize> Sizes { get; private set; } = null!;
 

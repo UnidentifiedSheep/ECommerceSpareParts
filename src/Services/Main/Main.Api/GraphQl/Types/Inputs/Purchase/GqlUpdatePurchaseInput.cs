@@ -19,10 +19,4 @@ public sealed record GqlUpdatePurchaseInput
 
 	[GraphQLName("comment")]
 	public string? Comment { get; init; }
-
-	[GraphQLName("withLogistics")]
-	public bool? WithLogistics { get; init; }
-
-	[GraphQLName("storageFrom")]
-	public string? StorageFrom { get; init; }
 }

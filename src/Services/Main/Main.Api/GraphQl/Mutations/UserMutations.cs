@@ -4,18 +4,16 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using Main.Api.GraphQl.Types.Inputs.User;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Handlers.Auth.AddPermissionsToUser;
-using Main.Application.Handlers.Auth.AddRolesToUser;
-using Main.Application.Handlers.Auth.EmailVerification;
-using Main.Application.Handlers.Auth.RemovePermissionsFromUser;
-using Main.Application.Handlers.Auth.RemoveRolesFromUser;
-using Main.Application.Handlers.StorageOwners.AddStorageToUser;
-using Main.Application.Handlers.StorageOwners.DeleteStorageFromUser;
-using Main.Application.Handlers.Users.AddEmailToUser;
-using Main.Application.Handlers.Users.CreateUser;
-using Main.Application.Handlers.Users.EditUserInfo;
-using Main.Application.Handlers.Users.MakeEmailPrimary;
-using Main.Application.Handlers.Users.RemoveEmailFromUser;
+using Main.Modules.Identity.Application.Handlers.Auth.AddPermissionsToUser;
+using Main.Modules.Identity.Application.Handlers.Auth.AddRolesToUser;
+using Main.Modules.Identity.Application.Handlers.Auth.EmailVerification;
+using Main.Modules.Identity.Application.Handlers.Auth.RemovePermissionsFromUser;
+using Main.Modules.Identity.Application.Handlers.Auth.RemoveRolesFromUser;
+using Main.Modules.Identity.Application.Handlers.Users.AddEmailToUser;
+using Main.Modules.Identity.Application.Handlers.Users.CreateUser;
+using Main.Modules.Identity.Application.Handlers.Users.EditUserInfo;
+using Main.Modules.Identity.Application.Handlers.Users.MakeEmailPrimary;
+using Main.Modules.Identity.Application.Handlers.Users.RemoveEmailFromUser;
 using MediatR;
 using Security.Core.Interfaces;
 
@@ -30,13 +28,15 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new CreateUserCommand(
-			input.UserName,
-			input.Password,
-			input.UserInfo.ToDto(),
-			input.Emails.Select(email => email.ToDto()).ToArray(),
-			input.Phones.Select(phone => phone.ToDto()).ToArray(),
-			input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new CreateUserCommand(
+				input.UserName,
+				input.Password,
+				input.UserInfo.ToDto(),
+				input.Emails.Select(email => email.ToDto()).ToArray(),
+				input.Phones.Select(phone => phone.ToDto()).ToArray(),
+				input.Roles),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -49,7 +49,8 @@ public sealed class UserMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new EditUserInfoCommand(input.UserId, input.UserInfo.ToDto()), cancellationToken);
+			new EditUserInfoCommand(input.UserId, input.UserInfo.ToDto()),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -62,7 +63,11 @@ public sealed class UserMutations
 		CancellationToken cancellationToken)
 	{
 		var result = await sender.Send(
-			new AddEmailToUserCommand(input.UserId, input.Email, input.Type), cancellationToken);
+			new AddEmailToUserCommand(
+				input.UserId,
+				input.Email,
+				input.Type),
+			cancellationToken);
 
 		return new GqlUser(result.UserId);
 	}
@@ -107,7 +112,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new AddRolesToUserCommand(input.UserId, input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new AddRolesToUserCommand(input.UserId, input.Roles),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -118,7 +125,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new RemoveRolesFromUserCommand(input.UserId, input.Roles), cancellationToken);
+		var result = await sender.Send(
+			new RemoveRolesFromUserCommand(input.UserId, input.Roles),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -129,7 +138,9 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new AddPermissionsToUserCommand(input.UserId, input.Permissions), cancellationToken);
+		var result = await sender.Send(
+			new AddPermissionsToUserCommand(input.UserId, input.Permissions),
+			cancellationToken);
 		return new GqlUser(result.UserId);
 	}
 
@@ -140,30 +151,10 @@ public sealed class UserMutations
 		ISender sender,
 		CancellationToken cancellationToken)
 	{
-		var result = await sender.Send(new RemovePermissionsFromUserCommand(input.UserId, input.Permissions), cancellationToken);
+		var result = await sender.Send(
+			new RemovePermissionsFromUserCommand(input.UserId, input.Permissions),
+			cancellationToken);
 		return new GqlUser(result.UserId);
-	}
-
-	[GraphQLName("addStorage")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_ADD)]
-	public async Task<GqlUser> AddStorageAsync(
-		GqlUserStorageInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		await sender.Send(new AddStorageToUserCommand(input.UserId, input.StorageCode), cancellationToken);
-		return new GqlUser(input.UserId);
-	}
-
-	[GraphQLName("removeStorage")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_DELETE)]
-	public async Task<GqlUser> RemoveStorageAsync(
-		GqlUserStorageInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		await sender.Send(new DeleteStorageFromUserCommand(input.UserId, input.StorageCode), cancellationToken);
-		return new GqlUser(input.UserId);
 	}
 
 	[GraphQLName("requestMyEmailVerification")]

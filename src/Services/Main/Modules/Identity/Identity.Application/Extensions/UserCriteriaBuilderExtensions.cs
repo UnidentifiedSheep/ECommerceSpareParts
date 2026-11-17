@@ -1,0 +1,56 @@
+using Application.Common.Interfaces.Repositories;
+using Main.Entities.User;
+using RoleEnum = Enums.Role;
+
+namespace Main.Modules.Identity.Application.Extensions;
+
+public static class UserCriteriaBuilderExtensions
+{
+	public static CriteriaBuilder<User> WhereHasRole(this CriteriaBuilder<User> criteria, RoleEnum role)
+		=> criteria.WhereHasAnyRole([role]);
+
+	public static CriteriaBuilder<User> WhereHasRole(this CriteriaBuilder<User> criteria, string role)
+		=> criteria.WhereHasAnyRole([role]);
+
+	public static CriteriaBuilder<User> WhereHasAnyRole(
+		this CriteriaBuilder<User> criteria,
+		IEnumerable<RoleEnum> roles)
+		=> UserRoleFilter.Apply(
+			criteria,
+			roles,
+			true);
+
+	public static CriteriaBuilder<User> WhereHasAnyRole(
+		this CriteriaBuilder<User> criteria,
+		IEnumerable<string> roles)
+		=> UserRoleFilter.Apply(
+			criteria,
+			roles,
+			true);
+
+	public static CriteriaBuilder<User> WhereDoesNotHaveRole(
+		this CriteriaBuilder<User> criteria,
+		RoleEnum role)
+		=> criteria.WhereDoesNotHaveAnyRole([role]);
+
+	public static CriteriaBuilder<User> WhereDoesNotHaveRole(
+		this CriteriaBuilder<User> criteria,
+		string role)
+		=> criteria.WhereDoesNotHaveAnyRole([role]);
+
+	public static CriteriaBuilder<User> WhereDoesNotHaveAnyRole(
+		this CriteriaBuilder<User> criteria,
+		IEnumerable<RoleEnum> roles)
+		=> UserRoleFilter.Apply(
+			criteria,
+			roles,
+			false);
+
+	public static CriteriaBuilder<User> WhereDoesNotHaveAnyRole(
+		this CriteriaBuilder<User> criteria,
+		IEnumerable<string> roles)
+		=> UserRoleFilter.Apply(
+			criteria,
+			roles,
+			false);
+}

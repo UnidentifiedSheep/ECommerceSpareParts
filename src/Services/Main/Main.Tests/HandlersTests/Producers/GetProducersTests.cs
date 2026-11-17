@@ -1,7 +1,6 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Producers.GetProducers;
+using Main.Modules.Product.Application.Handlers.Producers.GetProducers;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -15,11 +14,11 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	{
 		var first = await new ProducerBuilder(Faker)
 			.WithName("First requested producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var second = await new ProducerBuilder(Faker)
 			.WithName("Second requested producer")
-			.BuildAndAddToDb(Context);
-		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
+		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery([first.Id, second.Id]), CancellationToken);
 
@@ -30,8 +29,8 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	[Fact]
 	public async Task GetProducers_WithEmptyIds_DoesNotFilterById()
 	{
-		var first = await new ProducerBuilder(Faker).WithName("First producer").BuildAndAddToDb(Context);
-		var second = await new ProducerBuilder(Faker).WithName("Second producer").BuildAndAddToDb(Context);
+		var first = await new ProducerBuilder(Faker).WithName("First producer").BuildAndAddToDb(Context, CancellationToken);
+		var second = await new ProducerBuilder(Faker).WithName("Second producer").BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery([]), CancellationToken);
 
@@ -44,8 +43,8 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	{
 		var producer = await new ProducerBuilder(Faker)
 			.WithName("Existing producer")
-			.BuildAndAddToDb(Context);
-		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
+		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			CreateQuery([producer.Id, producer.Id, int.MaxValue]),
@@ -61,13 +60,13 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	{
 		var matchingRequested = await new ProducerBuilder(Faker)
 			.WithName("Alpha requested producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var notMatchingRequested = await new ProducerBuilder(Faker)
 			.WithName("Beta requested producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var matchingNotRequested = await new ProducerBuilder(Faker)
 			.WithName("Alpha skipped producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			CreateQuery([matchingRequested.Id, notMatchingRequested.Id], "Alpha"),
@@ -82,10 +81,10 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 	[Fact]
 	public async Task GetProducers_WithIds_AppliesPaginationAfterFiltering()
 	{
-		var first = await new ProducerBuilder(Faker).WithName("Alpha producer").BuildAndAddToDb(Context);
-		var second = await new ProducerBuilder(Faker).WithName("Beta producer").BuildAndAddToDb(Context);
-		var third = await new ProducerBuilder(Faker).WithName("Gamma producer").BuildAndAddToDb(Context);
-		await new ProducerBuilder(Faker).WithName("Aardvark skipped producer").BuildAndAddToDb(Context);
+		var first = await new ProducerBuilder(Faker).WithName("Alpha producer").BuildAndAddToDb(Context, CancellationToken);
+		var second = await new ProducerBuilder(Faker).WithName("Beta producer").BuildAndAddToDb(Context, CancellationToken);
+		var third = await new ProducerBuilder(Faker).WithName("Gamma producer").BuildAndAddToDb(Context, CancellationToken);
+		await new ProducerBuilder(Faker).WithName("Aardvark skipped producer").BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			CreateQuery(
@@ -103,10 +102,8 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 		string? searchTerm = null,
 		int page = 0,
 		int size = 100)
-	{
-		return new GetProducersQuery(
+		=> new(
 			searchTerm,
 			ids,
 			new Pagination(page, size));
-	}
 }

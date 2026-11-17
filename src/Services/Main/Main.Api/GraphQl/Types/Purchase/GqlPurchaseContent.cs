@@ -1,11 +1,12 @@
 using HotChocolate;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Purchase;
+using Main.Modules.Purchase.Application.Dtos.Purchase;
 
 namespace Main.Api.GraphQl.Types.Purchase;
 
 [GraphQLName("PurchaseContent")]
-public sealed record GqlPurchaseContent([property: GraphQLIgnore] PurchaseContentDto Content)
+public sealed record GqlPurchaseContent([property: GraphQLIgnore]
+	PurchaseContentDto Content)
 {
 	[GraphQLName("id")]
 	public int Id => Content.Id;
@@ -23,9 +24,5 @@ public sealed record GqlPurchaseContent([property: GraphQLIgnore] PurchaseConten
 	public string? Comment => Content.Comment;
 
 	[GraphQLName("product")]
-	public GqlProduct Product => new(Content.Product);
-
-	[GraphQLName("logistics")]
-	public GqlPurchaseContentLogistic? Logistics =>
-		Content.ContentLogistics is { } logistics ? new(logistics) : null;
+	public GqlProduct Product => new(Content.ProductId);
 }

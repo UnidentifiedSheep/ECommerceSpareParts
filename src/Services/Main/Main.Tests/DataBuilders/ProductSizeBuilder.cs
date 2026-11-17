@@ -1,6 +1,6 @@
 using Bogus;
 using Enums.Units;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -41,12 +41,10 @@ public class ProductSizeBuilder(Faker faker) : BuilderBase<ProductSize>(faker)
 	}
 
 	public override ProductSize Build()
-	{
-		return ProductSize.Create(
+		=> ProductSize.Create(
 			ProductId ?? Faker.Random.Int(1),
 			Length ?? 1m,
 			Width ?? 1m,
 			Height ?? 1m,
 			Unit ?? DimensionUnit.Meter);
-	}
 }

@@ -1,16 +1,11 @@
 using Enums;
 using GraphQL.Common.Attributes;
-using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Auth;
-using Main.Api.GraphQl.Types.Inputs.User;
-using Main.Api.GraphQl.Types.Organization;
-using Main.Application.Handlers.Organizations.GetOrganizations;
-using MediatR;
-using Main.Application.Dtos.Users;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Dtos.Users;
 
 namespace Main.Api.GraphQl.Types.User;
 
@@ -19,15 +14,9 @@ public record GqlUser
 {
 	private readonly UserDto? _dto;
 
-	public GqlUser(Guid id)
-	{
-		Id = id;
-	}
+	public GqlUser(Guid id) => Id = id;
 
-	public GqlUser(UserDto user) : this(user.Id)
-	{
-		_dto = user;
-	}
+	public GqlUser(UserDto user) : this(user.Id) => _dto = user;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -36,54 +25,54 @@ public record GqlUser
 	[GraphQLName("userName")]
 	public async Task<string> GetUserNameAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).UserName;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).UserName;
 
 	[GraphQLName("normalizedUserName")]
 	public async Task<string> GetNormalizedUserNameAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).NormalizedUserName;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).NormalizedUserName;
 
 	[GraphQLName("createdAt")]
 	public async Task<DateTime> GetCreatedAtAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).CreatedAt;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).CreatedAt;
 
 	[GraphQLName("updatedAt")]
 	public async Task<DateTime> GetUpdatedAtAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).UpdatedAt;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).UpdatedAt;
 
 	[GraphQLName("twoFactorEnabled")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<bool> GetTwoFactorEnabledAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).TwoFactorEnabled;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).TwoFactorEnabled;
 
 	[GraphQLName("lockoutEnd")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<DateTime?> GetLockoutEndAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).LockoutEnd;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).LockoutEnd;
 
 	[GraphQLName("accessFailedCount")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<int> GetAccessFailedCountAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).AccessFailedCount;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).AccessFailedCount;
 
 	[GraphQLName("lastLoginAt")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<DateTime?> GetLastLoginAtAsync(
 		IUserByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetUserAsync(loader, cancellationToken)).LastLoginAt;
+		CancellationToken cancellationToken)
+		=> (await GetUserAsync(loader, cancellationToken)).LastLoginAt;
 
 	[GraphQLName("info")]
 	public async Task<GqlUserInfo?> GetInfoAsync(
@@ -113,51 +102,23 @@ public record GqlUser
 			.ToArray();
 
 
-	[GraphQLName("storages")]
-	[RequireAllPermissions(PermissionCodes.USERS_STORAGES_GET)]
-	public async Task<IReadOnlyList<GqlStorage>> GetStoragesAsync(
-		IUserStoragesByIdDataLoader loader,
-		CancellationToken cancellationToken)
-		=> (await loader.LoadAsync(Id, cancellationToken) ?? [])
-			.Select(storage => new GqlStorage(storage))
-			.ToArray();
-
-	[GraphQLName("organizations")]
-	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]
-	public async Task<IReadOnlyList<GqlOrganization>> GetOrganizationsAsync(
-		GqlUserOrganizationsInput input,
-		ISender sender,
-		CancellationToken cancellationToken)
-	{
-		var result = await sender.Send(
-			new GetOrganizationsQuery(
-				input.Pagination,
-				input.SortBy.ToSortExpressions(),
-				input.SearchTerm,
-				Id,
-				input.Ids ?? [],
-				input.Types ?? [],
-				input.ShowHidden ?? false),
-			cancellationToken);
-
-		return result.Organizations.Select(organization => new GqlOrganization(organization)).ToArray();
-	}
-
 	[GraphQLName("roles")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<IReadOnlyList<GqlRole>> GetRolesAsync(
 		IUserRolesAndPermissionsByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Roles
-			.Select(role => new GqlRole(role)).ToArray();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Roles
+			.Select(role => new GqlRole(role))
+			.ToArray();
 
 	[GraphQLName("permissions")]
 	[RequireAllPermissions(PermissionCodes.USERS_INFO_GET)]
 	public async Task<IReadOnlyList<GqlPermission>> GetPermissionsAsync(
 		IUserRolesAndPermissionsByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Permissions
-			.Select(permission => new GqlPermission(permission)).ToArray();
+		CancellationToken cancellationToken)
+		=> (await loader.LoadAsync(Id, cancellationToken) ?? throw new UserNotFoundException(Id)).Permissions
+			.Select(permission => new GqlPermission(permission))
+			.ToArray();
 
 	private async Task<UserDto> GetUserAsync(
 		IUserByIdDataLoader loader,

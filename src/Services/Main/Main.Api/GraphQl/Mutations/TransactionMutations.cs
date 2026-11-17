@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Transaction;
-using Main.Application.Handlers.Balance;
-using Main.Application.Handlers.Balance.ReverseTransaction;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance;
+using Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

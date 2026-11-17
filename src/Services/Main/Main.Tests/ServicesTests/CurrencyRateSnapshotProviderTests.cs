@@ -2,12 +2,12 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Application.Services.Currency;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Microsoft.Extensions.DependencyInjection;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Currency.Application.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
@@ -17,14 +17,23 @@ namespace Tests.ServicesTests;
 
 public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 {
-	private static readonly DateTime Start = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+	private static readonly DateTime Start = new(
+		2026,
+		1,
+		1,
+		0,
+		0,
+		0,
+		DateTimeKind.Utc);
 
-	public CurrencyRateSnapshotProviderTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<CurrencyRatesTestContext>();
+	public CurrencyRateSnapshotProviderTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<CurrencyRatesTestContext>();
 
 	private CurrencyRatesTestContext Rates => GetContext<CurrencyRatesTestContext>();
 	private CurrencyRate Rate => Rates.Rates.First();
-	private ICurrencyRateSnapshotProvider Provider => Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>();
+
+	private ICurrencyRateSnapshotProvider Provider
+		=> Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>();
 
 	[Theory]
 	[InlineData(-730, 2)]
@@ -36,37 +45,72 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 	[InlineData(100, 4)]
 	public async Task GetNearestRate_SelectsClosestDate_AndEarlierOnTie(int days, decimal expected)
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start.AddDays(10), 4m), (Start, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start.AddDays(10), 4m), (Start, 2m)],
+			CancellationToken);
 
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(days), CancellationToken))
-			.Should().Be(expected);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(days),
+				CancellationToken))
+			.Should()
+			.Be(expected);
 	}
 
 	[Fact]
 	public async Task SameTimestamp_SelectsChangeWithLargestId()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 2m), (Start, 4m)], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m), (Start, 4m)],
+			CancellationToken);
 
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(-1), CancellationToken)).Should().Be(4m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start.AddDays(1), CancellationToken)).Should().Be(4m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(4m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(-1),
+				CancellationToken)).Should()
+			.Be(4m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(1),
+				CancellationToken)).Should()
+			.Be(4m);
 	}
 
 	[Fact]
 	public async Task BaseCurrency_WithoutHistory_ReturnsOne()
 	{
-		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[],
+			CancellationToken);
 
-		(await Provider.GetNearestRateFor(Rate.ToCurrencyId, Start, CancellationToken)).Should().Be(1m);
+		(await Provider.GetNearestRateFor(
+				Rate.ToCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(1m);
 	}
 
 	[Fact]
 	public async Task MissingCurrency_DoesNotUseAnotherCurrenciesHistory()
 	{
-		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[],
+			CancellationToken);
 
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() =>
-			Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken));
+			Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken));
 	}
 
 	[Theory]
@@ -74,36 +118,54 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 	[InlineData(-1)]
 	public async Task InvalidRate_ThrowsNotFound(decimal value)
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
-		await Context.CurrencyRates.Where(row => row.FromCurrencyId == Rate.FromCurrencyId && row.ToCurrencyId == Rate.ToCurrencyId)
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
+		await Context.Set<CurrencyRate>()
+			.Where(row => row.FromCurrencyId == Rate.FromCurrencyId && row.ToCurrencyId == Rate.ToCurrencyId)
 			.ExecuteUpdateAsync(update => update.SetProperty(row => row.Rate, value), CancellationToken);
 
 		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() =>
-			Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken));
+			Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken));
 	}
 
 	[Theory]
 	[InlineData(DateTimeKind.Local)]
 	[InlineData(DateTimeKind.Unspecified)]
 	public async Task NonUtcDate_IsRejected(DateTimeKind kind)
-	{
-		await Assert.ThrowsAsync<ArgumentException>(() =>
-			Provider.GetNearestRateFor(Rate.FromCurrencyId, DateTime.SpecifyKind(Start, kind), CancellationToken));
-	}
+		=> await Assert.ThrowsAsync<ArgumentException>(() =>
+			Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				DateTime.SpecifyKind(Start, kind),
+				CancellationToken));
 
 	[Fact]
 	public async Task CurrentRate_UsesLatestObservationRatherThanNearestToToday()
 	{
-		await Rates.SetHistoryAsync(Rate, [(DateTime.UtcNow.AddYears(10), 8m), (Start, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(DateTime.UtcNow.AddYears(10), 8m), (Start, 2m)],
+			CancellationToken);
 
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(8m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(2m);
 	}
 
 	[Fact]
 	public async Task CurrentBaseCurrency_WithoutObservations_ReturnsOne()
 	{
-		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[],
+			CancellationToken);
 
 		(await Provider.GetCurrentRateOrDefault(Rate.ToCurrencyId, CancellationToken)).Should().Be(1m);
 	}
@@ -111,31 +173,116 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 	[Fact]
 	public async Task MissingCurrentRate_ReturnsNull_AndRequiredRateThrows()
 	{
-		await Rates.SetHistoryAsync(Rate, [], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[],
+			CancellationToken);
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().BeNull();
-		var rates = Scope.ServiceProvider.GetRequiredService<Application.Common.Interfaces.Currency.ICurrencyRatesProvider>();
+		var rates = Scope.ServiceProvider.GetRequiredService<ICurrencyRatesProvider>();
 
-		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => rates.GetRate(Rate.FromCurrencyId, CancellationToken));
+		await Assert.ThrowsAsync<CurrencyRateNotFoundException>(() => rates.GetRate(
+			Rate.FromCurrencyId,
+			CancellationToken));
 	}
 
 	[Fact]
 	public async Task Reload_ReplacesCachedSnapshot()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
-		await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(2m);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 4m)],
+			CancellationToken);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(2m);
 
 		await Provider.Reload(CancellationToken);
 
 		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(4m);
-		(await Provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(4m);
+	}
+
+	[Fact]
+	public async Task Apply_AppendsChangeToLoadedSnapshotWithoutReadingDatabase()
+	{
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(2m);
+		var change = new CurrencyRateChange(
+			Rate.FromCurrencyId,
+			Rate.ToCurrencyId,
+			4m,
+			Start.AddDays(10));
+
+		await Provider.Apply([change], CancellationToken);
+		await Provider.Apply([change], CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(4m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken)).Should()
+			.Be(2m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(10),
+				CancellationToken))
+			.Should()
+			.Be(4m);
+	}
+
+	[Fact]
+	public async Task Apply_InsertsOutOfOrderChangeIntoHistory()
+	{
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m), (Start.AddDays(10), 6m)],
+			CancellationToken);
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
+
+		await Provider.Apply(
+			[
+				new CurrencyRateChange(
+					Rate.FromCurrencyId,
+					Rate.ToCurrencyId,
+					4m,
+					Start.AddDays(5))
+			],
+			CancellationToken);
+
+		(await Provider.GetCurrentRateOrDefault(Rate.FromCurrencyId, CancellationToken)).Should().Be(6m);
+		(await Provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start.AddDays(5),
+				CancellationToken))
+			.Should()
+			.Be(4m);
 	}
 
 	[Fact]
 	public async Task Reload_DuringInitialLoad_DoesNotLoseNewHistory()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
 		var readCompleted = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 		var releaseRead = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 		var (provider, factory) = CreateProvider(async attempt =>
@@ -146,12 +293,18 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 		});
 		using (provider)
 		{
-			var firstRead = provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken);
+			var firstRead = provider.GetNearestRateFor(
+				Rate.FromCurrencyId,
+				Start,
+				CancellationToken);
 			Task reload;
 			try
 			{
 				await readCompleted.Task.WaitAsync(CancellationToken);
-				await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
+				await Rates.SetHistoryAsync(
+					Rate,
+					[(Start, 4m)],
+					CancellationToken);
 				reload = provider.Reload(CancellationToken);
 			}
 			finally
@@ -161,7 +314,11 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 
 			(await firstRead).Should().Be(2m);
 			await reload;
-			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
+			(await provider.GetNearestRateFor(
+					Rate.FromCurrencyId,
+					Start,
+					CancellationToken)).Should()
+				.Be(4m);
 			factory.Verify(value => value.Create(), Times.Exactly(2));
 		}
 	}
@@ -169,34 +326,56 @@ public sealed class CurrencyRateSnapshotProviderTests : IntegrationTest
 	[Fact]
 	public async Task FailedReload_PreservesPreviousSnapshot_AndCanBeRetried()
 	{
-		await Rates.SetHistoryAsync(Rate, [(Start, 2m)], CancellationToken);
+		await Rates.SetHistoryAsync(
+			Rate,
+			[(Start, 2m)],
+			CancellationToken);
 		var (provider, _) = CreateProvider(attempt => attempt == 2
-			? Task.FromException(new InvalidOperationException("Load failed")) : Task.CompletedTask);
+			? Task.FromException(new InvalidOperationException("Load failed"))
+			: Task.CompletedTask);
 		using (provider)
 		{
-			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
-			await Rates.SetHistoryAsync(Rate, [(Start, 4m)], CancellationToken);
+			(await provider.GetNearestRateFor(
+					Rate.FromCurrencyId,
+					Start,
+					CancellationToken)).Should()
+				.Be(2m);
+			await Rates.SetHistoryAsync(
+				Rate,
+				[(Start, 4m)],
+				CancellationToken);
 
 			await Assert.ThrowsAsync<InvalidOperationException>(() => provider.Reload(CancellationToken));
-			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(2m);
+			(await provider.GetNearestRateFor(
+					Rate.FromCurrencyId,
+					Start,
+					CancellationToken)).Should()
+				.Be(2m);
 			await provider.Reload(CancellationToken);
-			(await provider.GetNearestRateFor(Rate.FromCurrencyId, Start, CancellationToken)).Should().Be(4m);
+			(await provider.GetNearestRateFor(
+					Rate.FromCurrencyId,
+					Start,
+					CancellationToken)).Should()
+				.Be(4m);
 		}
 	}
 
-	private (CurrencyRateSnapshotProvider Provider, Mock<IApplicationTransactionFactory> Factory) CreateProvider(Func<int, Task> afterExecute)
+	private (CurrencyRateSnapshotProvider Provider, Mock<IApplicationTransactionFactory> Factory)
+		CreateProvider(Func<int, Task> afterExecute)
 	{
 		var context = new Mock<IApplicationTransactionContext>();
-		context.SetupGet(value => value.Repositories).Returns(Scope.ServiceProvider.GetRequiredService<IRepositoryProvider>());
+		context.SetupGet(value => value.Repositories)
+			.Returns(Scope.ServiceProvider.GetRequiredService<IRepositoryProvider>());
 		context.Setup(value => value.GetRequiredService<ISettingsService>())
 			.Returns(Scope.ServiceProvider.GetRequiredService<ISettingsService>());
 		var factory = new Mock<IApplicationTransactionFactory>();
 		var attempts = 0;
-		factory.Setup(value => value.Create()).Returns(() =>
-		{
-			var attempt = Interlocked.Increment(ref attempts);
-			return new ApplicationTransactionStub(context.Object, () => afterExecute(attempt));
-		});
+		factory.Setup(value => value.Create())
+			.Returns(() =>
+			{
+				var attempt = Interlocked.Increment(ref attempts);
+				return new ApplicationTransactionStub(context.Object, () => afterExecute(attempt));
+			});
 		return (new CurrencyRateSnapshotProvider(factory.Object), factory);
 	}
 }

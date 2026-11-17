@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "lrt.service.task.run.name": "Service task dispatch",
+    "lrt.service.task.run.description": "Runs a task in the selected service."
+  }
+}

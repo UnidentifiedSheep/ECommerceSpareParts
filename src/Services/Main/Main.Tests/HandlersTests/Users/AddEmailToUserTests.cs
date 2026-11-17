@@ -1,17 +1,17 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models.Options;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Users.AddEmailToUser;
-using Main.Application.Models.Options;
+using FluentValidation.TestHelper;
+using Main.Entities;
+using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums;
+using Main.Modules.Identity.Application.Handlers.Users.AddEmailToUser;
+using Main.Modules.Identity.Application.Models.Options;
+using Main.Modules.Identity.Application.Validators;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -37,7 +37,9 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 		created.Email.Should().Be("additional.email@example.com");
 
 		var addedEmail =
-			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == email, CancellationToken);
+			await Context.Set<UserEmail>()
+				.AsNoTracking()
+				.SingleAsync(x => x.Email == email, CancellationToken);
 
 		addedEmail.UserId.Should().Be(user.Id);
 		addedEmail.Email.Value.Should().Be("additional.email@example.com");
@@ -130,20 +132,24 @@ public class AddEmailToUserTests(CombinedContainerFixture fixture) : Integration
 
 public class AddEmailToUserValidationTests : ValidationTest<AddEmailToUserValidation, AddEmailToUserCommand>
 {
-	protected override AddEmailToUserValidation CreateValidator() =>
-		new(new Application.Common.Validators.EmailValidator());
+	protected override AddEmailToUserValidation CreateValidator() => new(new EmailValidator());
 
 	[Theory]
 	[InlineData("invalid-email", EmailType.Personal)]
 	[InlineData("valid@example.com", (EmailType)999)]
 	public async Task AddEmail_InvalidInput_FailsValidation(string email, EmailType emailType)
 	{
-		var result = await ValidateAsync(new AddEmailToUserCommand(Guid.NewGuid(), email, emailType));
+		var result = await ValidateAsync(
+			new AddEmailToUserCommand(
+				Guid.NewGuid(),
+				email,
+				emailType));
 		if (emailType == (EmailType)999)
 			result.ShouldHaveValidationErrorFor(x => x.EmailType).Only();
 		else
 			result.ShouldHaveValidationErrorFor(x => x.Email)
 				.WithErrorCode(EmailMustBeValidMessage.Instance.MessageKey)
-				.WithCustomState(EmailMustBeValidMessage.Instance).Only();
+				.WithCustomState(EmailMustBeValidMessage.Instance)
+				.Only();
 	}
 }

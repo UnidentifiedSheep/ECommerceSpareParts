@@ -7,13 +7,16 @@ using Tests.TestContainers.Combined;
 
 namespace Tests.Tests.Integration.Persistence;
 
-public sealed class MetadataPersistenceTests(CombinedContainerFixture fixture) : CommonLayerIntegrationTest(fixture)
+public sealed class MetadataPersistenceTests(CombinedContainerFixture fixture)
+	: CommonLayerIntegrationTest(fixture)
 {
 	[Fact]
 	public async Task Metadata_RoundTripsAsJsonb()
 	{
 		var entity = new TestMetadataEntityBuilder().WithDescription("Поступление")
-			.WithQuantity(12).WithTags("purchase", "manual").Build();
+			.WithQuantity(12)
+			.WithTags("purchase", "manual")
+			.Build();
 		Context.Add(entity);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
@@ -21,8 +24,9 @@ public sealed class MetadataPersistenceTests(CombinedContainerFixture fixture) :
 		var loaded = await Context.Set<TestMetadataEntity>().SingleAsync(CancellationToken);
 
 		loaded.Metadata.Should().BeEquivalentTo(entity.Metadata);
-		var columnType = await Context.Database.SqlQuery<string>(
-			$"SELECT pg_typeof(metadata)::text AS \"Value\" FROM metadata_entities WHERE \"Id\" = {entity.Id}")
+		var columnType = await Context.Database
+			.SqlQuery<string>(
+				$"SELECT pg_typeof(metadata)::text AS \"Value\" FROM metadata_entities WHERE \"Id\" = {entity.Id}")
 			.SingleAsync(CancellationToken);
 		columnType.Should().Be("jsonb");
 	}
@@ -30,7 +34,10 @@ public sealed class MetadataPersistenceTests(CombinedContainerFixture fixture) :
 	[Fact]
 	public async Task Metadata_InPlaceChangesArePersisted()
 	{
-		var entity = new TestMetadataEntityBuilder().WithDescription("Original").WithQuantity(5).WithTags("first").Build();
+		var entity = new TestMetadataEntityBuilder().WithDescription("Original")
+			.WithQuantity(5)
+			.WithTags("first")
+			.Build();
 		Context.Add(entity);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
@@ -74,7 +81,8 @@ public sealed class MetadataPersistenceTests(CombinedContainerFixture fixture) :
 
 		var ids = await Context.Set<TestMetadataEntity>()
 			.Where(entity => entity.Metadata.Details.Quantity > 5)
-			.Select(entity => entity.Id).ToListAsync(CancellationToken);
+			.Select(entity => entity.Id)
+			.ToListAsync(CancellationToken);
 
 		ids.Should().Equal(matching.Id);
 	}

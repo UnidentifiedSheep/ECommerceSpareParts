@@ -1,9 +1,9 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Dtos.Product.SupplierReferences;
-using Main.Application.Dtos.Product.References;
-using Main.Application.Products.Queries;
+using Main.Modules.Product.Application.Dtos.Product.References;
+using Main.Modules.Product.Application.Dtos.Product.SupplierReferences;
+using Main.Modules.Product.Application.Products.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

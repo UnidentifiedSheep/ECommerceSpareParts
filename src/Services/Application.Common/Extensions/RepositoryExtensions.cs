@@ -11,7 +11,8 @@ public static class RepositoryExtensions
 		IEnumerable<TKey> ids,
 		Func<IReadOnlyList<TKey>, Exception> errorFactory,
 		CancellationToken ct = default,
-		CriteriaBuilder<TEntity>? criteriaBuilder = null) where TEntity : Entity<TEntity, TKey> where TKey : notnull
+		CriteriaBuilder<TEntity>? criteriaBuilder = null)
+		where TEntity : Entity<TEntity, TKey> where TKey : notnull
 	{
 		var criteria = (criteriaBuilder ?? Criteria<TEntity>.New()).Track().Build();
 
@@ -27,7 +28,11 @@ public static class RepositoryExtensions
 		IEnumerable<TKey> ids,
 		Func<IReadOnlyList<TKey>, Exception> errorFactory,
 		CancellationToken ct = default) where TEntity : Entity<TEntity, TKey> where TKey : notnull
-		=> repository.EnsureExistsForUpdateAsync(ids, errorFactory, Criteria<TEntity>.New(), ct);
+		=> repository.EnsureExistsForUpdateAsync(
+			ids,
+			errorFactory,
+			Criteria<TEntity>.New(),
+			ct);
 
 	public static Task<Dictionary<TKey, TEntity>> EnsureExistsForUpdateAsync<TEntity, TKey>(
 		this IRepository<TEntity, TKey> repository,
@@ -71,13 +76,11 @@ public static class RepositoryExtensions
 		CriteriaBuilder<TEntity>? criteriaBuilder = null,
 		CancellationToken ct = default)
 		where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey> where TKey : notnull
-	{
-		return await repository.EnsureExistCoreAsync(
+		=> await repository.EnsureExistCoreAsync(
 			key,
 			errorFactory,
 			criteriaBuilder?.Track().ForUpdate() ?? Criteria<TEntity>.New().Track().ForUpdate(),
 			ct);
-	}
 
 	public static async Task<TEntity> EnsureExistAsync<TEntity, TKey>(
 		this IRepository<TEntity, TKey> repository,
@@ -86,13 +89,11 @@ public static class RepositoryExtensions
 		CriteriaBuilder<TEntity>? criteriaBuilder = null,
 		CancellationToken ct = default)
 		where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey> where TKey : notnull
-	{
-		return await repository.EnsureExistCoreAsync(
+		=> await repository.EnsureExistCoreAsync(
 			key,
 			errorFactory,
 			criteriaBuilder ?? Criteria<TEntity>.New(),
 			ct);
-	}
 
 	private static async Task<TEntity> EnsureExistCoreAsync<TEntity, TKey>(
 		this IRepository<TEntity, TKey> repository,

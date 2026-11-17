@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Main.Entities.Cart;
+using Main.Entities.Cart.Cart;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -31,10 +31,8 @@ public class CartItemBuilder(Faker faker) : BuilderBase<Cart>(faker)
 	}
 
 	public override Cart Build()
-	{
-		return Cart.Create(
+		=> Cart.Create(
 			UserId ?? Guid.NewGuid(),
 			ProductId ?? Faker.GlobalUniqueIndex,
 			Quantity ?? Faker.Random.Int(1));
-	}
 }

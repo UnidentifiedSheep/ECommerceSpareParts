@@ -7,13 +7,16 @@ namespace Tests.TestContainers.OpenSearch;
 public sealed class OpenSearchContainerFixture : IAsyncLifetime
 {
 	private const int SlotCount = AssemblyFixture.MaxThreads;
+
 	private readonly IContainer _container = new ContainerBuilder("opensearchproject/opensearch:latest")
 		.WithEnvironment("discovery.type", "single-node")
 		.WithEnvironment("DISABLE_SECURITY_PLUGIN", "true")
 		.WithEnvironment("DISABLE_INSTALL_DEMO_CONFIG", "true")
 		.WithEnvironment("OPENSEARCH_JAVA_OPTS", "-Xms512m -Xmx512m")
 		.WithPortBinding(9200, true)
-		.WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(request => request.ForPort(9200).ForPath("/")))
+		.WithWaitStrategy(
+			Wait.ForUnixContainer()
+				.UntilHttpRequestIsSucceeded(request => request.ForPort(9200).ForPath("/")))
 		.Build();
 
 	private Channel<OpenSearchIndexSlot> _indexPool = null!;
@@ -23,12 +26,13 @@ public sealed class OpenSearchContainerFixture : IAsyncLifetime
 	public async ValueTask InitializeAsync()
 	{
 		await _container.StartAsync(TestContext.Current.CancellationToken);
-		_indexPool = Channel.CreateBounded<OpenSearchIndexSlot>(new BoundedChannelOptions(SlotCount)
-		{
-			SingleReader = false,
-			SingleWriter = false,
-			FullMode = BoundedChannelFullMode.Wait
-		});
+		_indexPool = Channel.CreateBounded<OpenSearchIndexSlot>(
+			new BoundedChannelOptions(SlotCount)
+			{
+				SingleReader = false,
+				SingleWriter = false,
+				FullMode = BoundedChannelFullMode.Wait
+			});
 		var prefix = $"integration-{Guid.NewGuid():N}";
 		for (var i = 0; i < SlotCount; i++)
 			await _indexPool.Writer.WriteAsync(new OpenSearchIndexSlot($"{prefix}-{i}-", Endpoint));
@@ -36,7 +40,8 @@ public sealed class OpenSearchContainerFixture : IAsyncLifetime
 
 	public ValueTask DisposeAsync() => _container.DisposeAsync();
 
-	public async ValueTask<OpenSearchIndexLease> AcquireIndicesAsync(CancellationToken cancellationToken = default)
+	public async ValueTask<OpenSearchIndexLease> AcquireIndicesAsync(
+		CancellationToken cancellationToken = default)
 	{
 		var indices = await _indexPool.Reader.ReadAsync(cancellationToken);
 		return new OpenSearchIndexLease(indices, ReleaseAsync);

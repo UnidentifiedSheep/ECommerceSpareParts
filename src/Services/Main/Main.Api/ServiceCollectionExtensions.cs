@@ -1,6 +1,5 @@
-﻿using Abstractions.Models.Options;
-using Main.Application.Models;
-using Main.Application.Models.Options;
+﻿using Main.Modules.Identity.Application.Models;
+using Main.Modules.Identity.Application.Models.Options;
 
 namespace Main.Api;
 

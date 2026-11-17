@@ -1,5 +1,5 @@
-using Main.Entities.Product;
-using Main.Persistence.Context;
+using Main.Entities.Product.Product;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -7,8 +7,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class ProductCrossTestContext(DContext context, ProductTestContext productTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class ProductCrossTestContext(UnifiedDbContext context, ProductTestContext productTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	private readonly List<ProductCross> _productCrosses = [];
 

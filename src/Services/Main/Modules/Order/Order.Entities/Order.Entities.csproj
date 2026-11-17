@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <LocanDefaultCulture>en</LocanDefaultCulture>
+        <AssemblyName>Main.Modules.Order.Entities</AssemblyName>
+        <RootNamespace>Main.Entities.Order</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+        <PackageReference Include="BulkValidation.SourceGeneration" Version="1.2.0" PrivateAssets="all"/>
+        <PackageReference Include="Locan.Generator" Version="1.0.6"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Enums\Enums.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Extensions\Extensions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Main.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <LocanResource Include="Localization/**/*.json"
+                       GenerateMessages="true"
+                       CopyToOutput="false"/>
+    </ItemGroup>
+
+</Project>

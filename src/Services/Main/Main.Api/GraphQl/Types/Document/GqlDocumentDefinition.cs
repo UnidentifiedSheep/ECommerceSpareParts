@@ -1,13 +1,14 @@
+using Enums;
 using GraphQL.Common.Types.Schema;
 using HotChocolate;
-using Main.Application.Dtos.Documents;
-using Main.Enums.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
 
 namespace Main.Api.GraphQl.Types.Document;
 
 [GraphQLName("DocumentDefinition")]
 public sealed record GqlDocumentDefinition(
-	[property: GraphQLIgnore] DocumentDefinitionDto Definition)
+	[property: GraphQLIgnore]
+	DocumentDefinitionDto Definition)
 {
 	[GraphQLName("systemName")]
 	public string SystemName => Definition.SystemName;

@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Enums.Balances;
 
 namespace Main.Api.GraphQl.Types.Inputs.Transaction;
 

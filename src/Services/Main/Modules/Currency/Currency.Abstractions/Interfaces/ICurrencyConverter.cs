@@ -1,0 +1,52 @@
+using Main.Modules.Currency.Abstractions.Models;
+
+namespace Main.Modules.Currency.Abstractions.Interfaces;
+
+public interface ICurrencyConverter
+{
+	decimal Convert(
+		decimal value,
+		decimal fromRate,
+		decimal toRate);
+
+	decimal ToBase(decimal value, decimal fromRate);
+
+	decimal FromBase(decimal value, decimal toRate);
+
+	Task<decimal> ConvertAsync(
+		decimal value,
+		int fromCurrencyId,
+		int toCurrencyId,
+		CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertFromBaseAsync(
+		decimal value,
+		int toCurrencyId,
+		CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertToBaseAsync(
+		decimal value,
+		int fromCurrencyId,
+		CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertAsync(
+		decimal value,
+		int fromCurrencyId,
+		int toCurrencyId,
+		DateTime forDate,
+		CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertFromBaseAsync(
+		decimal value,
+		int toCurrencyId,
+		DateTime forDate,
+		CancellationToken cancellationToken = default);
+
+	Task<decimal> ConvertToBaseAsync(
+		decimal value,
+		int fromCurrencyId,
+		DateTime forDate,
+		CancellationToken cancellationToken = default);
+
+	CurrencyRates ChangeBaseCurrency(CurrencyRates data, string newBase);
+}

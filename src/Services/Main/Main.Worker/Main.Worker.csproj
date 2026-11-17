@@ -16,14 +16,14 @@
     </ItemGroup>
 
     <ItemGroup>
-		<Content Include="..\..\..\..\.dockerignore">
-		  <Link>.dockerignore</Link>
-		</Content>
-		<Content Include="..\Main.Api\Templates\Emails\*.cshtml">
-			<Link>Templates\Emails\%(Filename)%(Extension)</Link>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-		</Content>
+        <Content Include="..\..\..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+        <Content Include="..\Main.Api\Templates\Emails\*.cshtml">
+            <Link>Templates\Emails\%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -33,6 +33,86 @@
 
     <ItemGroup>
         <LocanResource Include="../Main.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Currency/Currency.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Product/Product.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Pricing/Pricing.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Storage/Storage.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Identity/Identity.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Purchase/Purchase.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Sale/Sale.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Analytics/Analytics.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Balance/Balance.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Platform/Platform.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Platform/Platform.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../Modules.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Suppliers/Suppliers.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Documents/Documents.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Documents/Documents.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Jobs/Jobs.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Cart/Cart.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Notifications/Notifications.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Order/Order.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Organization/Organization.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
@@ -56,7 +136,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Api\Main.Api.csproj"/>
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
-        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
+        <ProjectReference Include="..\Persistence.Relations\Persistence.Relations.csproj"/>
+        <ProjectReference Include="..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 </Project>

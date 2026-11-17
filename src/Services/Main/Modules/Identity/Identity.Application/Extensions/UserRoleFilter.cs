@@ -1,0 +1,74 @@
+using System.Linq.Expressions;
+using Application.Common.Interfaces.Repositories;
+using Main.Entities.User;
+using RoleEnum = Enums.Role;
+
+namespace Main.Modules.Identity.Application.Extensions;
+
+internal static class UserRoleFilter
+{
+	public static IQueryable<User> Apply(
+		IQueryable<User> query,
+		IEnumerable<RoleEnum> roles,
+		bool include)
+		=> Apply(
+			query,
+			NormalizeMany(roles),
+			include);
+
+	public static IQueryable<User> Apply(
+		IQueryable<User> query,
+		IEnumerable<string> roles,
+		bool include)
+		=> Apply(
+			query,
+			NormalizeMany(roles),
+			include);
+
+	public static CriteriaBuilder<User> Apply(
+		CriteriaBuilder<User> criteria,
+		IEnumerable<RoleEnum> roles,
+		bool include)
+		=> Apply(
+			criteria,
+			NormalizeMany(roles),
+			include);
+
+	public static CriteriaBuilder<User> Apply(
+		CriteriaBuilder<User> criteria,
+		IEnumerable<string> roles,
+		bool include)
+		=> Apply(
+			criteria,
+			NormalizeMany(roles),
+			include);
+
+	private static IQueryable<User> Apply(
+		IQueryable<User> query,
+		IReadOnlyCollection<string> normalizedRoles,
+		bool include)
+		=> normalizedRoles.Count == 0
+			? query
+			: query.Where(BuildPredicate(normalizedRoles, include));
+
+	private static CriteriaBuilder<User> Apply(
+		CriteriaBuilder<User> criteria,
+		IReadOnlyCollection<string> normalizedRoles,
+		bool include)
+		=> normalizedRoles.Count == 0
+			? criteria
+			: criteria.Where(BuildPredicate(normalizedRoles, include));
+
+	private static Expression<Func<User, bool>> BuildPredicate(
+		IReadOnlyCollection<string> normalizedRoles,
+		bool include)
+		=> include
+			? user => user.Roles.Any(role => normalizedRoles.Contains(role.RoleName))
+			: user => !user.Roles.Any(role => normalizedRoles.Contains(role.RoleName));
+
+	private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<string> roles)
+		=> roles.Select(RoleExtensions.ToNormalizedRole).Distinct().ToArray();
+
+	private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<RoleEnum> roles)
+		=> roles.Select(RoleExtensions.ToNormalizedRole).Distinct().ToArray();
+}

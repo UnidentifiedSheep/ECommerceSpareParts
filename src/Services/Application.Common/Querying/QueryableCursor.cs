@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
-using Abstractions.Models;
 
 namespace Application.Common.Querying;
 
@@ -20,10 +19,8 @@ public sealed class QueryableCursor
 	}
 
 	public CursorDefinition<TEntity, TKey> GetMapping<TEntity, TKey>() where TKey : struct
-	{
-		return _definitions.TryGetValue((typeof(TEntity), typeof(TKey)), out var definition)
+		=> _definitions.TryGetValue((typeof(TEntity), typeof(TKey)), out var definition)
 			? (CursorDefinition<TEntity, TKey>)definition
 			: throw new ArgumentException(
 				$"Cursor mapping for {typeof(TEntity)} and {typeof(TKey)} does not exist.");
-	}
 }

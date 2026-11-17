@@ -38,7 +38,12 @@ public sealed class S3Service(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
-		=> DownloadFileAsync(bucketName, keyName, 0, null, ct);
+		=> DownloadFileAsync(
+			bucketName,
+			keyName,
+			0,
+			null,
+			ct);
 
 	public async Task<Response<IStreamResponse>> DownloadFileAsync(
 		string bucketName,
@@ -67,29 +72,27 @@ public sealed class S3Service(
 		{
 			return Response<IStreamResponse>.Failure(HttpStatusCode.NotFound, "NoSuchKey");
 		}
-		catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable && offset > 0)
+		catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.RequestedRangeNotSatisfiable &&
+											offset > 0)
 		{
 			var metadata = await internalClient.GetObjectMetadataAsync(
-				new GetObjectMetadataRequest { BucketName = bucketName, Key = keyName }, ct);
+				new GetObjectMetadataRequest { BucketName = bucketName, Key = keyName },
+				ct);
 			if (metadata.ContentLength != offset ||
-			    expectedETag is not null && metadata.ETag != expectedETag)
+				expectedETag is not null && metadata.ETag != expectedETag)
 				throw;
 			return Response<IStreamResponse>.Success(new EmptyStreamResponse(metadata.ETag));
 		}
-	}
-
-	private sealed class EmptyStreamResponse(string? eTag) : IStreamResponse
-	{
-		public Stream Stream { get; } = Stream.Null;
-		public string? ETag => eTag;
-		public void Dispose() { }
 	}
 
 	public async Task<DeleteObjectResult> DeleteFileAsync(
 		string bucketName,
 		string keyName,
 		CancellationToken ct = default)
-		=> (await TryDeleteFilesAsync(bucketName, [keyName], ct))[0];
+		=> (await TryDeleteFilesAsync(
+			bucketName,
+			[keyName],
+			ct))[0];
 
 	public async Task<IReadOnlyList<DeleteObjectResult>> TryDeleteFilesAsync(
 		string bucketName,
@@ -111,55 +114,36 @@ public sealed class S3Service(
 			try
 			{
 				var response = await internalClient.DeleteObjectsAsync(request, ct);
-				AddBatchResults(batch, response.DeleteErrors, results);
+				AddBatchResults(
+					batch,
+					response.DeleteErrors,
+					results);
 			}
 			catch (DeleteObjectsException ex)
 			{
 				if (ex.Response?.DeleteErrors is { Count: > 0 } errors)
-					AddBatchResults(batch, errors, results);
+					AddBatchResults(
+						batch,
+						errors,
+						results);
 				else
-					AddBatchFailure(batch, ex.ErrorCode, ex.Message, results);
+					AddBatchFailure(
+						batch,
+						ex.ErrorCode,
+						ex.Message,
+						results);
 			}
 			catch (AmazonServiceException ex)
 			{
-				AddBatchFailure(batch, ex.ErrorCode, ex.Message, results);
+				AddBatchFailure(
+					batch,
+					ex.ErrorCode,
+					ex.Message,
+					results);
 			}
 		}
 
 		return results;
-	}
-
-	private static void AddBatchResults(
-		string[] batch,
-		IEnumerable<DeleteError>? errors,
-		List<DeleteObjectResult> results)
-	{
-		var errorsByKey = new Dictionary<string, DeleteError>(StringComparer.Ordinal);
-		foreach (var error in errors ?? [])
-		{
-			if (error.Key is null)
-			{
-				AddBatchFailure(batch, error.Code, error.Message, results);
-				return;
-			}
-
-			errorsByKey.TryAdd(error.Key, error);
-		}
-
-		foreach (var key in batch)
-			results.Add(errorsByKey.TryGetValue(key, out var error)
-				? DeleteObjectResult.Fail(key, error.Code, error.Message)
-				: DeleteObjectResult.Success(key));
-	}
-
-	private static void AddBatchFailure(
-		IEnumerable<string> batch,
-		string? errorCode,
-		string errorMessage,
-		List<DeleteObjectResult> results)
-	{
-		foreach (var key in batch)
-			results.Add(DeleteObjectResult.Fail(key, errorCode, errorMessage));
 	}
 
 	public async Task<S3ObjectListDto> ListFilesAsync(
@@ -198,13 +182,80 @@ public sealed class S3Service(
 		string objectKey,
 		string contentType,
 		TimeSpan lifetime)
-		=> CreatePresignedUrl(bucketName, objectKey, HttpVerb.PUT, lifetime, contentType);
+		=> CreatePresignedUrl(
+			bucketName,
+			objectKey,
+			HttpVerb.PUT,
+			lifetime,
+			contentType);
 
 	public Task<string> CreatePresignedDownloadUrl(
 		string bucketName,
 		string objectKey,
 		TimeSpan lifetime)
-		=> CreatePresignedUrl(bucketName, objectKey, HttpVerb.GET, lifetime);
+		=> CreatePresignedUrl(
+			bucketName,
+			objectKey,
+			HttpVerb.GET,
+			lifetime);
+
+	public Task CompletePresignedUploadUrl(
+		string bucketName,
+		string objectKey,
+		CancellationToken ct = default)
+	{
+		var request = new GetObjectMetadataRequest
+		{
+			BucketName = bucketName, Key = objectKey
+		};
+
+		return internalClient.GetObjectMetadataAsync(request, ct);
+	}
+
+	private static void AddBatchResults(
+		string[] batch,
+		IEnumerable<DeleteError>? errors,
+		List<DeleteObjectResult> results)
+	{
+		var errorsByKey = new Dictionary<string, DeleteError>(StringComparer.Ordinal);
+		foreach (var error in errors ?? [])
+		{
+			if (error.Key is null)
+			{
+				AddBatchFailure(
+					batch,
+					error.Code,
+					error.Message,
+					results);
+				return;
+			}
+
+			errorsByKey.TryAdd(error.Key, error);
+		}
+
+		foreach (var key in batch)
+			results.Add(
+				errorsByKey.TryGetValue(key, out var error)
+					? DeleteObjectResult.Fail(
+						key,
+						error.Code,
+						error.Message)
+					: DeleteObjectResult.Success(key));
+	}
+
+	private static void AddBatchFailure(
+		IEnumerable<string> batch,
+		string? errorCode,
+		string errorMessage,
+		List<DeleteObjectResult> results)
+	{
+		foreach (var key in batch)
+			results.Add(
+				DeleteObjectResult.Fail(
+					key,
+					errorCode,
+					errorMessage));
+	}
 
 	private Task<string> CreatePresignedUrl(
 		string bucketName,
@@ -213,7 +264,7 @@ public sealed class S3Service(
 		TimeSpan lifetime,
 		string? contentType = null)
 	{
-		ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(lifetime,TimeSpan.Zero);
+		ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(lifetime, TimeSpan.Zero);
 
 		var request = new GetPreSignedUrlRequest
 		{
@@ -228,16 +279,10 @@ public sealed class S3Service(
 		return externalClient.GetPreSignedURLAsync(request);
 	}
 
-	public Task CompletePresignedUploadUrl(
-		string bucketName,
-		string objectKey,
-		CancellationToken ct = default)
+	private sealed class EmptyStreamResponse(string? eTag) : IStreamResponse
 	{
-		var request = new GetObjectMetadataRequest
-		{
-			BucketName = bucketName, Key = objectKey
-		};
-
-		return internalClient.GetObjectMetadataAsync(request, ct);
+		public Stream Stream { get; } = Stream.Null;
+		public string? ETag => eTag;
+		public void Dispose() { }
 	}
 }

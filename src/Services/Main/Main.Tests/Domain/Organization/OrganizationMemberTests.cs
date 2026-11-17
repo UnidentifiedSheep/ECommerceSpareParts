@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Organization;
 
 namespace Tests.Domain.Organization;
 

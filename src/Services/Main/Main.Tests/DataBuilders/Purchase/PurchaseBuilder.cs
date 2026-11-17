@@ -1,8 +1,7 @@
 using Bogus;
-using Main.Entities.Storage;
 using Tests.Abstractions;
-using DomainPurchase = Main.Entities.Purchase.Purchase;
-using PurchaseContent = Main.Entities.Purchase.PurchaseContent;
+using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
+using PurchaseContent = Main.Entities.Purchase.Purchase.PurchaseContent;
 
 namespace Tests.DataBuilders.Purchase;
 
@@ -21,12 +20,6 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
 	public string? Storage { get; private set; }
 
 	public DateTime? PurchaseDateTime { get; private set; }
-
-	public StorageRoute? LogisticRoute { get; private set; }
-
-	public Guid? LogisticTransactionId { get; private set; }
-
-	public bool LogisticMinimumPriceApplied { get; private set; }
 
 	public PurchaseBuilder WithSupplierUserId(Guid supplierUserId)
 	{
@@ -70,17 +63,6 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
 		return this;
 	}
 
-	public PurchaseBuilder WithLogistic(
-		StorageRoute route,
-		Guid? transactionId = null,
-		bool minimumPriceApplied = false)
-	{
-		LogisticRoute = route;
-		LogisticTransactionId = transactionId;
-		LogisticMinimumPriceApplied = minimumPriceApplied;
-		return this;
-	}
-
 	public override DomainPurchase Build()
 	{
 		var supplierUserId = SupplierUserId ?? Guid.NewGuid();
@@ -94,19 +76,6 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
 
 		foreach (var content in _contents)
 			purchase.AddContent(content);
-
-		if (LogisticRoute is not null)
-			purchase.SetPurchaseLogistic(
-				LogisticRoute.Id,
-				LogisticRoute.CurrencyId,
-				LogisticRoute.PricingModel,
-				LogisticRoute.RouteType,
-				LogisticRoute.PriceKg,
-				LogisticRoute.PricePerM3,
-				LogisticRoute.PricePerOrder,
-				LogisticRoute.MinimumPrice,
-				LogisticTransactionId,
-				LogisticMinimumPriceApplied);
 
 		return purchase;
 	}

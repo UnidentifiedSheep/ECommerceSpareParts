@@ -1,12 +1,13 @@
 using HotChocolate;
-using Main.Application.Dtos.Users;
-using Main.Enums;
+using Main.Entities.Enums;
+using Main.Modules.Identity.Application.Dtos.Users;
 
 namespace Main.Api.GraphQl.Types.User;
 
 [GraphQLName("UserPhone")]
 public record GqlUserPhone(
-	[property: GraphQLIgnore] UserPhoneDto Dto)
+	[property: GraphQLIgnore]
+	UserPhoneDto Dto)
 {
 	[GraphQLName("number")]
 	public string Number => Dto.Number;

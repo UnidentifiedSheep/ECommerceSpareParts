@@ -3,8 +3,8 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Producer;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Product.Enrichment;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
 
 namespace Main.Api.GraphQl.Types.ProductEnrichment;
 
@@ -19,10 +19,7 @@ public record GqlCatalogueCandidate
 		Id = _candidate.Id;
 	}
 
-	public GqlCatalogueCandidate(Guid candidateId)
-	{
-		Id = candidateId;
-	}
+	public GqlCatalogueCandidate(Guid candidateId) => Id = candidateId;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -72,6 +69,7 @@ public record GqlCatalogueCandidate
 
 	private async Task<CatalogueCandidateReviewDto> GetCandidateAsync(
 		ICatalogueCandidateByIdDataLoader loader,
-		CancellationToken cancellation) => _candidate ?? await loader.LoadAsync(Id, cancellation) ??
-		throw new CatalogueCandidateNotFoundException();
+		CancellationToken cancellation)
+		=> _candidate ?? await loader.LoadAsync(Id, cancellation) ??
+			throw new CatalogueCandidateNotFoundException();
 }

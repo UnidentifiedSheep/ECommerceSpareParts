@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -31,10 +31,8 @@ public class ProducerBuilder(Faker faker) : BuilderBase<Producer>(faker)
 	}
 
 	public override Producer Build()
-	{
-		return Producer.Create(
+		=> Producer.Create(
 			Name ?? Faker.Lorem.Letter(40),
 			Description,
 			ImageUrl);
-	}
 }

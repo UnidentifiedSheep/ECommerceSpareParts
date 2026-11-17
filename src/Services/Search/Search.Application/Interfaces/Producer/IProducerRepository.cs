@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 
 namespace Search.Application.Interfaces.Producer;

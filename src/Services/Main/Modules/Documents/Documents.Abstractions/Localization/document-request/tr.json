@@ -1,0 +1,9 @@
+{
+  "culture": "tr",
+  "messages": {
+    "document.request.type.name": "Belge biçimi",
+    "document.request.type.description": "Oluşturulacak belgenin biçimini seçin.",
+    "document.request.culture.name": "Belge dili",
+    "document.request.culture.description": "Oluşturulacak belgenin dili (en, ru veya tr)."
+  }
+}

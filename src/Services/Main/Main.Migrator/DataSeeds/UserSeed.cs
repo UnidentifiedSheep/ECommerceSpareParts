@@ -1,16 +1,15 @@
-using Security.Core.Interfaces;
-using Application.Common.Interfaces.Validators;
 using Main.Entities.Auth;
 using Main.Entities.User;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Persistence.Context;
 using Persistence.Interfaces;
+using Security.Core.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdManager) : ISeed<DContext>
+public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdManager) : ISeed<UnifiedDbContext>
 {
 	private static readonly string[] Services =
 	[
@@ -22,10 +21,10 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 
 	private readonly ServiceSecrets _secrets = secrets.Value;
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		var existingSystemUsers = await context
-			.Users
+			.Set<User>()
 			.Where(x => x.Roles.Any(y => y.RoleName == RoleNames.Normalize(nameof(Role.System))))
 			.AsNoTracking()
 			.ToDictionaryAsync(x => x.UserName);
@@ -44,15 +43,14 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 		if (toAdd.Count == 0)
 			return;
 
-		await context.Users.AddRangeAsync(toAdd);
+		await context.Set<User>().AddRangeAsync(toAdd);
 		await context.SaveChangesAsync();
 	}
 
 	public int ExecutionOrder => 1;
 
 	private string GetServiceSecret(string service)
-	{
-		return service switch
+		=> service switch
 		{
 			nameof(ServiceSecrets.MainApp) => _secrets.MainApp,
 			nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
@@ -60,7 +58,6 @@ public class UserSeed(IOptions<ServiceSecrets> secrets, IPasswordManager pwdMana
 			nameof(ServiceSecrets.Gateway) => _secrets.Gateway,
 			_ => throw new InvalidOperationException($"Unknown service: {service}")
 		};
-	}
 
 	private User CreateSystemUser(string service, string secret)
 	{

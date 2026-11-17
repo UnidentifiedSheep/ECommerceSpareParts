@@ -1,8 +1,8 @@
 using Bogus;
 using Enums;
-using Main.Entities.Product.Enrichment;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product.Enrichment;
 using Tests.Abstractions;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.DataBuilders;
 

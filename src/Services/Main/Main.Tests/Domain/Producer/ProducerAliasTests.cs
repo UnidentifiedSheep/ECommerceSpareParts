@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Main.Entities.Producer;
-using ProducerDomain = Main.Entities.Producer.Producer;
+using Main.Entities.Product.Producer;
+using ProducerDomain = Main.Entities.Product.Producer.Producer;
 
 namespace Tests.Domain.Producer;
 

@@ -1,7 +1,7 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
 namespace Tests.Domain.Product;
 
@@ -48,8 +48,13 @@ public class ProductGroupTests
 	{
 		var act = () => ProductGroup.Create(name!);
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(expectedMessageKey);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(expectedMessageKey);
 	}
 
 	[Fact]
@@ -68,8 +73,13 @@ public class ProductGroupTests
 	{
 		var act = () => ProductGroup.Create(new string('a', 257));
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(ProductGroupNameMaxLengthMessage.Key);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(ProductGroupNameMaxLengthMessage.Key);
 	}
 
 	[Fact]

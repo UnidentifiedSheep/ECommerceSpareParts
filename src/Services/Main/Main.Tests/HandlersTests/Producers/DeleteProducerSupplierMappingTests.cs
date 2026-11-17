@@ -1,7 +1,8 @@
 ﻿using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.ProducerSupplierMappings;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -15,9 +16,7 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 	private int _mappingId;
 
 	public DeleteProducerSupplierMappingTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	public override async ValueTask InitializeAsync()
 	{
@@ -48,7 +47,9 @@ public class DeleteProducerSupplierMappingTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var mappings = await Context.ProducerSupplierMappings.AsNoTracking().ToListAsync(CancellationToken);
+		var mappings = await Context.Set<ProducerSupplierMapping>()
+			.AsNoTracking()
+			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(0);
 	}
 }

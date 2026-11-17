@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <AssemblyName>Main.Modules.Storage.Application</AssemblyName>
+        <RootNamespace>Main.Modules.Storage.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
+        <PackageReference Include="Scrutor" Version="7.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Lrt\Lrt.Core\Lrt.Core.csproj"/>
+        <ProjectReference Include="..\..\Currency\Currency.Abstractions\Currency.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>
+        <ProjectReference Include="..\Storage.Abstractions\Storage.Abstractions.csproj"/>
+        <ProjectReference Include="..\Storage.Entities\Storage.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

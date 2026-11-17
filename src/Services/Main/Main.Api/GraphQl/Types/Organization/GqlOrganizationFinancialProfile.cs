@@ -1,11 +1,12 @@
 using HotChocolate;
-using Main.Application.Dtos.Balances;
+using Main.Modules.Balance.Application.Dtos.Balances;
 
 namespace Main.Api.GraphQl.Types.Organization;
 
 [GraphQLName("OrganizationFinancialProfile")]
 public sealed record GqlOrganizationFinancialProfile(
-	[property: GraphQLIgnore] OrganizationFinancialProfileDto ProfileDto)
+	[property: GraphQLIgnore]
+	OrganizationFinancialProfileDto ProfileDto)
 {
 	[GraphQLName("netPositionInBaseCurrency")]
 	public decimal NetPositionInBaseCurrency => ProfileDto.NetPositionInBaseCurrency;

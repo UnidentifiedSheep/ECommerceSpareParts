@@ -25,6 +25,6 @@ public class ProducerIndexSynchronizer(
 		await producerRepository.UpsertMany(toUpsert, cancellationToken);
 	}
 
-	public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default) =>
-		producerRepository.DeleteMany(ids, cancellationToken);
+	public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+		=> producerRepository.DeleteMany(ids, cancellationToken);
 }

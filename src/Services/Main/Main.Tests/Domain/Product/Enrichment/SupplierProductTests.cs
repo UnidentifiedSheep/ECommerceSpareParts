@@ -1,8 +1,8 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.DomainEvents.CatalogueCandidate;
-using Main.Entities.Product.Enrichment;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.DomainEvents.CatalogueCandidate;
+using Main.Entities.Product.Product.Enrichment;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.Domain.Product.Enrichment;
 

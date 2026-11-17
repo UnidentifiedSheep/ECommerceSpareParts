@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Balances;
-using Main.Application.Handlers.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -11,6 +11,14 @@ public static class TransactionDataLoaders
 	public static async Task<IReadOnlyDictionary<Guid, TransactionDto>> GetTransactionByIdAsync(
 		IReadOnlyList<Guid> keys,
 		ISender sender,
-		CancellationToken cancellationToken) =>
-		(await sender.Send(new GetTransactionsByIdsQuery(keys), cancellationToken)).Transactions;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetTransactionsByIdsQuery(keys), cancellationToken)).Transactions;
+
+	[DataLoader]
+	public static async Task<IReadOnlyDictionary<Guid, decimal>> GetApproximateBalanceByOrganizationIdAsync(
+		IReadOnlyList<Guid> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetApproximateBalancesByOrganizationIdsQuery(keys), cancellationToken))
+			.Balances;
 }

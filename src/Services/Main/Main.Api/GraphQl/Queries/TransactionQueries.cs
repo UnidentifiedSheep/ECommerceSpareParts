@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using GraphQL.Common.Attributes;
@@ -7,7 +6,7 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Transaction;
-using Main.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;
@@ -42,7 +41,9 @@ public sealed class TransactionQueries
 				input.ReceiverId,
 				input.LogicalOperation ?? LogicalOperation.And,
 				new Cursor<(Guid id, DateTime dt)>(
-					cursor is null ? (Guid.Empty, DateTime.MinValue) : (cursor.Value.Id, cursor.Value.TransactionDate),
+					cursor is null
+						? (Guid.Empty, DateTime.MinValue)
+						: (cursor.Value.Id, cursor.Value.TransactionDate),
 					input.Cursor.Size),
 				input.SkipReversed ?? false),
 			cancellationToken);

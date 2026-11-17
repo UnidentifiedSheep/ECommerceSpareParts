@@ -5,12 +5,12 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Dtos.Organizations;
-using Main.Application.Handlers.Balance.GetOrganizationFinancialInfo;
-using Main.Application.Handlers.Balance.GetTransactions;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
-using Main.Entities.Exceptions;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;
+using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Organization.Application.Dtos.Organizations;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.Organization;
@@ -20,15 +20,9 @@ public sealed record GqlOrganization
 {
 	private readonly OrganizationDto? _dto;
 
-	public GqlOrganization(Guid id)
-	{
-		Id = id;
-	}
+	public GqlOrganization(Guid id) => Id = id;
 
-	public GqlOrganization(OrganizationDto organization) : this(organization.Id)
-	{
-		_dto = organization;
-	}
+	public GqlOrganization(OrganizationDto organization) : this(organization.Id) => _dto = organization;
 
 	[GraphQLName("id")]
 	public Guid Id { get; }
@@ -36,38 +30,38 @@ public sealed record GqlOrganization
 	[GraphQLName("type")]
 	public async Task<OrganizationType> GetTypeAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetOrganizationAsync(loader, cancellationToken)).Type;
+		CancellationToken cancellationToken)
+		=> (await GetOrganizationAsync(loader, cancellationToken)).Type;
 
 	[GraphQLName("name")]
 	public async Task<string> GetNameAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetOrganizationAsync(loader, cancellationToken)).Name;
+		CancellationToken cancellationToken)
+		=> (await GetOrganizationAsync(loader, cancellationToken)).Name;
 
 	[GraphQLName("systemName")]
 	public async Task<string> GetSystemNameAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetOrganizationAsync(loader, cancellationToken)).SystemName;
+		CancellationToken cancellationToken)
+		=> (await GetOrganizationAsync(loader, cancellationToken)).SystemName;
 
 	[GraphQLName("isHidden")]
 	public async Task<bool> GetIsHiddenAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetOrganizationAsync(loader, cancellationToken)).IsHidden;
+		CancellationToken cancellationToken)
+		=> (await GetOrganizationAsync(loader, cancellationToken)).IsHidden;
 
 	[GraphQLName("owner")]
 	public async Task<GqlUser> GetOwnerAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		new((await GetOrganizationAsync(loader, cancellationToken)).Owner.User);
+		CancellationToken cancellationToken)
+		=> new((await GetOrganizationAsync(loader, cancellationToken)).Owner.UserId);
 
 	[GraphQLName("approximateBalanceInBaseCurrency")]
 	public async Task<decimal?> GetApproximateBalanceInBaseCurrencyAsync(
-		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetOrganizationAsync(loader, cancellationToken)).ApproximateBalanceInBaseCurrency;
+		IApproximateBalanceByOrganizationIdDataLoader loader,
+		CancellationToken cancellationToken)
+		=> await loader.LoadAsync(Id, cancellationToken);
 
 	[GraphQLName("members")]
 	[RequireAllPermissions(PermissionCodes.ORGANIZATIONS_GET)]
@@ -99,7 +93,9 @@ public sealed record GqlOrganization
 				Id,
 				LogicalOperation.Or,
 				new Cursor<(Guid id, DateTime dt)>(
-					cursor is null ? (Guid.Empty, DateTime.MinValue) : (cursor.Value.Id, cursor.Value.TransactionDate),
+					cursor is null
+						? (Guid.Empty, DateTime.MinValue)
+						: (cursor.Value.Id, cursor.Value.TransactionDate),
 					input.Cursor.Size),
 				input.SkipReversed ?? false),
 			cancellationToken);
@@ -122,7 +118,7 @@ public sealed record GqlOrganization
 
 	private async Task<OrganizationDto> GetOrganizationAsync(
 		IOrganizationByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_dto ?? await loader.LoadAsync(Id, cancellationToken)
-		?? throw new OrganizationNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _dto ?? await loader.LoadAsync(Id, cancellationToken)
+			?? throw new OrganizationNotFoundException(Id);
 }

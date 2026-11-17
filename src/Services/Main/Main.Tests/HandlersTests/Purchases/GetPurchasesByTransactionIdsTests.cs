@@ -1,8 +1,8 @@
+using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Purchases;
-using Main.Entities.Balance;
-using Main.Entities.Purchase;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Purchase.Purchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
 using Tests.Extensions;
@@ -15,9 +15,7 @@ namespace Tests.HandlersTests.Purchases;
 public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 {
 	public GetPurchasesByTransactionIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<PurchaseTestContext>();
-	}
+		=> RegisterBasicContext<PurchaseTestContext>();
 
 	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
 
@@ -28,8 +26,10 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 		var second = await CreatePurchase();
 		await CreatePurchase();
 
-		var result = await Mediator.Send(new GetPurchasesByTransactionIdsQuery(
-			[first.TransactionId, second.TransactionId, first.TransactionId, Guid.NewGuid()]), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesByTransactionIdsQuery(
+				[first.TransactionId, second.TransactionId, first.TransactionId, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Purchases.Keys.Should().BeEquivalentTo([first.TransactionId, second.TransactionId]);
 		result.Purchases[first.TransactionId].Id.Should().Be(first.Id);
@@ -41,7 +41,9 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 	{
 		var transaction = await CreateTransaction(TransactionSourceType.Manual);
 
-		var result = await Mediator.Send(new GetPurchasesByTransactionIdsQuery(transaction.Id), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesByTransactionIdsQuery(transaction.Id),
+			CancellationToken);
 
 		result.Purchases.Should().BeEmpty();
 	}
@@ -49,7 +51,9 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetPurchasesByTransactionIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesByTransactionIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Purchases.Should().BeEmpty();
 	}
@@ -64,7 +68,8 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
-			new GetPurchasesByTransactionIdsQuery([oldTransactionId, transaction.Id]), CancellationToken);
+			new GetPurchasesByTransactionIdsQuery([oldTransactionId, transaction.Id]),
+			CancellationToken);
 
 		result.Purchases.Keys.Should().Equal(transaction.Id);
 		result.Purchases[transaction.Id].Id.Should().Be(purchase.Id);
@@ -77,7 +82,9 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 		Context.Remove(purchase);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		var result = await Mediator.Send(new GetPurchasesByTransactionIdsQuery(purchase.TransactionId), CancellationToken);
+		var result = await Mediator.Send(
+			new GetPurchasesByTransactionIdsQuery(purchase.TransactionId),
+			CancellationToken);
 
 		result.Purchases.Should().BeEmpty();
 	}
@@ -96,8 +103,8 @@ public sealed class GetPurchasesByTransactionIdsTests : IntegrationTest
 			.BuildAndAddToDb(Context);
 	}
 
-	private Task<Transaction> CreateTransaction(TransactionSourceType sourceType) =>
-		new TransactionBuilder(Faker)
+	private Task<Transaction> CreateTransaction(TransactionSourceType sourceType)
+		=> new TransactionBuilder(Faker)
 			.WithSenderId(TestContext.Purchase.SupplierOrganizationId)
 			.WithReceiverId(GetContext<UserContextTestContext>().SystemUser.Id)
 			.WithCurrencyId(TestContext.Purchase.CurrencyId)

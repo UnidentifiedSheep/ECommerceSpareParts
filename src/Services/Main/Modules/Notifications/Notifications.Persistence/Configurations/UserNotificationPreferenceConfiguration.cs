@@ -1,0 +1,21 @@
+using Main.Entities.User;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Main.Modules.Notifications.Persistence.Configurations;
+
+public class UserNotificationPreferenceConfiguration : IEntityTypeConfiguration<UserNotificationPreference>
+{
+	public void Configure(EntityTypeBuilder<UserNotificationPreference> builder)
+	{
+		builder.ToTable("user_notification_preferences", "auth");
+
+		builder
+			.HasKey(e => new { e.UserId, e.ChannelName })
+			.HasName("user_notification_preferences_pk");
+
+		builder.Property(e => e.UserId).HasColumnName("user_id");
+		builder.Property(e => e.ChannelName).HasMaxLength(128).HasColumnName("channel_name");
+		builder.Property(e => e.Enabled).HasColumnName("enabled");
+	}
+}

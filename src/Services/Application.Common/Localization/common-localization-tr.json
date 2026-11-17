@@ -13,11 +13,6 @@
     "pagination.size.range.default": "Öğe sayısı 1 ile 100 arasında olmalıdır.",
     "pagination.size.range": "Öğe sayısı {Start} ile {End} arasında olmalıdır.",
     "row.is.out.dated": "Güncellemeye çalıştığınız veri güncel değil. Lütfen veriyi yeniden yükleyin.",
-    "job.not.found": "İstenen görev bulunamadı.",
-    "job.schedule.not.found": "İstenen görev zamanlaması bulunamadı.",
-    "setting.not.found": "Ayar {Name} bulunamadı.",
-    "sorting.invalid": "Geçersiz sıralama: {Sort}",
-    "operation.date.cannot.be.in.future": "İşlem tarihi gelecekte olamaz.",
-    "operation.date.too.old": "İşlem tarihi çok eski."
+    "sorting.invalid": "Geçersiz sıralama: {Sort}"
   }
 }

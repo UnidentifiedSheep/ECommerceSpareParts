@@ -2,18 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
+using Persistence.Context;
 
 #nullable disable
 
 namespace Main.Migrator.Migrations
 {
-    [DbContext(typeof(DContext))]
+    [DbContext(typeof(UnifiedDbContext))]
     partial class DContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -191,10 +191,10 @@ namespace Main.Migrator.Migrations
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_created_idx");
+                        .HasDatabaseName("jobs_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job.singlerunjob_who_updated_idx");
+                        .HasDatabaseName("jobs_who_updated_idx");
 
                     b.HasIndex(new[] { "CreatedAt" }, "jobs_created_at_idx");
 
@@ -292,10 +292,10 @@ namespace Main.Migrator.Migrations
                         .HasName("job_schedules_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_created_idx");
+                        .HasDatabaseName("job_schedules_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job.jobschedule_who_updated_idx");
+                        .HasDatabaseName("job_schedules_who_updated_idx");
 
                     b.HasIndex(new[] { "Enabled", "NextRunAt", "Id" }, "job_schedules_enabled_next_run_at_id_idx");
 
@@ -398,16 +398,72 @@ namespace Main.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.settings.supplier.tmtrsuppliersetting_who_created_idx");
+                        .HasDatabaseName("settings_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.settings.supplier.tmtrsuppliersetting_who_updated_idx");
+                        .HasDatabaseName("settings_who_updated_idx");
 
                     b.ToTable("settings", "public");
 
                     b.HasDiscriminator<string>("Key").HasValue("Setting");
 
                     b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
+                {
+                    b.Property<int>("SaleContentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sale_content_id");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("buyer_id");
+
+                    b.Property<decimal>("CostInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("cost_in_base_currency");
+
+                    b.Property<int>("Count")
+                        .HasColumnType("integer")
+                        .HasColumnName("count");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_completed");
+
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<decimal>("OriginalAmountInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("original_amount_in_base_currency");
+
+                    b.Property<decimal>("RevenueInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("revenue_in_base_currency");
+
+                    b.Property<DateTime>("SaleDatetime")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sale_datetime");
+
+                    b.Property<Guid>("SaleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sale_id");
+
+                    b.HasKey("SaleContentId")
+                        .HasName("sale_content_analytics_pk");
+
+                    b.HasIndex(new[] { "BuyerId" }, "sale_content_analytics_buyer_id_index");
+
+                    b.HasIndex(new[] { "IsCompleted", "SaleDatetime" }, "sale_content_analytics_is_completed_sale_datetime_index");
+
+                    b.HasIndex(new[] { "OrganizationId" }, "sale_content_analytics_organization_id_index");
+
+                    b.HasIndex(new[] { "SaleId" }, "sale_content_analytics_sale_id_index");
+
+                    b.ToTable("sale_content_analytics", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Auth.Permission", b =>
@@ -436,10 +492,10 @@ namespace Main.Migrator.Migrations
                         .HasName("permissions_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.permission_who_created_idx");
+                        .HasDatabaseName("permissions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.permission_who_updated_idx");
+                        .HasDatabaseName("permissions_who_updated_idx");
 
                     b.ToTable("permissions", "auth");
                 });
@@ -475,10 +531,10 @@ namespace Main.Migrator.Migrations
                     b.HasKey("Name");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.role_who_created_idx");
+                        .HasDatabaseName("roles_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.role_who_updated_idx");
+                        .HasDatabaseName("roles_who_updated_idx");
 
                     b.ToTable("roles", "auth");
                 });
@@ -535,10 +591,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("IX_user_permissions_permission");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.userpermission_who_created_idx");
+                        .HasDatabaseName("user_permissions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.userpermission_who_updated_idx");
+                        .HasDatabaseName("user_permissions_who_updated_idx");
 
                     b.ToTable("user_permissions", "auth");
                 });
@@ -576,10 +632,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("IX_user_roles_role_id");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.userrole_who_created_idx");
+                        .HasDatabaseName("user_roles_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.userrole_who_updated_idx");
+                        .HasDatabaseName("user_roles_who_updated_idx");
 
                     b.ToTable("user_roles", "auth");
                 });
@@ -656,10 +712,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_tokens_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.auth.usertoken_who_created_idx");
+                        .HasDatabaseName("user_tokens_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.auth.usertoken_who_updated_idx");
+                        .HasDatabaseName("user_tokens_who_updated_idx");
 
                     b.ToTable("user_tokens", "auth");
                 });
@@ -713,16 +769,64 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organization_balances_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.balance.organizationbalance_who_created_idx");
+                        .HasDatabaseName("organization_balances_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.balance.organizationbalance_who_updated_idx");
+                        .HasDatabaseName("organization_balances_who_updated_idx");
 
                     b.HasIndex("CurrencyId", "OrganizationId")
                         .IsUnique()
                         .HasDatabaseName("organization_balances_currency_id_user_id_uindex");
 
                     b.ToTable("organization_balances", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+                {
+                    b.Property<Guid>("OrganizationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("organization_id");
+
+                    b.Property<decimal>("ApproximateBalance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("approximate_balance");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("MinAllowedBalance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("min_allowed_balance");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("OrganizationId")
+                        .HasName("organization_financial_profile_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("organization_financial_profile_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("organization_financial_profile_who_updated_idx");
+
+                    b.ToTable("organization_financial_profile", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
@@ -803,10 +907,10 @@ namespace Main.Migrator.Migrations
                         .HasName("transactions_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.balance.transaction_who_created_idx");
+                        .HasDatabaseName("transactions_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.balance.transaction_who_updated_idx");
+                        .HasDatabaseName("transactions_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "IX_transactions_currency_id");
 
@@ -869,10 +973,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("cart_product_id_idx");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.cart.cart_who_created_idx");
+                        .HasDatabaseName("cart_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.cart.cart_who_updated_idx");
+                        .HasDatabaseName("cart_who_updated_idx");
 
                     b.ToTable("cart", "public");
                 });
@@ -971,10 +1075,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("ToCurrencyId");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_created_idx");
+                        .HasDatabaseName("currency_rates_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.currency.currencyrate_who_updated_idx");
+                        .HasDatabaseName("currency_rates_who_updated_idx");
 
                     b.HasIndex("FromCurrencyId", "ToCurrencyId", "CreatedAt", "Id")
                         .HasDatabaseName("currency_rates_pair_date_idx");
@@ -1036,68 +1140,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "RequesterId", "CreatedAt" }, "document_generation_requests_requester_created_idx");
 
                     b.ToTable("document_generation_requests", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Mailing.EmailOutBox", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("body");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime?>("SentAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("sent_at");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("status");
-
-                    b.Property<string>("Subject")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("subject");
-
-                    b.Property<string>("To")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("to");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.mailing.emailoutbox_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.mailing.emailoutbox_who_updated_idx");
-
-                    b.HasIndex(new[] { "Status" }, "status_email_outbox_idx");
-
-                    b.HasIndex(new[] { "To", "Status" }, "to_status_email_outbox_idx");
-
-                    b.ToTable("email_outbox", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.Order", b =>
@@ -1167,10 +1209,10 @@ namespace Main.Migrator.Migrations
                         .HasName("orders_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.order.order_who_created_idx");
+                        .HasDatabaseName("orders_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.order.order_who_updated_idx");
+                        .HasDatabaseName("orders_who_updated_idx");
 
                     b.HasIndex(new[] { "ConfirmedByUserId" }, "orders_confirmed_by_user_id_index");
 
@@ -1310,60 +1352,12 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organizations_system_name_uindex");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organization_who_created_idx");
+                        .HasDatabaseName("organizations_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organization_who_updated_idx");
+                        .HasDatabaseName("organizations_who_updated_idx");
 
                     b.ToTable("organizations", "auth");
-                });
-
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationFinancialProfile", b =>
-                {
-                    b.Property<Guid>("OrganizationId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("organization_id");
-
-                    b.Property<decimal>("ApproximateBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("approximate_balance");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<decimal>("MinAllowedBalance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("min_allowed_balance");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("OrganizationId")
-                        .HasName("organization_financial_profile_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organizationfinancialprofile_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organizationfinancialprofile_who_updated_idx");
-
-                    b.ToTable("organization_financial_profile", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
@@ -1405,10 +1399,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("organization_members_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.organization.organizationmember_who_created_idx");
+                        .HasDatabaseName("organization_members_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.organization.organizationmember_who_updated_idx");
+                        .HasDatabaseName("organization_members_who_updated_idx");
 
                     b.HasIndex("OrganizationId", "Role")
                         .IsUnique()
@@ -1467,10 +1461,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("producer_name_uindex");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.producer.producer_who_created_idx");
+                        .HasDatabaseName("producer_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.producer.producer_who_updated_idx");
+                        .HasDatabaseName("producer_who_updated_idx");
 
                     b.ToTable("producer", "public");
                 });
@@ -1632,10 +1626,10 @@ namespace Main.Migrator.Migrations
                         .HasFilter("product_id IS NOT NULL");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.enrichment.cataloguecandidate_who_created_idx");
+                        .HasDatabaseName("catalogue_candidates_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.enrichment.cataloguecandidate_who_updated_idx");
+                        .HasDatabaseName("catalogue_candidates_who_updated_idx");
 
                     b.ToTable("catalogue_candidates", "catalogue_enrichment");
 
@@ -1710,10 +1704,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("supplier_products_catalogue_candidate_id_idx");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.enrichment.supplierproduct_who_created_idx");
+                        .HasDatabaseName("supplier_products_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.enrichment.supplierproduct_who_updated_idx");
+                        .HasDatabaseName("supplier_products_who_updated_idx");
 
                     b.ToTable("supplier_products", "catalogue_enrichment");
 
@@ -1869,10 +1863,10 @@ namespace Main.Migrator.Migrations
                         .HasName("products_id_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.product_who_created_idx");
+                        .HasDatabaseName("products_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.product_who_updated_idx");
+                        .HasDatabaseName("products_who_updated_idx");
 
                     b.HasIndex(new[] { "CategoryId" }, "products_category_id_index");
 
@@ -2145,10 +2139,10 @@ namespace Main.Migrator.Migrations
                         .HasName("purchase_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.purchase.purchase_who_created_idx");
+                        .HasDatabaseName("purchase_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.purchase.purchase_who_updated_idx");
+                        .HasDatabaseName("purchase_who_updated_idx");
 
                     b.HasIndex(new[] { "Comment" }, "purchase_comment_index");
 
@@ -2228,93 +2222,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("purchase_content", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContentLogistic", b =>
-                {
-                    b.Property<int>("PurchaseContentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("purchase_content_id");
-
-                    b.Property<decimal>("AreaM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("area_m3");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
-
-                    b.Property<decimal>("WeightKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("weight_kg");
-
-                    b.HasKey("PurchaseContentId")
-                        .HasName("purchase_content_logistics_pk");
-
-                    b.ToTable("purchase_content_logistics", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseLogistic", b =>
-                {
-                    b.Property<Guid>("PurchaseId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("purchase_id");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<decimal?>("MinimumPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("minimum_price");
-
-                    b.Property<bool>("MinimumPriceApplied")
-                        .HasColumnType("boolean")
-                        .HasColumnName("minimum_price_applied");
-
-                    b.Property<decimal>("PriceKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_kg");
-
-                    b.Property<decimal>("PricePerM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_m3");
-
-                    b.Property<decimal>("PricePerOrder")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_order");
-
-                    b.Property<string>("PricingModel")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("pricing_model");
-
-                    b.Property<Guid>("RouteId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("route_id");
-
-                    b.Property<string>("RouteType")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("route_type");
-
-                    b.Property<Guid?>("TransactionId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_id");
-
-                    b.HasKey("PurchaseId")
-                        .HasName("purchase_logistics_pk");
-
-                    b.HasIndex("CurrencyId");
-
-                    b.HasIndex("RouteId");
-
-                    b.HasIndex(new[] { "TransactionId" }, "purchase_logistics_transaction_id_uindex")
-                        .IsUnique();
-
-                    b.ToTable("purchase_logistics", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
                 {
                     b.Property<Guid>("Id")
@@ -2383,10 +2290,10 @@ namespace Main.Migrator.Migrations
                         .HasName("sale_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.sale.sale_who_created_idx");
+                        .HasDatabaseName("sale_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.sale.sale_who_updated_idx");
+                        .HasDatabaseName("sale_who_updated_idx");
 
                     b.HasIndex(new[] { "Comment" }, "sale_comment_index");
 
@@ -2461,30 +2368,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SaleId" }, "sale_content_sale_id_index");
 
                     b.ToTable("sale_content", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentAnalytics", b =>
-                {
-                    b.Property<int>("SaleContentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("sale_content_id");
-
-                    b.Property<decimal>("CostInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("cost_in_base_currency");
-
-                    b.Property<decimal>("OriginalAmountInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("original_amount_in_base_currency");
-
-                    b.Property<decimal>("RevenueInBaseCurrency")
-                        .HasColumnType("numeric")
-                        .HasColumnName("revenue_in_base_currency");
-
-                    b.HasKey("SaleContentId")
-                        .HasName("sale_content_analytics_pk");
-
-                    b.ToTable("sale_content_analytics", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
@@ -2601,10 +2484,10 @@ namespace Main.Migrator.Migrations
                         .HasName("storages_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storage_who_created_idx");
+                        .HasDatabaseName("storages_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storage_who_updated_idx");
+                        .HasDatabaseName("storages_who_updated_idx");
 
                     b.HasIndex(new[] { "Description" }, "storages_description_index");
 
@@ -2703,10 +2586,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("BaseCurrencyId");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storagecontent_who_created_idx");
+                        .HasDatabaseName("storage_content_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storagecontent_who_updated_idx");
+                        .HasDatabaseName("storage_content_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "storage_content_currency_id_index");
 
@@ -2776,10 +2659,10 @@ namespace Main.Migrator.Migrations
                         .HasName("storage_content_locks_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storagecontentlock_who_created_idx");
+                        .HasDatabaseName("storage_content_locks_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storagecontentlock_who_updated_idx");
+                        .HasDatabaseName("storage_content_locks_who_updated_idx");
 
                     b.HasIndex(new[] { "StorageContentId" }, "storage_content_locks_active_content_idx")
                         .HasFilter("state = 'Active'");
@@ -2795,155 +2678,6 @@ namespace Main.Migrator.Migrations
                         {
                             t.HasCheckConstraint("storage_content_locks_quantity_positive_ck", "quantity > 0");
                         });
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageOwner", b =>
-                {
-                    b.Property<string>("StorageCode")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("storage_name");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("StorageCode", "UserId")
-                        .HasName("storage_owners_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storageowner_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storageowner_who_updated_idx");
-
-                    b.HasIndex(new[] { "UserId" }, "storage_owners_owner_id_index");
-
-                    b.ToTable("storage_owners", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageRoute", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid?>("CarrierId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("carrier_id");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<int>("DeliveryTimeMinutes")
-                        .HasColumnType("integer")
-                        .HasColumnName("delivery_time_minutes");
-
-                    b.Property<int>("DistanceM")
-                        .HasColumnType("integer")
-                        .HasColumnName("distance_m");
-
-                    b.Property<string>("FromStorageCode")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("from_storage_name");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true)
-                        .HasColumnName("is_active");
-
-                    b.Property<decimal>("MinimumPrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("minimum_price");
-
-                    b.Property<decimal>("PriceKg")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_kg");
-
-                    b.Property<decimal>("PricePerM3")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_m3");
-
-                    b.Property<decimal>("PricePerOrder")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_per_order");
-
-                    b.Property<string>("PricingModel")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("pricing_model");
-
-                    b.Property<string>("RouteType")
-                        .IsRequired()
-                        .HasMaxLength(24)
-                        .HasColumnType("character varying(24)")
-                        .HasColumnName("route_type");
-
-                    b.Property<string>("ToStorageCode")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("to_storage_name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id")
-                        .HasName("storage_routes_pk");
-
-                    b.HasIndex("ToStorageCode");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.storage.storageroute_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.storage.storageroute_who_updated_idx");
-
-                    b.HasIndex(new[] { "FromStorageCode", "ToStorageCode", "IsActive" }, "storage_from_to_active_uindex")
-                        .IsUnique()
-                        .HasFilter("(is_active = true)");
-
-                    b.HasIndex(new[] { "CarrierId" }, "storage_routes_carrier_id_index");
-
-                    b.HasIndex(new[] { "CurrencyId" }, "storage_routes_currency_id_index");
-
-                    b.ToTable("storage_routes", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.User.User", b =>
@@ -3016,10 +2750,10 @@ namespace Main.Migrator.Migrations
                         .HasName("users_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.user_who_created_idx");
+                        .HasDatabaseName("users_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.user_who_updated_idx");
+                        .HasDatabaseName("users_who_updated_idx");
 
                     b.ToTable("users", "auth");
                 });
@@ -3076,10 +2810,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_emails_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.useremail_who_created_idx");
+                        .HasDatabaseName("user_emails_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.useremail_who_updated_idx");
+                        .HasDatabaseName("user_emails_who_updated_idx");
 
                     b.HasIndex("UserId", "IsPrimary")
                         .IsUnique()
@@ -3217,10 +2951,10 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_phones_user_id_index");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.userphone_who_created_idx");
+                        .HasDatabaseName("user_phones_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.userphone_who_updated_idx");
+                        .HasDatabaseName("user_phones_who_updated_idx");
 
                     b.HasIndex(new[] { "NormalizedPhone" }, "user_phones_normalized_phone_index");
 
@@ -3232,128 +2966,6 @@ namespace Main.Migrator.Migrations
                         .HasFilter("(is_primary = true)");
 
                     b.ToTable("user_phones", "auth");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserSearchHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Query")
-                        .IsRequired()
-                        .HasColumnType("jsonb")
-                        .HasColumnName("query");
-
-                    b.Property<DateTime>("SearchDateTime")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("search_date_time");
-
-                    b.Property<string>("SearchPlace")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("search_place");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id")
-                        .HasName("user_search_history_pk");
-
-                    b.HasIndex("SearchDateTime")
-                        .HasDatabaseName("user_search_history_search_date_time_index");
-
-                    b.HasIndex("SearchPlace")
-                        .HasDatabaseName("user_search_history_search_place_index");
-
-                    b.HasIndex("UserId", "SearchPlace")
-                        .HasDatabaseName("user_search_history_user_id_search_place_index");
-
-                    b.ToTable("user_search_history", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<string>("Comment")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)")
-                        .HasColumnName("comment");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("PlateNumber")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("character varying(32)")
-                        .HasColumnName("plate_number");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("vehicle_id");
-
-                    b.Property<string>("Vin")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("vin");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("Id")
-                        .HasName("user_vehicles_pk");
-
-                    b.HasIndex("Comment")
-                        .HasDatabaseName("user_vehicles_comment_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Comment"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Comment"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("PlateNumber")
-                        .IsUnique()
-                        .HasDatabaseName("user_vehicles_plate_number_uindex");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("user_vehicles_user_id_index");
-
-                    b.HasIndex("VehicleId")
-                        .HasDatabaseName("user_vehicles_vehicle_id_index");
-
-                    b.HasIndex("Vin")
-                        .IsUnique()
-                        .HasDatabaseName("user_vehicles_vin_uindex");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.uservehicle_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.uservehicle_who_updated_idx");
-
-                    b.ToTable("user_vehicles", "public");
                 });
 
             modelBuilder.Entity("Main.Persistence.ReadModels.UserSearchDocument", b =>
@@ -3656,6 +3268,418 @@ namespace Main.Migrator.Migrations
                     b.ToTable("notification_deliveries", "notification");
                 });
 
+            modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<Guid?>("SourceMessageId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("source_message_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id")
+                        .HasName("markup_group_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("markup_group_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("markup_group_who_updated_idx");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "IX_markup_group_currency_id");
+
+                    b.HasIndex(new[] { "SourceMessageId" }, "markup_group_source_message_id_uindex")
+                        .IsUnique();
+
+                    b.ToTable("markup_group", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.MarkupRange", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("GroupId")
+                        .HasColumnType("integer")
+                        .HasColumnName("group_id");
+
+                    b.Property<decimal>("Markup")
+                        .HasColumnType("numeric")
+                        .HasColumnName("markup");
+
+                    b.Property<decimal>("RangeEnd")
+                        .HasColumnType("numeric")
+                        .HasColumnName("range_end");
+
+                    b.Property<decimal>("RangeStart")
+                        .HasColumnType("numeric")
+                        .HasColumnName("range_start");
+
+                    b.HasKey("Id")
+                        .HasName("markup_ranges_pk");
+
+                    b.HasIndex(new[] { "GroupId" }, "IX_markup_ranges_group_id");
+
+                    b.ToTable("markup_ranges", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOffer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("AvailableQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("available_quantity");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<int>("DaysToRefund")
+                        .HasColumnType("integer")
+                        .HasColumnName("days_to_refund");
+
+                    b.Property<DateTime?>("DeliveryDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivery_date");
+
+                    b.Property<int>("DeliveryProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_probability");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<DateTime?>("GuaranteedDeliveryDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("guaranteed_delivery_date");
+
+                    b.Property<int>("MinimumPurchaseQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("minimum_purchase_quantity");
+
+                    b.Property<string>("OfferForStorage")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("offer_for_storage");
+
+                    b.Property<DateTime?>("OrderTill")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("order_till");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<int>("QuantityCoefficient")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity_coefficient");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("source_key");
+
+                    b.Property<DateTime?>("SourceOccurredAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("source_occurred_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id")
+                        .HasName("price_offer_pk");
+
+                    b.HasAlternateKey("ProductId", "Source", "SourceKey", "OfferForStorage")
+                        .HasName("price_offer_source_source_key_uq");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("price_offers_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("price_offers_who_updated_idx");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "price_offer_currency_id_index");
+
+                    b.HasIndex(new[] { "ExpiresAt" }, "price_offer_expires_at_index");
+
+                    b.HasIndex(new[] { "OfferForStorage" }, "price_offer_offer_for_storage_index");
+
+                    b.HasIndex(new[] { "ProductId", "OfferForStorage" }, "price_offer_product_id_index");
+
+                    b.ToTable("price_offers", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferRefreshState", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("StorageCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_name");
+
+                    b.Property<int>("LastOffersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_offers_count");
+
+                    b.Property<DateTime?>("LastOffersUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_offers_updated_at");
+
+                    b.HasKey("ProductId", "Source", "StorageCode")
+                        .HasName("price_offer_refresh_state_pk");
+
+                    b.ToTable("price_offer_refresh_states", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>
+                {
+                    b.Property<Guid>("PriceOfferId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("price_offer_id");
+
+                    b.Property<string>("AppliersVersion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("appliers_version");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<int>("DeliveryProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_probability");
+
+                    b.Property<TimeSpan>("DeliveryTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("delivery_time");
+
+                    b.Property<string>("ForStorageCode")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("for_storage_name");
+
+                    b.Property<TimeSpan>("GuaranteedDeliveryTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("guaranteed_delivery_time");
+
+                    b.Property<decimal>("Markup")
+                        .HasColumnType("numeric")
+                        .HasColumnName("markup");
+
+                    b.Property<string>("MarkupVersion")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("markup_version");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<Guid>("PricingSettingsVersion")
+                        .HasColumnType("uuid")
+                        .HasColumnName("pricing_settings_version");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("numeric")
+                        .HasColumnName("score");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("PriceOfferId")
+                        .HasName("product_price_option_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("product_price_options_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("product_price_options_who_updated_idx");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "product_price_option_currency_id_index");
+
+                    b.HasIndex(new[] { "Score" }, "product_price_option_score_index");
+
+                    b.ToTable("product_price_options", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplier", b =>
+                {
+                    b.Property<string>("SystemName")
+                        .HasColumnType("text")
+                        .HasColumnName("system_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("DslLogic")
+                        .HasColumnType("jsonb")
+                        .HasColumnName("dsl_logic");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("SystemName")
+                        .HasName("price_appliers_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("price_appliers_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("price_appliers_who_updated_idx");
+
+                    b.ToTable("price_appliers", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplierState", b =>
+                {
+                    b.Property<string>("PriceApplierSystemName")
+                        .HasColumnType("text")
+                        .HasColumnName("price_applier_system_name");
+
+                    b.Property<string>("Usage")
+                        .HasColumnType("text")
+                        .HasColumnName("usage");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("integer")
+                        .HasColumnName("order");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("PriceApplierSystemName", "Usage")
+                        .HasName("price_applier_states_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("price_applier_states_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("price_applier_states_who_updated_idx");
+
+                    b.HasIndex(new[] { "Usage", "Order" }, "price_applier_states_enabled_usage_order_uq")
+                        .IsUnique()
+                        .HasFilter("enabled = true");
+
+                    b.ToTable("price_applier_states", "public");
+                });
+
             modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Job.Job");
@@ -3703,6 +3727,13 @@ namespace Main.Migrator.Migrations
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("TmtrSupplierSetting");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Settings.PricingSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("PricingSettings");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Job.Job", b =>
@@ -3761,6 +3792,16 @@ namespace Main.Migrator.Migrations
                     b.Navigation("MultiStepJob");
 
                     b.Navigation("Step");
+                });
+
+            modelBuilder.Entity("Main.Entities.Analytics.SaleContentAnalytics", b =>
+                {
+                    b.HasOne("Main.Entities.Sale.SaleContent", null)
+                        .WithOne()
+                        .HasForeignKey("Main.Entities.Analytics.SaleContentAnalytics", "SaleContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("sale_content_analytics_sale_content_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Auth.RolePermission", b =>
@@ -3834,7 +3875,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Balance.OrganizationBalance", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3842,13 +3883,21 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("user_balances_currency_id_fk");
 
                     b.HasOne("Main.Entities.Organization.Organization", null)
-                        .WithMany("Balances")
+                        .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("organization_balances_organizations_id_fk");
+                });
 
-                    b.Navigation("Currency");
+            modelBuilder.Entity("Main.Entities.Balance.OrganizationFinancialProfile", b =>
+                {
+                    b.HasOne("Main.Entities.Organization.Organization", null)
+                        .WithOne()
+                        .HasForeignKey("Main.Entities.Balance.OrganizationFinancialProfile", "OrganizationId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("organization_financial_profile_organization_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Balance.Transaction", b =>
@@ -3860,7 +3909,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("transactions_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Receiver")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("ReceiverId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3873,21 +3922,17 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .HasConstraintName("transactions_users_id_fk_4");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Sender")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("transactions_sender_organization_id_fk");
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3895,13 +3940,11 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("cart_product_id_fk");
 
                     b.HasOne("Main.Entities.User.User", null)
-                        .WithMany("CartItems")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("cart_users_id_fk");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
@@ -3979,7 +4022,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("order_fulfillments_order_item_id_fk");
 
-                    b.HasOne("Main.Entities.Sale.SaleContent", "SaleContent")
+                    b.HasOne("Main.Entities.Sale.SaleContent", null)
                         .WithMany()
                         .HasForeignKey("SaleContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3987,8 +4030,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("order_fulfillments_sale_content_id_fk");
 
                     b.Navigation("OrderItem");
-
-                    b.Navigation("SaleContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.OrderItem", b =>
@@ -4010,16 +4051,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("Main.Entities.Organization.OrganizationFinancialProfile", b =>
-                {
-                    b.HasOne("Main.Entities.Organization.Organization", null)
-                        .WithOne("FinancialProfile")
-                        .HasForeignKey("Main.Entities.Organization.OrganizationFinancialProfile", "OrganizationId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("organization_financial_profile_organization_id_fk");
-                });
-
             modelBuilder.Entity("Main.Entities.Organization.OrganizationMember", b =>
                 {
                     b.HasOne("Main.Entities.Organization.Organization", "Organization")
@@ -4029,7 +4060,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("organization_members_organizations_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "User")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4037,8 +4068,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("organization_members_users_id_fk");
 
                     b.Navigation("Organization");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
@@ -4253,7 +4282,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4267,39 +4296,31 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "SupplierOrganization")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("SupplierOrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_supplier_organization_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "SupplierUser")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("SupplierUserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_supplier_user_id_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
+                    b.HasOne("Main.Entities.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("purchase_transactions_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("SupplierOrganization");
-
-                    b.Navigation("SupplierUser");
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4313,72 +4334,24 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_content_purchase_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
+                    b.HasOne("Main.Entities.Storage.StorageContent", null)
                         .WithOne()
                         .HasForeignKey("Main.Entities.Purchase.PurchaseContent", "StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired()
                         .HasConstraintName("purchase_content_storage_content_id_fk");
-
-                    b.Navigation("Product");
-
-                    b.Navigation("StorageContent");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContentLogistic", b =>
-                {
-                    b.HasOne("Main.Entities.Purchase.PurchaseContent", null)
-                        .WithOne("PurchaseContentLogistic")
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseContentLogistic", "PurchaseContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("purchase_content_logistics_purchase_content_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseLogistic", b =>
-                {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_currency_id_fk");
-
-                    b.HasOne("Main.Entities.Purchase.Purchase", null)
-                        .WithOne("PurchaseLogistic")
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseLogistic", "PurchaseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_purchase_id_fk");
-
-                    b.HasOne("Main.Entities.Storage.StorageRoute", null)
-                        .WithMany()
-                        .HasForeignKey("RouteId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("purchase_logistics_storage_routes_id_fk");
-
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
-                        .WithOne()
-                        .HasForeignKey("Main.Entities.Purchase.PurchaseLogistic", "TransactionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("purchase_logistics_transactions_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Transaction");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Organization.Organization", "Organization")
+                    b.HasOne("Main.Entities.Organization.Organization", null)
                         .WithMany()
                         .HasForeignKey("OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4392,32 +4365,24 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_storages_name_fk");
 
-                    b.HasOne("Main.Entities.Balance.Transaction", "Transaction")
+                    b.HasOne("Main.Entities.Balance.Transaction", null)
                         .WithMany()
                         .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_transactions_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", "User")
+                    b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_user_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("Organization");
-
-                    b.Navigation("Transaction");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
                 {
-                    b.HasOne("Main.Entities.Product.Product", "Product")
+                    b.HasOne("Main.Entities.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4431,26 +4396,12 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_sale_id_fk");
 
-                    b.Navigation("Product");
-
                     b.Navigation("Sale");
-                });
-
-            modelBuilder.Entity("Main.Entities.Sale.SaleContentAnalytics", b =>
-                {
-                    b.HasOne("Main.Entities.Sale.SaleContent", "Content")
-                        .WithOne("Analytics")
-                        .HasForeignKey("Main.Entities.Sale.SaleContentAnalytics", "SaleContentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("sale_content_analytics_sale_content_id_fk");
-
-                    b.Navigation("Content");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4464,16 +4415,12 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
+                    b.HasOne("Main.Entities.Storage.StorageContent", null)
                         .WithMany()
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
-
-                    b.Navigation("Currency");
-
-                    b.Navigation("StorageContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.ProductStock", b =>
@@ -4485,7 +4432,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("product_stocks_product_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.Storage", "Storage")
+                    b.HasOne("Main.Entities.Storage.Storage", null)
                         .WithMany()
                         .HasForeignKey("StorageCode")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -4493,8 +4440,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("product_stocks_storage_code_fk");
 
                     b.Navigation("Product");
-
-                    b.Navigation("Storage");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
@@ -4506,7 +4451,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("storage_content_base_currency_id_fk");
 
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
+                    b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -4526,8 +4471,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("storage_content_storages_name_fk");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContentLock", b =>
@@ -4540,59 +4483,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("storage_content_locks_storage_content_id_fk");
 
                     b.Navigation("StorageContent");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageOwner", b =>
-                {
-                    b.HasOne("Main.Entities.Storage.Storage", "Storage")
-                        .WithMany("Owners")
-                        .HasForeignKey("StorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_owners_storages_name_fk");
-
-                    b.HasOne("Main.Entities.User.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_owners_users_id_fk");
-
-                    b.Navigation("Storage");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.StorageRoute", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("CarrierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .HasConstraintName("storage_routes_users_id_fk");
-
-                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_currency_id_fk");
-
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("FromStorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_storages_name_fk");
-
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("ToStorageCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("storage_routes_storages_name_fk_2");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.User.UserEmail", b =>
@@ -4620,7 +4510,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.User.UserNotificationPreference", b =>
                 {
                     b.HasOne("Main.Entities.User.User", null)
-                        .WithMany("NotificationPreferences")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -4635,28 +4525,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("user_phones_user_id_fkey");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserSearchHistory", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("user_search_history_users_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
-                {
-                    b.HasOne("Main.Entities.User.User", "User")
-                        .WithMany("Vehicles")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("user_vehicles_users_id_fk");
 
                     b.Navigation("User");
                 });
@@ -4697,6 +4565,40 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Notification");
                 });
 
+            modelBuilder.Entity("Pricing.Entities.MarkupRange", b =>
+                {
+                    b.HasOne("Pricing.Entities.MarkupGroup", "Group")
+                        .WithMany("MarkupRanges")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("markup_ranges_markup_group_id_fk");
+
+                    b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>
+                {
+                    b.HasOne("Pricing.Entities.Offers.PriceOffer", "PriceOffer")
+                        .WithOne()
+                        .HasForeignKey("Pricing.Entities.Offers.ProductPriceOption", "PriceOfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("product_price_options_price_offer_id_fk");
+
+                    b.Navigation("PriceOffer");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplierState", b =>
+                {
+                    b.HasOne("Pricing.Entities.Pricing.PriceApplier", null)
+                        .WithMany("States")
+                        .HasForeignKey("PriceApplierSystemName")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_applier_states_price_applier_system_name_fk");
+                });
+
             modelBuilder.Entity("Domain.CommonEntities.Job.JobSchedule", b =>
                 {
                     b.Navigation("Runs");
@@ -4721,10 +4623,6 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Organization.Organization", b =>
                 {
-                    b.Navigation("Balances");
-
-                    b.Navigation("FinancialProfile");
-
                     b.Navigation("Members");
                 });
 
@@ -4763,13 +4661,6 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Purchase.Purchase", b =>
                 {
                     b.Navigation("Contents");
-
-                    b.Navigation("PurchaseLogistic");
-                });
-
-            modelBuilder.Entity("Main.Entities.Purchase.PurchaseContent", b =>
-                {
-                    b.Navigation("PurchaseContentLogistic");
                 });
 
             modelBuilder.Entity("Main.Entities.Sale.Sale", b =>
@@ -4779,14 +4670,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContent", b =>
                 {
-                    b.Navigation("Analytics");
-
                     b.Navigation("Details");
-                });
-
-            modelBuilder.Entity("Main.Entities.Storage.Storage", b =>
-                {
-                    b.Navigation("Owners");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
@@ -4796,11 +4680,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.User.User", b =>
                 {
-                    b.Navigation("CartItems");
-
                     b.Navigation("Emails");
-
-                    b.Navigation("NotificationPreferences");
 
                     b.Navigation("Permissions");
 
@@ -4809,13 +4689,21 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Roles");
 
                     b.Navigation("UserInfo");
-
-                    b.Navigation("Vehicles");
                 });
 
             modelBuilder.Entity("Notification.Core.Entities.Notification", b =>
                 {
                     b.Navigation("Deliveries");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>
+                {
+                    b.Navigation("MarkupRanges");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Pricing.PriceApplier", b =>
+                {
+                    b.Navigation("States");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Job.MultiStepJob", b =>

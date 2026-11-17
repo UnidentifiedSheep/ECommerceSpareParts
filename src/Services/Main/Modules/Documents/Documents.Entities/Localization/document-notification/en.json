@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "notifications.document.generated.title": "Document ready",
+    "notifications.document.generated.text": "The document {DocumentName|string} is ready: {DocumentUrl|string}"
+  }
+}

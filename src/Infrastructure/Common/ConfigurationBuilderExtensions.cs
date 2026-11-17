@@ -6,6 +6,7 @@ namespace Common;
 public static class ConfigurationBuilderExtensions
 {
 	private const string Appsettings = "appsettings";
+
 	private static readonly string DefaultConfigsPath =
 		Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "configs");
 
@@ -13,23 +14,19 @@ public static class ConfigurationBuilderExtensions
 		this IConfigurationBuilder configuration,
 		string? contour,
 		string? path = null)
-	{
-		return configuration.AddConfigsFromJsons(
+		=> configuration.AddConfigsFromJsons(
 			Appsettings,
 			contour,
 			path);
-	}
 
 	public static IConfigurationBuilder AddMigratorSettingsFromJsons(
 		this IConfigurationBuilder configuration,
 		string? contour,
 		string? path = null)
-	{
-		return configuration.AddConfigsFromJsons(
+		=> configuration.AddConfigsFromJsons(
 			"migrator",
 			contour,
 			path ?? Path.Combine(DefaultConfigsPath, "migrator"));
-	}
 
 	public static IConfigurationBuilder AddConfigsFromJsons(
 		this IConfigurationBuilder configuration,
@@ -37,12 +34,10 @@ public static class ConfigurationBuilderExtensions
 		string purpose,
 		string? contour,
 		string? path)
-	{
-		return configuration.AddConfigsFromJsons(
+		=> configuration.AddConfigsFromJsons(
 			$"{nameStart}.{purpose}",
 			contour,
 			path);
-	}
 
 	public static IConfigurationBuilder AddConfigsFromJsons(
 		this IConfigurationBuilder configuration,

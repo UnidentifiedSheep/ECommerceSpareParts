@@ -1,4 +1,5 @@
 using Search.Enums;
+
 namespace Search.Entities;
 
 public class Product

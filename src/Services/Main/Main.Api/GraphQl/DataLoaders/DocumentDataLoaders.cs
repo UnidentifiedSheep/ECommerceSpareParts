@@ -1,7 +1,7 @@
 using Enums;
 using GreenDonut;
-using Main.Application.Dtos.Documents;
-using Main.Application.Handlers.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
+using Main.Modules.Documents.Application.Handlers.Documents;
 using MediatR;
 using Security.Authorization;
 using Security.Core.Interfaces;
@@ -11,19 +11,21 @@ namespace Main.Api.GraphQl.DataLoaders;
 public static class DocumentDataLoaders
 {
 	[DataLoader]
-	public static async Task<IReadOnlyDictionary<Guid, DocumentGenerationRequestDto>> GetDocumentGenerationRequests(
-		IReadOnlyList<Guid> keys,
-		IUserContext userContext,
-		ISender sender,
-		CancellationToken cancellationToken)
+	public static async Task<IReadOnlyDictionary<Guid, DocumentGenerationRequestDto>>
+		GetDocumentGenerationRequests(
+			IReadOnlyList<Guid> keys,
+			IUserContext userContext,
+			ISender sender,
+			CancellationToken cancellationToken)
 		=> (await sender.Send(
 				new GetDocumentsByIdsQuery(
-					requestIds: keys,
-					callerId: userContext.UserId,
-					canAccessAll: userContext
+					keys,
+					userContext.UserId,
+					userContext
 						.Permissions
-						.Contains(AuthorizationValueNormalizer
-							.NormalizePermission(nameof(PermissionCodes.DOCUMENTS_ALL)))),
+						.Contains(
+							AuthorizationValueNormalizer
+								.NormalizePermission(nameof(PermissionCodes.DOCUMENTS_ALL)))),
 				cancellationToken))
 			.Documents;
 }

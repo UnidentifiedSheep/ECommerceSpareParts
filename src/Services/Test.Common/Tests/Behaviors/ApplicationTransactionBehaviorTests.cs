@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Behaviors;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
@@ -56,8 +55,10 @@ public sealed class ApplicationTransactionBehaviorTests
 			_ => Task.FromResult(Unit.Value),
 			CancellationToken.None);
 
-		service.Settings!.RetryErrors.Should().Be(
-			TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
+		service.Settings!.RetryErrors
+			.Should()
+			.Be(
+				TransactionalAttribute.DefaultRetryErrors | TransactionErrorKind.UniqueConstraintViolation);
 		service.Settings.RetryCount.Should().Be(2);
 	}
 
@@ -80,19 +81,22 @@ public sealed class ApplicationTransactionBehaviorTests
 		unitOfWork.Verify(x => x.SaveChangesAsync(It.IsAny<CancellationToken>()), Times.Once);
 	}
 
-    [Fact]
-    public async Task Handle_UnannotatedRequest_LetsTheServiceConfigureItsTransaction()
-    {
-        var transaction = new RecordingApplicationTransaction();
-        var settings = TransactionalAttribute.ReadCommitted(20, 3);
-        var behavior = new ApplicationTransactionBehavior<TestRequest, Unit>(transaction);
+	[Fact]
+	public async Task Handle_UnannotatedRequest_LetsTheServiceConfigureItsTransaction()
+	{
+		var transaction = new RecordingApplicationTransaction();
+		var settings = TransactionalAttribute.ReadCommitted(20, 3);
+		var behavior = new ApplicationTransactionBehavior<TestRequest, Unit>(transaction);
 
-        await behavior.Handle(new TestRequest(), ct => transaction.WithSettings(settings)
-            .ExecuteAsync((_, _) => Task.FromResult(Unit.Value), ct), TestContext.Current.CancellationToken);
+		await behavior.Handle(
+			new TestRequest(),
+			ct => transaction.WithSettings(settings)
+				.ExecuteAsync((_, _) => Task.FromResult(Unit.Value), ct),
+			TestContext.Current.CancellationToken);
 
-        transaction.Calls.Should().Be(1);
-        transaction.Settings.Should().BeSameAs(settings);
-    }
+		transaction.Calls.Should().Be(1);
+		transaction.Settings.Should().BeSameAs(settings);
+	}
 
 	private sealed record TestRequest : IRequest<Unit>;
 

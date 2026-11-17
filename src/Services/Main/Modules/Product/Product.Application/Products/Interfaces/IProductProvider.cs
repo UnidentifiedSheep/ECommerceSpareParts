@@ -1,0 +1,24 @@
+﻿using Main.Modules.Product.Application.Dtos.Product;
+
+namespace Main.Modules.Product.Application.Products.Interfaces;
+
+public interface IProductProvider
+{
+	Task<ProductDto> GetProductOrSetAsync(int productId, CancellationToken cancellationToken = default);
+
+	Task<ProductDto?> GetProductAsync(int productId, CancellationToken cancellationToken = default);
+
+	Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids);
+
+	Task<IReadOnlyList<int>> GetProductCrossesAsync(
+		int productId,
+		CancellationToken cancellationToken = default);
+
+	Task<IReadOnlyDictionary<int, IReadOnlyList<int>>> GetProductsCrossesAsync(
+		IEnumerable<int> productIds,
+		CancellationToken cancellationToken = default);
+
+	Task<Dictionary<int, ProductDto>> GetProductsOrSetAsync(
+		IEnumerable<int> ids,
+		CancellationToken cancellationToken = default);
+}

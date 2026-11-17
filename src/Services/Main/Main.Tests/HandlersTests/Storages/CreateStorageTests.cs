@@ -1,9 +1,10 @@
-using Tests.Abstractions.Test;
 using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
-using Main.Application.Handlers.Storages.CreateStorage;
-using Main.Application.Static;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -35,9 +36,10 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
 		var command = GetCommand();
 		await Mediator.Send(command, CancellationToken);
 
-		var createdStorage = await Context.Storages.FirstOrDefaultAsync(
-			x => x.Code == command.Code,
-			CancellationToken);
+		var createdStorage = await Context.Set<Storage>()
+			.FirstOrDefaultAsync(
+				x => x.Code == command.Code,
+				CancellationToken);
 		Assert.NotNull(createdStorage);
 
 		Assert.Equal(command.Description, createdStorage.Description);
@@ -61,7 +63,14 @@ public class CreateStorageValidationTests : ValidationTest<CreateStorageValidati
 	[Fact]
 	public async Task CreateStorage_TooLargeCode_FailsValidation()
 	{
-		var command = new CreateStorageCommand("warehouse", null, null, Main.Enums.StorageType.Warehouse) with { Code = new string('x', 500) };
+		var command = new CreateStorageCommand(
+				"warehouse",
+				null,
+				null,
+				StorageType.Warehouse) with
+			{
+				Code = new string('x', 500)
+			};
 		var result = await ValidateAsync(command);
 		result.ShouldHaveValidationErrorFor(x => x.Code).Only();
 	}
@@ -69,7 +78,14 @@ public class CreateStorageValidationTests : ValidationTest<CreateStorageValidati
 	[Fact]
 	public async Task CreateStorage_TooSmallCode_FailsValidation()
 	{
-		var command = new CreateStorageCommand("warehouse", null, null, Main.Enums.StorageType.Warehouse) with { Code = "x" };
+		var command = new CreateStorageCommand(
+				"warehouse",
+				null,
+				null,
+				StorageType.Warehouse) with
+			{
+				Code = "x"
+			};
 		var result = await ValidateAsync(command);
 		result.ShouldHaveValidationErrorFor(x => x.Code).Only();
 	}
@@ -77,7 +93,14 @@ public class CreateStorageValidationTests : ValidationTest<CreateStorageValidati
 	[Fact]
 	public async Task CreateStorage_TooLargeDescription_FailsValidation()
 	{
-		var command = new CreateStorageCommand("warehouse", null, null, Main.Enums.StorageType.Warehouse) with { Description = new string('x', 600) };
+		var command = new CreateStorageCommand(
+				"warehouse",
+				null,
+				null,
+				StorageType.Warehouse) with
+			{
+				Description = new string('x', 600)
+			};
 		var result = await ValidateAsync(command);
 		result.ShouldHaveValidationErrorFor(x => x.Description).Only();
 	}

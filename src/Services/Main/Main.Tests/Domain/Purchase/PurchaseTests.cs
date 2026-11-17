@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using Main.Entities.Purchase;
-using Main.Enums;
-using DomainPurchase = Main.Entities.Purchase.Purchase;
+using Main.Entities.Purchase.Enums;
+using Main.Entities.Purchase.Purchase;
+using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
 
 namespace Tests.Domain.Purchase;
 
@@ -41,7 +41,11 @@ public class PurchaseTests
 	public void AddContent_BeforeSaving_AssignsPurchaseId()
 	{
 		var purchase = Create();
-		var content = PurchaseContent.Create(1, 2, 10m, 3);
+		var content = PurchaseContent.Create(
+			1,
+			2,
+			10m,
+			3);
 
 		purchase.AddContent(content);
 
@@ -53,7 +57,11 @@ public class PurchaseTests
 	public void RemoveContent_BeforeSaving_RemovesContent()
 	{
 		var purchase = Create();
-		var content = PurchaseContent.Create(1, 2, 10m, 3);
+		var content = PurchaseContent.Create(
+			1,
+			2,
+			10m,
+			3);
 		purchase.AddContent(content);
 
 		purchase.RemoveContent(content);
@@ -80,13 +88,11 @@ public class PurchaseTests
 	}
 
 	private static DomainPurchase Create()
-	{
-		return DomainPurchase.Create(
+		=> DomainPurchase.Create(
 			Guid.NewGuid(),
 			Guid.NewGuid(),
 			1,
 			Guid.NewGuid(),
 			"WH-1",
 			DateTime.UtcNow);
-	}
 }

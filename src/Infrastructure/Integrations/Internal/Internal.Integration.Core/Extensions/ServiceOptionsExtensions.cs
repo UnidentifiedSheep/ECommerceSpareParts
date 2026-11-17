@@ -8,13 +8,10 @@ public static class ServiceOptionsExtensions
 	public static ServiceOptions GetOptionsForService(
 		this InternalServicesOptions options,
 		IServiceDefinition serviceDefinition)
-	{
-		return serviceDefinition switch
+		=> serviceDefinition switch
 		{
 			Main => options.Main,
-			Pricing => options.Pricing,
 			Search => options.Search,
 			_ => throw new InvalidOperationException("This service definition is not supported.")
 		};
-	}
 }

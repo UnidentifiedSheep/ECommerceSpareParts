@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "lrt.service.task.run.name": "Servis görevi başlatma",
+    "lrt.service.task.run.description": "Seçilen serviste bir görev çalıştırır."
+  }
+}

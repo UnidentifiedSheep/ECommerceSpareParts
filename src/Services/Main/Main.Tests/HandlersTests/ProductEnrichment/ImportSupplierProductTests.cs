@@ -1,8 +1,8 @@
 using Contracts.Models.Supplier;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 
@@ -133,7 +133,7 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.ContainSingle("Analogue name");
 
-		var cross = await Context.SupplierProductCrosses.AsNoTracking().SingleAsync(CancellationToken);
+		var cross = await Context.Set<SupplierProductCross>().AsNoTracking().SingleAsync(CancellationToken);
 		cross.LeftId.Should().Be(Math.Min(products[0].Id, products[1].Id));
 		cross.RightId.Should().Be(Math.Max(products[0].Id, products[1].Id));
 	}
@@ -184,27 +184,25 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			.Should()
 			.BeEquivalentTo("First analogue name", "Second analogue name");
 
-		var crossesCount = await Context.SupplierProductCrosses.AsNoTracking().CountAsync(CancellationToken);
+		var crossesCount =
+			await Context.Set<SupplierProductCross>().AsNoTracking().CountAsync(CancellationToken);
 		crossesCount.Should().Be(1);
 	}
 
 	private async Task<List<SupplierProduct>> GetProducts()
-	{
-		return await Context
-			.SupplierProducts
+		=> await Context
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.Include(x => x.Names)
 			.OrderBy(x => x.Id)
 			.ToListAsync();
-	}
 
 	private static ContractSupplierProductDto CreateProduct(
 		string number,
 		string brand,
 		IReadOnlyList<string> names,
 		IReadOnlyList<ContractSupplierProductDto>? analogues = null)
-	{
-		return new ContractSupplierProductDto
+		=> new()
 		{
 			Id = Guid.NewGuid().ToString(),
 			Number = number,
@@ -213,5 +211,4 @@ public class ImportSupplierProductTests(CombinedContainerFixture fixture) : Inte
 			Analogues = analogues ?? [],
 			Positions = []
 		};
-	}
 }

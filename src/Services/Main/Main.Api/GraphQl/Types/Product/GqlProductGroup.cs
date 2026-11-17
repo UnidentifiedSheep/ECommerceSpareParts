@@ -1,8 +1,8 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Application.Dtos.Product;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Product;
 
@@ -11,15 +11,9 @@ public record GqlProductGroup
 {
 	private readonly ProductGroupDto? _productGroupDto;
 
-	public GqlProductGroup(int id)
-	{
-		Id = id;
-	}
+	public GqlProductGroup(int id) => Id = id;
 
-	public GqlProductGroup(ProductGroupDto dto) : this(dto.Id)
-	{
-		_productGroupDto = dto;
-	}
+	public GqlProductGroup(ProductGroupDto dto) : this(dto.Id) => _productGroupDto = dto;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -28,18 +22,18 @@ public record GqlProductGroup
 	[GraphQLName("name")]
 	public async Task<string> GetNameAsync(
 		IProductGroupByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetProductGroupAsync(loader, cancellationToken)).Name;
+		CancellationToken cancellationToken)
+		=> (await GetProductGroupAsync(loader, cancellationToken)).Name;
 
 	[GraphQLName("normalizedName")]
 	public async Task<string> GetNormalizedNameAsync(
 		IProductGroupByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetProductGroupAsync(loader, cancellationToken)).NormalizedName;
+		CancellationToken cancellationToken)
+		=> (await GetProductGroupAsync(loader, cancellationToken)).NormalizedName;
 
 	private async Task<ProductGroupDto> GetProductGroupAsync(
 		IProductGroupByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		_productGroupDto ?? await loader.LoadAsync(Id, cancellationToken) ??
-		throw new ProductGroupNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _productGroupDto ?? await loader.LoadAsync(Id, cancellationToken) ??
+			throw new ProductGroupNotFoundException(Id);
 }

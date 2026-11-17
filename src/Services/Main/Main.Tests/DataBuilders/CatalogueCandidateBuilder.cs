@@ -1,6 +1,6 @@
 using Bogus;
-using Main.Entities.Producer;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Producer;
+using Main.Entities.Product.Product.Enrichment;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -41,8 +41,8 @@ public sealed class CatalogueCandidateBuilder(Faker faker) : BuilderBase<Catalog
 		return this;
 	}
 
-	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers) =>
-		WithProducerIds(producers.Select(x => x.Id));
+	public CatalogueCandidateBuilder WithProducers(IEnumerable<Producer> producers)
+		=> WithProducerIds(producers.Select(x => x.Id));
 
 	public CatalogueCandidateBuilder WithProductId(int productId)
 	{

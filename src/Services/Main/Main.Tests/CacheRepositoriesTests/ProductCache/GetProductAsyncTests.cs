@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -11,9 +11,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class GetProductAsyncTests : IntegrationTest
 {
 	public GetProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -53,10 +51,8 @@ public class GetProductAsyncTests : IntegrationTest
 	private IProductProvider GetRepository() => Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
 	private async Task RemoveCachedProduct(int productId)
-	{
-		await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
-	}
+			.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 }

@@ -1,0 +1,6 @@
+{
+  "culture": "en",
+  "messages": {
+    "order.item.product.deletion.blocked": "Cannot delete product: orders reference the product."
+  }
+}

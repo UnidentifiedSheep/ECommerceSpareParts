@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Application.Common.Interfaces.Events;
 using Bogus;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Interfaces;
@@ -24,11 +25,11 @@ public abstract class TestBase : IAsyncLifetime, ITest
 	public abstract ValueTask DisposeAsync();
 	public abstract ValueTask InitializeAsync();
 
-	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext =>
-		RegisterBasicContext(typeof(TContext));
+	public void RegisterBasicContext<TContext>() where TContext : class, ITestContext
+		=> RegisterBasicContext(typeof(TContext));
 
-	public void RemoveBasicContext<TContext>() where TContext : class, ITestContext =>
-		_basicContexts.Remove(typeof(TContext));
+	public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
+		=> _basicContexts.Remove(typeof(TContext));
 
 	private void RegisterBasicContext(Type type)
 	{
@@ -82,6 +83,9 @@ public abstract class TestBase : IAsyncLifetime, ITest
 			return (T)ctx;
 		throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
 	}
+
+	protected void DiscardPendingDomainEvents()
+		=> Scope.ServiceProvider.GetService<IDomainEventScope>()?.Flush();
 
 	protected virtual async Task InitializeBasicContexts()
 	{

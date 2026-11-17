@@ -1,5 +1,5 @@
-using Application.Common.Querying;
 using Application.Common.Extensions;
+using Application.Common.Querying;
 using Exceptions;
 using FluentAssertions;
 using GraphQL.Common.Extensions;
@@ -10,17 +10,48 @@ namespace Tests.Tests.Querying;
 public sealed class QueryableSortByTests
 {
 	[Theory]
-	[InlineData("count", "count", false, null)]
-	[InlineData("count_desc", "count", true, null)]
-	[InlineData("count_asc", "count", false, null)]
-	[InlineData(" COUNT_Main_Warehouse_DESC ", "count", true, "Main_Warehouse")]
-	[InlineData("count_MainWarehouse_asc", "count", false, "MainWarehouse")]
-	[InlineData("count_склад-1_desc", "count", true, "склад-1")]
+	[InlineData(
+		"count",
+		"count",
+		false,
+		null)]
+	[InlineData(
+		"count_desc",
+		"count",
+		true,
+		null)]
+	[InlineData(
+		"count_asc",
+		"count",
+		false,
+		null)]
+	[InlineData(
+		" COUNT_Main_Warehouse_DESC ",
+		"count",
+		true,
+		"Main_Warehouse")]
+	[InlineData(
+		"count_MainWarehouse_asc",
+		"count",
+		false,
+		"MainWarehouse")]
+	[InlineData(
+		"count_склад-1_desc",
+		"count",
+		true,
+		"склад-1")]
 	public void Parse_PreservesArgumentAndReadsDirection(
-		string text, string field, bool descending, string? argument)
-	{
-		SortExpression.Parse(text).Should().Be(new SortExpression(field, descending, argument));
-	}
+		string text,
+		string field,
+		bool descending,
+		string? argument)
+		=> SortExpression.Parse(text)
+			.Should()
+			.Be(
+				new SortExpression(
+					field,
+					descending,
+					argument));
 
 	[Theory]
 	[InlineData("count__desc")]
@@ -48,8 +79,11 @@ public sealed class QueryableSortByTests
 	{
 		var sorting = new QueryableSortBy()
 			.Map<Item, long>("count", item => item.Stocks.Sum(stock => (long)stock.Quantity))
-			.MapParameterized<Item, string, long>("count", (item, storage) => item.Stocks
-				.Where(stock => stock.Code == storage).Sum(stock => (long)stock.Quantity));
+			.MapParameterized<Item, string, long>(
+				"count",
+				(item, storage) => item.Stocks
+					.Where(stock => stock.Code == storage)
+					.Sum(stock => (long)stock.Quantity));
 		var items = new[] { new Item(1, [new Stock("Main", 3), new Stock("Other", 7)]) }.AsQueryable();
 
 		items.Select(sorting.GetMapping<Item>("count")).Single().Should().Be(10L);
@@ -100,10 +134,18 @@ public sealed class QueryableSortByTests
 	{
 		var input = new GqlSortBy { Field = "count", IsDescending = true, Argument = "Main_Warehouse" };
 
-		new[] { input }.ToSortExpressions().Should().Equal(new SortExpression("count", true, "Main_Warehouse"));
+		new[] { input }.ToSortExpressions()
+			.Should()
+			.Equal(
+				new SortExpression(
+					"count",
+					true,
+					"Main_Warehouse"));
 	}
 
 	private sealed record Item(int Id, IReadOnlyList<Stock> Stocks);
+
 	private sealed record Stock(string Code, int Quantity);
+
 	private enum TestState { Ready, Closed }
 }

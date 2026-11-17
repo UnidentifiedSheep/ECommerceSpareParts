@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <AssemblyName>Main.Modules.Documents.Application</AssemblyName>
+        <RootNamespace>Main.Modules.Documents.Application</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.2.0"/>
+        <PackageReference Include="ClosedXML.Report" Version="0.2.12"/>
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
+        <PackageReference Include="Scrutor" Version="7.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Jobs\Jobs.Abstractions\Jobs.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\Notifications\Notifications.Abstractions\Notifications.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\Identity\Identity.Abstractions\Identity.Abstractions.csproj"/>
+        <ProjectReference Include="..\Documents.Abstractions\Documents.Abstractions.csproj"/>
+        <ProjectReference Include="..\Documents.Entities\Documents.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

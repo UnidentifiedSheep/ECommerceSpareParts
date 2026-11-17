@@ -1,6 +1,7 @@
 using FluentAssertions;
-using Main.Application.Products.Commands.DeleteProductEan;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Commands.DeleteProductEan;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -10,9 +11,7 @@ namespace Tests.HandlersTests.ProductEans;
 public class DeleteProductEanTests : IntegrationTest
 {
 	public DeleteProductEanTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductEanTestContext>();
-	}
+		=> RegisterBasicContext<ProductEanTestContext>();
 
 	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
 
@@ -25,7 +24,8 @@ public class DeleteProductEanTests : IntegrationTest
 			new DeleteProductEanCommand(existing.ProductId, $" {existing.Ean} "),
 			CancellationToken);
 
-		var remaining = await Context.ProductEans.AsNoTracking()
+		var remaining = await Context.Set<ProductEan>()
+			.AsNoTracking()
 			.Where(x => x.ProductId == existing.ProductId)
 			.Select(x => x.Ean)
 			.ToListAsync(CancellationToken);

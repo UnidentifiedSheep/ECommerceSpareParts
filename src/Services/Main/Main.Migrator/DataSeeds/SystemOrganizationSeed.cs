@@ -1,19 +1,21 @@
 using Main.Entities.Auth;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
-using Main.Persistence.Context;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Organization;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class SystemOrganizationSeed : ISeed<DContext>
+public class SystemOrganizationSeed : ISeed<UnifiedDbContext>
 {
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		var systemUserIds = await context
-			.Users
+			.Set<User>()
 			.Where(x => x.Roles.Any(role => role.RoleName == RoleNames.Normalize(nameof(Role.System))))
 			.Select(x => x.Id)
 			.ToListAsync();
@@ -23,28 +25,31 @@ public class SystemOrganizationSeed : ISeed<DContext>
 
 		var systemUserIdSet = systemUserIds.ToHashSet();
 		var organizations = await context
-			.Organizations
+			.Set<Organization>()
 			.Where(x => systemUserIdSet.Contains(x.Id))
 			.Include(x => x.Members)
-			.Include(x => x.FinancialProfile)
 			.ToDictionaryAsync(x => x.Id);
+		var profiles = await context
+			.Set<OrganizationFinancialProfile>()
+			.Where(x => systemUserIdSet.Contains(x.OrganizationId))
+			.ToDictionaryAsync(x => x.OrganizationId);
 
 		foreach (var systemUserId in systemUserIds)
 		{
 			if (!organizations.TryGetValue(systemUserId, out var organization))
 			{
 				organization = Organization.CreateSystem(systemUserId, systemUserId);
-				await context.Organizations.AddAsync(organization);
+				await context.Set<Organization>().AddAsync(organization);
 			}
 			else
 				EnsureSystemOrganizationIsValid(organization, systemUserId);
 
-			if (organization.FinancialProfile is null)
+			if (!profiles.TryGetValue(systemUserId, out var profile))
 				await context
 					.Set<OrganizationFinancialProfile>()
 					.AddAsync(OrganizationFinancialProfile.Create(systemUserId, decimal.MinValue));
-			else if (organization.FinancialProfile.MinAllowedBalance != decimal.MinValue)
-				organization.FinancialProfile.SetMinAllowedBalance(decimal.MinValue);
+			else if (profile.MinAllowedBalance != decimal.MinValue)
+				profile.SetMinAllowedBalance(decimal.MinValue);
 		}
 
 		await context.SaveChangesAsync();

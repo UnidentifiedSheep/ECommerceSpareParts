@@ -1,8 +1,8 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
 using Tests.TestContainers.Combined;
@@ -13,9 +13,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class GetProductCrossesAsyncTests : IntegrationTest
 {
 	public GetProductCrossesAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductCrossTestContext>();
-	}
+		=> RegisterBasicContext<ProductCrossTestContext>();
 
 	private ProductCrossTestContext TestContext => GetContext<ProductCrossTestContext>();
 
@@ -97,9 +95,10 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 			productId,
 			CancellationToken)).ToList();
 
-		await Context.ProductCrosses.AddAsync(
-			ProductCross.Create(productId, isolatedProductId),
-			CancellationToken);
+		await Context.Set<ProductCross>()
+			.AddAsync(
+				ProductCross.Create(productId, isolatedProductId),
+				CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
 
@@ -114,9 +113,13 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 	[Fact]
 	public async Task GetProductsCrossesAsync_DuplicateIds_ReturnsRelationsForEachDistinctProduct()
 	{
-		var ids = TestContext.ProductCrosses.SelectMany(cross => new[] { cross.LeftProductId, cross.RightProductId })
-			.Distinct().Take(2).ToArray();
-		var result = await GetRepository().GetProductsCrossesAsync([ids[0], ids[1], ids[0]], CancellationToken);
+		var ids = TestContext.ProductCrosses
+			.SelectMany(cross => new[] { cross.LeftProductId, cross.RightProductId })
+			.Distinct()
+			.Take(2)
+			.ToArray();
+		var result =
+			await GetRepository().GetProductsCrossesAsync([ids[0], ids[1], ids[0]], CancellationToken);
 
 		result.Should().HaveCount(2);
 		foreach (var id in ids)
@@ -128,7 +131,7 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 	{
 		var productId = TestContext.ProductCrosses[0].LeftProductId;
 		var repository = GetRepository();
-		var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId);
+		var cacheKey = ProductCacheKeys.ProductCrosses(productId);
 
 		await RemoveCachedCrosses(productId);
 
@@ -138,51 +141,47 @@ public class GetProductCrossesAsyncTests : IntegrationTest
 
 		var productRelations = await GetRelations(productId);
 		productRelations.Should().Contain(cacheKey);
-		var productRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(productId));
+		var productRelationTtl = await GetTtl(ProductCacheKeys.ProductCrossRelations(productId));
 		productRelationTtl.Should().NotBeNull();
 		productRelationTtl.Value.Should().BePositive();
-		productRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
+		productRelationTtl.Value.Should().BeLessThanOrEqualTo(ProductCacheKeys.Ttl);
 
 		foreach (var crossId in result)
 		{
 			var crossRelations = await GetRelations(crossId);
 			crossRelations.Should().Contain(cacheKey);
-			var crossRelationTtl = await GetTtl(CacheKeys.ProductCache.ProductCrossRelations(crossId));
+			var crossRelationTtl = await GetTtl(ProductCacheKeys.ProductCrossRelations(crossId));
 			crossRelationTtl.Should().NotBeNull();
 			crossRelationTtl.Value.Should().BePositive();
-			crossRelationTtl.Value.Should().BeLessThanOrEqualTo(CacheKeys.ProductCache.Ttl);
+			crossRelationTtl.Value.Should().BeLessThanOrEqualTo(ProductCacheKeys.Ttl);
 		}
 	}
 
 	private IProductProvider GetRepository() => Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
 	private IReadOnlyList<int> GetExpectedCrossIds(int productId)
-	{
-		return TestContext
+		=> TestContext
 			.ProductCrosses
 			.Where(x => x.LeftProductId == productId || x.RightProductId == productId)
 			.Select(x => x.LeftProductId == productId ? x.RightProductId : x.LeftProductId)
 			.OrderBy(x => x)
 			.ToList();
-	}
 
 	private async Task RemoveCachedCrosses(int productId)
 	{
 		var cache = Scope.ServiceProvider.GetRequiredService<ICache>();
-		var cacheKey = CacheKeys.ProductCache.ProductCrosses(productId);
-		var relationKey = CacheKeys.ProductCache.ProductCrossRelations(productId);
+		var cacheKey = ProductCacheKeys.ProductCrosses(productId);
+		var relationKey = ProductCacheKeys.ProductCrossRelations(productId);
 
 		await cache.RemoveKeyAsync(cacheKey);
 		await cache.RemoveKeyAsync(relationKey);
 	}
 
 	private async Task<string[]> GetRelations(int productId)
-	{
-		return await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.GetFromSetAsync(CacheKeys.ProductCache.ProductCrossRelations(productId));
-	}
+			.GetFromSetAsync(ProductCacheKeys.ProductCrossRelations(productId));
 
 	private async Task<TimeSpan?> GetTtl(string key)
 	{

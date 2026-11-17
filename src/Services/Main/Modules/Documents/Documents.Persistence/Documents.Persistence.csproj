@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Documents.Persistence</AssemblyName>
+        <RootNamespace>Main.Modules.Documents.Persistence</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Documents.Application\Documents.Application.csproj"/>
+        <ProjectReference Include="..\Documents.Entities\Documents.Entities.csproj"/>
+    </ItemGroup>
+
+</Project>

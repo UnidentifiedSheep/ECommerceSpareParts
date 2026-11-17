@@ -5,7 +5,8 @@ using Persistence.TransactionBuilder;
 
 namespace Persistence.Services.UnitOfWork;
 
-public class EfUnitOfWorkBase(DbContext context, ITransactionExceptionClassifier exceptionClassifier) : IUnitOfWork
+public class EfUnitOfWorkBase(DbContext context, ITransactionExceptionClassifier exceptionClassifier)
+	: IUnitOfWork
 {
 	public bool HasActiveTransaction => context.Database.CurrentTransaction is not null;
 
@@ -15,44 +16,42 @@ public class EfUnitOfWorkBase(DbContext context, ITransactionExceptionClassifier
 		TransactionalAttribute settings,
 		Func<Task<T>> action,
 		CancellationToken cancellationToken = default)
-	{
-		return await context
+		=> await context
 			.WithIsolationLevel(settings.IsolationLevel, exceptionClassifier)
 			.WithRetries(settings.RetryCount)
 			.WithRetryOn(settings.RetryErrors)
 			.WithRetryDelay(TimeSpan.FromMilliseconds(settings.RetryDelayMs))
 			.ExecuteWithTransaction(action, cancellationToken);
-	}
 
 	public async Task ExecuteWithTransaction(
 		TransactionalAttribute settings,
 		Func<Task> action,
 		CancellationToken cancellationToken = default)
-	{
-		await context
+		=> await context
 			.WithIsolationLevel(settings.IsolationLevel, exceptionClassifier)
 			.WithRetryOn(settings.RetryErrors)
 			.WithRetries(settings.RetryCount)
 			.WithRetryDelay(TimeSpan.FromMilliseconds(settings.RetryDelayMs))
 			.ExecuteWithTransaction(action, cancellationToken);
-	}
 
-	public async Task SaveChangesAsync(CancellationToken cancellationToken = default) =>
-		await context.SaveChangesAsync(cancellationToken);
+	public async Task SaveChangesAsync(CancellationToken cancellationToken = default)
+		=> await context.SaveChangesAsync(cancellationToken);
 
 	public async Task AddAsync<T>(T entity, CancellationToken cancellationToken = default)
-		where T : notnull => await context.AddAsync(entity, cancellationToken);
+		where T : notnull
+		=> await context.AddAsync(entity, cancellationToken);
 
 	public async Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
-		where T : class => await context.Set<T>().AddRangeAsync(entities, cancellationToken);
+		where T : class
+		=> await context.Set<T>().AddRangeAsync(entities, cancellationToken);
 
-	public Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class =>
-		context
+	public Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
+		=> context
 			.Entry(entity ?? throw new ArgumentNullException(nameof(entity)))
 			.ReloadAsync(cancellationToken);
 
 	public void Remove<T>(T entity) where T : notnull => context.Remove(entity);
 
-	public void RemoveRange<T>(IEnumerable<T> entities) where T : class =>
-		context.Set<T>().RemoveRange(entities);
+	public void RemoveRange<T>(IEnumerable<T> entities) where T : class
+		=> context.Set<T>().RemoveRange(entities);
 }

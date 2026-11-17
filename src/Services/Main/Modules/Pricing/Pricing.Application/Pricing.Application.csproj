@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Main.Modules.Pricing.Application</AssemblyName>
+        <RootNamespace>Pricing.Application</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JsonLogic" Version="6.1.0"/>
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Platform\Platform.Abstractions\Platform.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Jobs\Jobs.Abstractions\Jobs.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier\Integrations.Supplier.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\..\Analytics\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Currency\Currency.Abstractions\Currency.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Storage\Storage.Abstractions\Storage.Abstractions.csproj"/>
+        <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

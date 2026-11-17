@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Handlers.Users.GetUserEmail;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Handlers.Users.GetUserEmail;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -9,9 +9,7 @@ namespace Tests.HandlersTests.Users;
 public class GetUserEmailTests : IntegrationTest
 {
 	public GetUserEmailTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserContactsTestContext>();
-	}
+		=> RegisterBasicContext<UserContactsTestContext>();
 
 	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
 

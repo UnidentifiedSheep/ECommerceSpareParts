@@ -1,12 +1,12 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.MakeLinkageBetweenArticles;
+using FluentValidation.TestHelper;
 using Main.Entities.Product;
-using Main.Enums.Products;
+using Main.Entities.Product.Enums.Products;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.MakeLinkageBetweenArticles;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,17 +15,13 @@ namespace Tests.HandlersTests.Products;
 public class MakeLinkageBetweenProductsTests : IntegrationTest
 {
 	public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
 	[Fact]
 	public async Task EmptyBatch_CompletesWithoutValidationErrors()
-	{
-		await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
-	}
+		=> await Mediator.Send(new MakeLinkageBetweenProductsCommand([]), CancellationToken);
 
 	[Fact]
 	public async Task MakeLinkage_SingleCrosses_Succeeds()
@@ -44,7 +40,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var crosses = await Context
-			.ProductCrosses
+			.Set<ProductCross>()
 			.AsNoTracking()
 			.Where(x => x.LeftProductId == l || x.RightProductId == l)
 			.FirstOrDefaultAsync(CancellationToken);
@@ -59,7 +55,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var p2 = TestContext.Products[1].Id;
 		var p3 = TestContext.Products[2].Id;
 
-		await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p3), CancellationToken);
+		await Context.Set<ProductCross>().AddAsync(ProductCross.Create(p1, p3), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = new MakeLinkageBetweenProductsCommand(
@@ -74,7 +70,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken);
+		var crosses = await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken);
 
 		crosses
 			.Should()
@@ -92,7 +88,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var p2 = TestContext.Products[1].Id;
 		var p3 = TestContext.Products[2].Id;
 
-		await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p3), CancellationToken);
+		await Context.Set<ProductCross>().AddAsync(ProductCross.Create(p1, p3), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = new MakeLinkageBetweenProductsCommand(
@@ -107,7 +103,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken);
+		var crosses = await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken);
 
 		crosses.Should().Contain(x => x.RightProductId == p2 && x.LeftProductId == Math.Min(p1, p2));
 		crosses
@@ -122,7 +118,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var p2 = TestContext.Products[1].Id;
 		var p3 = TestContext.Products[2].Id;
 
-		await Context.ProductCrosses.AddAsync(ProductCross.Create(p2, p3), CancellationToken);
+		await Context.Set<ProductCross>().AddAsync(ProductCross.Create(p2, p3), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = new MakeLinkageBetweenProductsCommand(
@@ -137,7 +133,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken);
+		var crosses = await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken);
 
 		crosses
 			.Should()
@@ -157,7 +153,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var p1 = TestContext.Products[0].Id;
 		var p2 = TestContext.Products[1].Id;
 
-		await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p2), CancellationToken);
+		await Context.Set<ProductCross>().AddAsync(ProductCross.Create(p1, p2), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var command = new MakeLinkageBetweenProductsCommand(
@@ -173,7 +169,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var act = () => Mediator.Send(command, CancellationToken);
 
 		await act.Should().NotThrowAsync();
-		(await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken))
+		(await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken))
 			.Should()
 			.ContainSingle(x =>
 				x.LeftProductId == Math.Min(p1, p2) && x.RightProductId == Math.Max(p1, p2));
@@ -204,7 +200,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		var p2 = TestContext.Products[1].Id;
 
 		var n = ProductCross.Create(p1, p2);
-		await Context.ProductCrosses.AddAsync(n, CancellationToken);
+		await Context.Set<ProductCross>().AddAsync(n, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		Context.Entry(n).State = EntityState.Detached;
@@ -222,7 +218,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var crosses = await Context
-			.ProductCrosses
+			.Set<ProductCross>()
 			.Where(x => x.LeftProductId == Math.Min(p1, p2) && x.RightProductId == Math.Max(p1, p2))
 			.ToListAsync(CancellationToken);
 
@@ -254,19 +250,27 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
 		await Mediator.Send(command, CancellationToken);
 
-		var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync(CancellationToken);
+		var crosses = await Context.Set<ProductCross>().AsNoTracking().ToListAsync(CancellationToken);
 
 		crosses.Should().HaveCountGreaterThanOrEqualTo(2);
 	}
 }
 
-public class MakeLinkageBetweenProductsValidationTests : ValidationTest<MakeLinkageBetweenProductsValidation, MakeLinkageBetweenProductsCommand>
+public class MakeLinkageBetweenProductsValidationTests : ValidationTest<MakeLinkageBetweenProductsValidation,
+	MakeLinkageBetweenProductsCommand>
 {
 	[Fact]
 	public async Task MakeLinkage_SameIds_FailsValidation()
 	{
-		var result = await ValidateAsync(new MakeLinkageBetweenProductsCommand([new NewProductLinkageDto { ProductId = 1, CrossProductId = 1, LinkageType = ProductLinkageType.FullCross }]));
+		var result = await ValidateAsync(
+			new MakeLinkageBetweenProductsCommand(
+			[
+				new NewProductLinkageDto
+					{ ProductId = 1, CrossProductId = 1, LinkageType = ProductLinkageType.FullCross }
+			]));
 		result.ShouldHaveValidationErrorFor("Linkages[0]")
-			.WithErrorCode(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance.MessageKey).WithCustomState(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance).Only();
+			.WithErrorCode(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance.MessageKey)
+			.WithCustomState(ArticleLinkageArticleCannotEqualCrossArticleMessage.Instance)
+			.Only();
 	}
 }

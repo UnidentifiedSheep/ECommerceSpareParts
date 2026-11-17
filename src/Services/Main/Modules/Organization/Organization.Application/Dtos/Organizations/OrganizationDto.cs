@@ -1,0 +1,25 @@
+using System.Text.Json.Serialization;
+using Main.Entities.Organization.Enums.Organization;
+
+namespace Main.Modules.Organization.Application.Dtos.Organizations;
+
+public record OrganizationDto
+{
+	[JsonPropertyName("id")]
+	public required Guid Id { get; init; }
+
+	[JsonPropertyName("type")]
+	public required OrganizationType Type { get; init; }
+
+	[JsonPropertyName("name")]
+	public required string Name { get; init; }
+
+	[JsonPropertyName("systemName")]
+	public required string SystemName { get; init; }
+
+	[JsonPropertyName("isHidden")]
+	public required bool IsHidden { get; init; }
+
+	[JsonPropertyName("owner")]
+	public required OrganizationMemberDto Owner { get; init; }
+}

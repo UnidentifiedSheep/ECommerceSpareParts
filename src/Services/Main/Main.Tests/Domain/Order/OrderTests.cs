@@ -1,8 +1,7 @@
-using FluentAssertions;
 using Exceptions;
-using Main.Entities.Order;
-using Main.Enums.Orders;
-using DomainOrder = Main.Entities.Order.Order;
+using FluentAssertions;
+using Main.Entities.Order.Enums.Orders;
+using DomainOrder = Main.Entities.Order.Order.Order;
 
 namespace Tests.Domain.Order;
 
@@ -38,7 +37,8 @@ public class OrderTests
 		confirm.Should().Throw<InvalidInputException>();
 		cancel.Should().Throw<InvalidInputException>();
 		addItem.Should().Throw<InvalidInputException>();
-		updateFulfillment.Should().Throw<InvalidInputException>();
+		// Fulfillment can still be updated on a completed order (only cancelled/deleted orders are frozen).
+		updateFulfillment.Should().NotThrow();
 	}
 
 	[Fact]
@@ -92,15 +92,18 @@ public class OrderTests
 		var item = order.AddItem(1, 1);
 		order.Delete();
 		order.Status.Should().Be(OrderStatus.Deleted);
-		Action[] actions = [() => order.AddItem(2, 1), () => order.RemoveItem(item),
+		Action[] actions =
+		[
+			() => order.AddItem(2, 1), () => order.RemoveItem(item),
 			() => order.ChangeItemCount(item, 2), () => order.Confirm(null), order.Complete, order.Cancel,
-			() => order.SetFulfillmentStatus(OrderFulfillmentStatus.FullyAvailable)];
+			() => order.SetFulfillmentStatus(OrderFulfillmentStatus.FullyAvailable)
+		];
 		foreach (var action in actions) action.Should().Throw<InvalidInputException>();
 	}
 
 	private static DomainOrder Create()
 		=> DomainOrder.CreateOnline(
 			Guid.NewGuid(),
-		Guid.NewGuid(),
-		1);
+			Guid.NewGuid(),
+			1);
 }

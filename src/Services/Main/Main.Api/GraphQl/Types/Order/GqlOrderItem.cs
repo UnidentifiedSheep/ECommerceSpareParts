@@ -1,12 +1,13 @@
 using HotChocolate;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Orders.Dtos;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Modules.Order.Application.Orders.Dtos;
 
 namespace Main.Api.GraphQl.Types.Order;
 
 [GraphQLName("OrderItem")]
-public sealed record GqlOrderItem([property: GraphQLIgnore] OrderItemDto Dto)
+public sealed record GqlOrderItem([property: GraphQLIgnore]
+	OrderItemDto Dto)
 {
 	[GraphQLName("id")]
 	public int Id => Dto.Id;

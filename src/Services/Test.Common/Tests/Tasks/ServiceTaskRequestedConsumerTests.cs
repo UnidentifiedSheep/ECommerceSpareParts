@@ -1,6 +1,5 @@
 using Application.Common.Consumer;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
+using Application.Common.Interfaces;
 using Contracts.Tasks;
 using FluentAssertions;
 using Locan.Core.Interfaces;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NamedObject;
 using NamedObject.Core.Interfaces;
+using NoneInputState = Application.Common.NoneInputState;
 
 namespace Tests.Tests.Tasks;
 
@@ -29,7 +29,8 @@ public sealed class ServiceTaskRequestedConsumerTests
 			return Task.CompletedTask;
 		};
 
-		await scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>()
+		await scope.ServiceProvider
+			.GetRequiredService<ServiceTaskRequestedConsumer>()
 			.Consume(Context(task.SystemName.ToUpperInvariant(), cancellation.Token));
 
 		task.Executions.Should().Be(1);
@@ -47,7 +48,8 @@ public sealed class ServiceTaskRequestedConsumerTests
 		var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
 		task.Work = _ => completion.Task;
 
-		var consumption = scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>()
+		var consumption = scope.ServiceProvider
+			.GetRequiredService<ServiceTaskRequestedConsumer>()
 			.Consume(Context(task.SystemName, TestContext.Current.CancellationToken));
 
 		consumption.IsCompleted.Should().BeFalse();
@@ -66,7 +68,9 @@ public sealed class ServiceTaskRequestedConsumerTests
 		task.Work = _ => Task.FromException(failure);
 
 		var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-			scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>().Consume(Context(task.SystemName, TestContext.Current.CancellationToken)));
+			scope.ServiceProvider
+				.GetRequiredService<ServiceTaskRequestedConsumer>()
+				.Consume(Context(task.SystemName, TestContext.Current.CancellationToken)));
 
 		exception.Should().BeSameAs(failure);
 	}
@@ -78,7 +82,9 @@ public sealed class ServiceTaskRequestedConsumerTests
 		await using var scope = provider.CreateAsyncScope();
 
 		await Assert.ThrowsAsync<KeyNotFoundException>(async () =>
-			await scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>().Consume(Context("unknown-task", TestContext.Current.CancellationToken)));
+			await scope.ServiceProvider
+				.GetRequiredService<ServiceTaskRequestedConsumer>()
+				.Consume(Context("unknown-task", TestContext.Current.CancellationToken)));
 
 		GetTask(scope.ServiceProvider).Executions.Should().Be(0);
 	}
@@ -92,7 +98,8 @@ public sealed class ServiceTaskRequestedConsumerTests
 		await cancellation.CancelAsync();
 
 		await Assert.ThrowsAnyAsync<OperationCanceledException>(async () =>
-			await scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>()
+			await scope.ServiceProvider
+				.GetRequiredService<ServiceTaskRequestedConsumer>()
 				.Consume(Context(nameof(RecordingServiceTask), cancellation.Token)));
 
 		GetTask(scope.ServiceProvider).Executions.Should().Be(0);
@@ -107,7 +114,8 @@ public sealed class ServiceTaskRequestedConsumerTests
 		await using var scope = provider.CreateAsyncScope();
 
 		await Assert.ThrowsAsync<ArgumentException>(async () =>
-			await scope.ServiceProvider.GetRequiredService<ServiceTaskRequestedConsumer>()
+			await scope.ServiceProvider
+				.GetRequiredService<ServiceTaskRequestedConsumer>()
 				.Consume(Context(name, TestContext.Current.CancellationToken)));
 	}
 
@@ -128,32 +136,38 @@ public sealed class ServiceTaskRequestedConsumerTests
 		services.AddScoped<ILrtNamedObject, RecordingServiceTask>();
 		services.AddNamedObjectRegistry();
 		services.AddTransient<ServiceTaskRequestedConsumer>();
-		return services.BuildServiceProvider(validateScopes: true);
+		return services.BuildServiceProvider(true);
 	}
 
-	private static RecordingServiceTask GetTask(IServiceProvider provider) =>
-		(RecordingServiceTask)provider.GetRequiredService<INamedObjectRegistry<ILrtNamedObject>>()
+	private static RecordingServiceTask GetTask(IServiceProvider provider)
+		=> (RecordingServiceTask)provider.GetRequiredService<INamedObjectRegistry<ILrtNamedObject>>()
 			.GetBySystemName(nameof(RecordingServiceTask));
 
-	private static ConsumeContext<ServiceTaskRequestedEvent> Context(string name, CancellationToken token = default)
+	private static ConsumeContext<ServiceTaskRequestedEvent> Context(
+		string name,
+		CancellationToken token = default)
 	{
 		var context = new Mock<ConsumeContext<ServiceTaskRequestedEvent>>();
-		context.SetupGet(value => value.Message).Returns(new ServiceTaskRequestedEvent { TaskSystemName = name });
+		context.SetupGet(value => value.Message)
+			.Returns(new ServiceTaskRequestedEvent { TaskSystemName = name });
 		context.SetupGet(value => value.CancellationToken).Returns(token);
 		return context.Object;
 	}
 
 	public sealed class RecordingServiceTask : ILrtNamedObject
 	{
-		public string SystemName => nameof(RecordingServiceTask);
-		public ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-task-name");
-		public ILocalizableMessage DescriptionLocalizationMessage => new LocalizableMessage("test-task-description");
-		public Type InputType => typeof(NoneInputState);
-		public Type StateType => typeof(NoneInputState);
 		public int Executions { get; private set; }
 		public Guid? ReceivedJobId { get; private set; }
 		public Guid? ReceivedLeaseHolderId { get; private set; }
 		public Func<CancellationToken, Task> Work { get; set; } = _ => Task.CompletedTask;
+		public string SystemName => nameof(RecordingServiceTask);
+		public ILocalizableMessage NameLocalizationMessage => new LocalizableMessage("test-task-name");
+
+		public ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test-task-description");
+
+		public Type InputType => typeof(NoneInputState);
+		public Type StateType => typeof(NoneInputState);
 
 		public Task ExecuteAsync(
 			Guid jobId,

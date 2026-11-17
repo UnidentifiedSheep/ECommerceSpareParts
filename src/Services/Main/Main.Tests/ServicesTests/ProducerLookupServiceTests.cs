@@ -1,7 +1,8 @@
+using Enums;
 using FluentAssertions;
-using Main.Application.Interfaces.Services;
-using Main.Application.Models.Producer;
-using Main.Application.Services;
+using Main.Modules.Product.Application.Interfaces.Services;
+using Main.Modules.Product.Application.Models.Producer;
+using Main.Modules.Product.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Tests.ServicesTests;
@@ -22,8 +23,12 @@ public sealed class ProducerLookupServiceTests
 		});
 		await using var firstScope = root.CreateAsyncScope();
 		await using var secondScope = root.CreateAsyncScope();
-		var first = firstScope.ServiceProvider.GetRequiredService<IProducerLookupService>().Load(CancellationToken);
-		var second = secondScope.ServiceProvider.GetRequiredService<IProducerLookupService>().Load(CancellationToken);
+		var first = firstScope.ServiceProvider
+			.GetRequiredService<IProducerLookupService>()
+			.Load(CancellationToken);
+		var second = secondScope.ServiceProvider
+			.GetRequiredService<IProducerLookupService>()
+			.Load(CancellationToken);
 
 		calls.Should().Be(1);
 		completion.SetResult(Snapshot(1));
@@ -35,7 +40,8 @@ public sealed class ProducerLookupServiceTests
 	{
 		var completion = Completion();
 		var calls = 0;
-		await using var root = CreateProvider(_ => ++calls == 1 ? Task.FromResult(Snapshot(1)) : completion.Task);
+		await using var root =
+			CreateProvider(_ => ++calls == 1 ? Task.FromResult(Snapshot(1)) : completion.Task);
 		var service = root.GetRequiredService<IProducerLookupService>();
 		var old = await service.Load(CancellationToken);
 
@@ -124,7 +130,7 @@ public sealed class ProducerLookupServiceTests
 		var aliases = new Dictionary<string, int> { ["ALIAS"] = 1 };
 		var mappings = new Dictionary<ProducerSupplierLookupKey, int>
 		{
-			[new ProducerSupplierLookupKey(Enums.Supplier.Armtek, "SUPPLIER NAME")] = 1
+			[new ProducerSupplierLookupKey(Supplier.Armtek, "SUPPLIER NAME")] = 1
 		};
 		var snapshot = new SupplierProducerLookup(new ProducerLookup(names, aliases), mappings);
 
@@ -134,21 +140,28 @@ public sealed class ProducerLookupServiceTests
 
 		snapshot.ResolveId("producer").Should().Be(1);
 		snapshot.ResolveId("alias").Should().Be(1);
-		snapshot.ResolveId("supplier name", Enums.Supplier.Armtek).Should().Be(1);
+		snapshot.ResolveId("supplier name", Supplier.Armtek).Should().Be(1);
 	}
 
-	private static TaskCompletionSource<IProducerLookup> Completion() => new(TaskCreationOptions.RunContinuationsAsynchronously);
+	private static TaskCompletionSource<IProducerLookup> Completion()
+		=> new(TaskCreationOptions.RunContinuationsAsynchronously);
 
-	private static IProducerLookup Snapshot(int id) => new ProducerLookup(
-		new Dictionary<string, int> { ["PRODUCER"] = id }, new Dictionary<string, int>());
+	private static IProducerLookup Snapshot(int id)
+		=> new ProducerLookup(
+			new Dictionary<string, int> { ["PRODUCER"] = id },
+			new Dictionary<string, int>());
 
-	private static ServiceProvider CreateProvider(Func<CancellationToken, Task<IProducerLookup>> load) => new ServiceCollection()
-		.AddSingleton<IProducerLookupService, ProducerLookupService>()
-		.AddScoped<IProducerLookupLoader>(_ => new DelegateLoader(load))
-		.BuildServiceProvider(new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
+	private static ServiceProvider CreateProvider(Func<CancellationToken, Task<IProducerLookup>> load)
+		=> new ServiceCollection()
+			.AddSingleton<IProducerLookupService, ProducerLookupService>()
+			.AddScoped<IProducerLookupLoader>(_ => new DelegateLoader(load))
+			.BuildServiceProvider(
+				new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true });
 
-	private sealed class DelegateLoader(Func<CancellationToken, Task<IProducerLookup>> load) : IProducerLookupLoader
+	private sealed class DelegateLoader(Func<CancellationToken, Task<IProducerLookup>> load)
+		: IProducerLookupLoader
 	{
-		public Task<IProducerLookup> Load(CancellationToken cancellationToken = default) => load(cancellationToken);
+		public Task<IProducerLookup> Load(CancellationToken cancellationToken = default)
+			=> load(cancellationToken);
 	}
 }

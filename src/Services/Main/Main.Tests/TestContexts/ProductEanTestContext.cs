@@ -1,5 +1,5 @@
-using Main.Entities.Product;
-using Main.Persistence.Context;
+using Main.Entities.Product.Product;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -7,8 +7,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class ProductEanTestContext(DContext context, ProductTestContext productTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class ProductEanTestContext(UnifiedDbContext context, ProductTestContext productTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public ProductTestContext ProductTestContext => productTestContext;
 
@@ -18,7 +18,8 @@ public class ProductEanTestContext(DContext context, ProductTestContext productT
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{
-		var builders = productTestContext.Products.Take(3)
+		var builders = productTestContext.Products
+			.Take(3)
 			.Select(product => new ProductEanBuilder(Faker).WithProductId(product.Id));
 
 		ProductEans = await builders.BuildManyCombinedAndAddToDb(DbContext, 3);

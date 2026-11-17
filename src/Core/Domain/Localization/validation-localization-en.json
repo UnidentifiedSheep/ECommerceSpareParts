@@ -1,0 +1,8 @@
+﻿{
+  "culture": "en",
+  "messages": {
+    "position.count.must.be.greater.than.zero": "The position count must be greater than 0.",
+    "price.must.be.positive": "Price must be greater than 0.",
+    "price.max.two.decimal.places": "Price can have at most 2 decimal places."
+  }
+}

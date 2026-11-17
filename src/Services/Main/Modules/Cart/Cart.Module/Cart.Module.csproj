@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Cart.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Cart</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Cart.Application\Cart.Application.csproj"/>
+        <ProjectReference Include="..\Cart.Persistence\Cart.Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

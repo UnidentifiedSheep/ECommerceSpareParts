@@ -15,10 +15,12 @@ public sealed record GqlProductSearchCriteriaInput
 	[GraphQLName("characteristics")]
 	public IReadOnlyList<GqlCharacteristicSearchCriteriaInput>? Characteristics { get; init; }
 
-	public ProductSearchCriteria ToCriteria() => new()
-	{
-		Weight = Weight?.ToCriteria(),
-		Dimensions = Dimensions?.ToCriteria(),
-		Characteristics = Characteristics?.Select(characteristic => characteristic.ToCriteria()).ToArray() ?? []
-	};
+	public ProductSearchCriteria ToCriteria()
+		=> new()
+		{
+			Weight = Weight?.ToCriteria(),
+			Dimensions = Dimensions?.ToCriteria(),
+			Characteristics =
+				Characteristics?.Select(characteristic => characteristic.ToCriteria()).ToArray() ?? []
+		};
 }

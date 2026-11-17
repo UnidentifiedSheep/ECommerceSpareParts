@@ -2,9 +2,7 @@ using Application.Common.Services.Events;
 using Domain;
 using Domain.Interfaces.Events;
 using FluentAssertions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Persistence.Services;
 
 namespace Tests.Tests.Services.Events;
@@ -149,8 +147,11 @@ public sealed class DomainEventCollectorTests
 		secondEntity.Callbacks.Should().Equal("created");
 	}
 
-	private static CollectorContext CreateContext() => new(new DbContextOptionsBuilder<CollectorContext>()
-		.UseNpgsql("Host=127.0.0.1;Port=1;Database=collector_tests;Username=test;Password=test").Options);
+	private static CollectorContext CreateContext()
+		=> new(
+			new DbContextOptionsBuilder<CollectorContext>()
+				.UseNpgsql("Host=127.0.0.1;Port=1;Database=collector_tests;Username=test;Password=test")
+				.Options);
 
 	private sealed class CollectorContext(DbContextOptions<CollectorContext> options) : DbContext(options)
 	{
@@ -171,10 +172,16 @@ public sealed class DomainEventCollectorTests
 		public override void OnCreated() => Notify("created");
 		public override void OnUpdated() => Notify("updated");
 		public override void OnDeleted() => Notify("deleted");
-		private void Notify(string name) { Callbacks.Add(name); AddDomainEvent(new LifecycleEvent(name)); }
+		private void Notify(string name)
+		{
+			Callbacks.Add(name);
+			AddDomainEvent(new LifecycleEvent(name));
+		}
 	}
 
 	private sealed record LifecycleEvent(string Name) : IDomainEvent;
+
 	private sealed record ExplicitEvent : IDomainEvent;
+
 	private sealed record BeforeSaveEvent : IBeforeSaveDomainEvent;
 }

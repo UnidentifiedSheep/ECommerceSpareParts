@@ -1,7 +1,6 @@
 using GraphQL.Common.Extensions;
 using Main.Api.GraphQl.Mutations;
 using Main.Api.GraphQl.Queries;
-using Main.Api.GraphQl.Subscriptions;
 
 namespace Main.Api.GraphQl;
 
@@ -12,7 +11,8 @@ public static class ServiceCollectionExtensions
 		services.AddCommonGraphQl(name)
 			.AddMutationType<RootMutation>()
 			.AddQueryType<RootQuery>()
-			.AddMainGraphQL();
+			.AddMainGraphQL()
+			.AddPricingGraphQL();
 
 		return services;
 	}

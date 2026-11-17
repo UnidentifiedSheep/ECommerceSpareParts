@@ -30,27 +30,24 @@ public class FavoritPartsSupplier(
 		return Response<IReadOnlyList<SupplierProduct>>.Ok(AdaptResponse(result.ValueOrThrow, settings));
 	}
 
-	public async Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default) =>
-		await connectionProvider.CheckConnectionAsync(cancellationToken);
+	public async Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default)
+		=> await connectionProvider.CheckConnectionAsync(cancellationToken);
 
 	private static GetPricesRequest AdaptRequest(GetProductsRequest request)
-	{
-		return new GetPricesRequest
+		=> new()
 		{
 			Brand = request.Brand,
 			Number = request.Number,
 			ShowAnalogues = request.ShowAnalogues,
 			ShowIsRefundable = true
 		};
-	}
 
 	private static List<SupplierProduct>
-		AdaptResponse(GetPricesResponse response, FavoriteSettings settings) =>
-		response.Goods.Select(good => AdaptGood(good, settings)).ToList();
+		AdaptResponse(GetPricesResponse response, FavoriteSettings settings)
+		=> response.Goods.Select(good => AdaptGood(good, settings)).ToList();
 
 	private static SupplierProduct AdaptGood(Good good, FavoriteSettings settings)
-	{
-		return new SupplierProduct
+		=> new()
 		{
 			Brand = good.Brand,
 			Id = good.Id,
@@ -84,5 +81,4 @@ public class FavoritPartsSupplier(
 				})
 				.ToList()
 		};
-	}
 }

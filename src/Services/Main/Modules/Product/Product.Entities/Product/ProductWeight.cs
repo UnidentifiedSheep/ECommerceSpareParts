@@ -1,0 +1,70 @@
+using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
+using Domain;
+using Domain.Interfaces;
+using Domain.Validation;
+using Enums.Units;
+using Main.Entities.Product.DomainEvents.Product;
+
+namespace Main.Entities.Product.Product;
+
+public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeight, int>
+{
+	private ProductWeight()
+	{
+	}
+
+	private ProductWeight(
+		int productId,
+		decimal weight,
+		WeightUnit unit)
+	{
+		ValidateWeight(weight);
+
+		ProductId = productId;
+		Weight = weight;
+		Unit = unit;
+	}
+
+	[Validate]
+	public int ProductId { get; }
+
+	public decimal Weight { get; private set; }
+
+	public WeightUnit Unit { get; private set; }
+
+	public static Expression<Func<ProductWeight, int>> GetKeySelector() => x => x.ProductId;
+
+	public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.ProductId == key;
+
+	public static ProductWeight Create(
+		int productId,
+		decimal weight,
+		WeightUnit unit)
+		=> new(
+			productId,
+			weight,
+			unit);
+
+	public void Update(decimal weight, WeightUnit unit)
+	{
+		ValidateWeight(weight);
+		Weight = weight;
+		Unit = unit;
+	}
+
+	public override void OnCreated() => AddDomainEvent(new ProductWeightUpdatedDomainEvent(ProductId));
+
+	public override void OnUpdated() => OnCreated();
+
+	public override void OnDeleted() => OnCreated();
+
+	public override int GetId() => ProductId;
+
+	private static void ValidateWeight(decimal weight)
+		=> weight
+			.EnsureGreaterThan(0, ArticleWeightMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleWeightMaxTwoDecimalsMessage.Instance);
+}

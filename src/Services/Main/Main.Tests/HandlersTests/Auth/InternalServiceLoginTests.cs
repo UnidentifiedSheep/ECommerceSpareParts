@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using FluentAssertions;
-using Main.Application.Handlers.Auth;
-using Main.Application.Interfaces.Services;
+using Main.Entities.Auth;
 using Main.Entities.Exceptions;
+using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
@@ -21,21 +23,33 @@ public sealed class InternalServiceLoginTests(CombinedContainerFixture fixture) 
 	[Fact]
 	public async Task Login_ServiceReceivesLongerLivedJwtWithoutRefreshTokenOrLoginEvent()
 	{
-		var user = await new UserBuilder(Faker).WithUserName(Service).WithUserInfo().WithRole("System")
-			.WithPasswordHash(Scope.ServiceProvider.GetRequiredService<IPasswordManager>().GetHashOfPassword(Secret))
+		var user = await new UserBuilder(Faker).WithUserName(Service)
+			.WithUserInfo()
+			.WithRole("System")
+			.WithPasswordHash(
+				Scope.ServiceProvider.GetRequiredService<IPasswordManager>().GetHashOfPassword(Secret))
 			.BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 		var before = DateTime.UtcNow;
 
 		var result = await Mediator.Send(new InternalServiceLoginCommand(Service, Secret), CancellationToken);
 
-		var principal = Scope.ServiceProvider.GetRequiredService<IJwtGenerator>().GetClaimsPrincipal(result.Token);
+		var principal = Scope.ServiceProvider
+			.GetRequiredService<IJwtGenerator>()
+			.GetClaimsPrincipal(result.Token);
 		principal.FindFirstValue(ClaimTypes.NameIdentifier).Should().Be(user.Id.ToString());
 		principal.IsInRole("SYSTEM").Should().BeTrue();
-		new JwtSecurityTokenHandler().ReadJwtToken(result.Token).ValidTo
-			.Should().BeOnOrAfter(before.AddMinutes(75).AddSeconds(-1)).And.BeOnOrBefore(DateTime.UtcNow.AddMinutes(75));
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
-		(await Context.Users.AsNoTracking().SingleAsync(x => x.Id == user.Id, CancellationToken)).LastLoginAt.Should().BeNull();
+		new JwtSecurityTokenHandler().ReadJwtToken(result.Token)
+			.ValidTo
+			.Should()
+			.BeOnOrAfter(before.AddMinutes(75).AddSeconds(-1))
+			.And
+			.BeOnOrBefore(DateTime.UtcNow.AddMinutes(75));
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<User>().AsNoTracking().SingleAsync(x => x.Id == user.Id, CancellationToken))
+			.LastLoginAt
+			.Should()
+			.BeNull();
 	}
 
 	[Theory]
@@ -43,14 +57,17 @@ public sealed class InternalServiceLoginTests(CombinedContainerFixture fixture) 
 	[InlineData("unknown-service", Secret)]
 	public async Task Login_InvalidServiceCredentialsAreRejected(string service, string secret)
 	{
-		await new UserBuilder(Faker).WithUserName(Service).WithUserInfo().WithRole("System")
-			.WithPasswordHash(Scope.ServiceProvider.GetRequiredService<IPasswordManager>().GetHashOfPassword(Secret))
+		await new UserBuilder(Faker).WithUserName(Service)
+			.WithUserInfo()
+			.WithRole("System")
+			.WithPasswordHash(
+				Scope.ServiceProvider.GetRequiredService<IPasswordManager>().GetHashOfPassword(Secret))
 			.BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 
 		var action = () => Mediator.Send(new InternalServiceLoginCommand(service, secret), CancellationToken);
 
 		await action.Should().ThrowAsync<WrongCredentialsException>();
-		(await Context.UserTokens.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<UserToken>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

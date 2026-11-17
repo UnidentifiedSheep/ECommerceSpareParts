@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "notifications.document.generated.title": "Belge hazır",
+    "notifications.document.generated.text": "{DocumentName|string} belgesi hazır: {DocumentUrl|string}"
+  }
+}

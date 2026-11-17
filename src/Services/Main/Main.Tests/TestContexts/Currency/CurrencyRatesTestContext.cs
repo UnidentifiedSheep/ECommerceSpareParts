@@ -1,19 +1,21 @@
-﻿using Application.Common.Interfaces.Settings;
+﻿using Application.Common.Interfaces.Events;
+using Application.Common.Interfaces.Settings;
 using Main.Entities.Currency;
-using Main.Entities.Settings;
-using Main.Persistence.Context;
+using Main.Entities.Currency.Settings;
+using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Currency;
 using Tests.Extensions;
 using Tests.Interfaces;
-using Microsoft.EntityFrameworkCore;
 
 namespace Tests.TestContexts.Currency;
 
 public class CurrencyRatesTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	CurrencyTestContext currencyTestContext,
-	ISettingsService settingsService) : TestContextBase<DContext>(context), IDependentTestContext
+	ISettingsService settingsService,
+	IDomainEventScope eventScope) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 
@@ -34,18 +36,25 @@ public class CurrencyRatesTestContext(
 
 		Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
 	}
-	public async Task SetHistoryAsync(CurrencyRate rate,
-		IReadOnlyCollection<(DateTime Date, decimal Rate)> rows, CancellationToken cancellationToken)
+	public async Task SetHistoryAsync(
+		CurrencyRate rate,
+		IReadOnlyCollection<(DateTime Date, decimal Rate)> rows,
+		CancellationToken cancellationToken)
 	{
-		await DbContext.CurrencyRates
+		await DbContext.Set<CurrencyRate>()
 			.Where(row => row.FromCurrencyId == rate.FromCurrencyId && row.ToCurrencyId == rate.ToCurrencyId)
 			.ExecuteDeleteAsync(cancellationToken);
 		foreach (var item in rows)
 		{
-			var row = CurrencyRate.Create(rate.FromCurrencyId, rate.ToCurrencyId, item.Rate);
+			var row = CurrencyRate.Create(
+				rate.FromCurrencyId,
+				rate.ToCurrencyId,
+				item.Rate);
 			await DbContext.AddAsync(row, cancellationToken);
 			DbContext.Entry(row).Property(value => value.CreatedAt).CurrentValue = item.Date;
 		}
+
 		await DbContext.SaveChangesAsync(cancellationToken);
+		eventScope.Flush();
 	}
 }

@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Purchase;
+using Main.Entities.Purchase.Purchase;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Purchase;
@@ -47,12 +47,10 @@ public class PurchaseContentBuilder(Faker faker) : BuilderBase<PurchaseContent>(
 	}
 
 	public override PurchaseContent Build()
-	{
-		return PurchaseContent.Create(
+		=> PurchaseContent.Create(
 			ProductId ?? Faker.Random.Int(1),
 			Count ?? Faker.Random.Int(1, 100),
 			Price ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
 			StorageContentId ?? Faker.Random.Int(1),
 			Comment);
-	}
 }

@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.Storages;
+using Main.Modules.Storage.Application.Dtos.Storage;
+using Main.Modules.Storage.Application.Handlers.Storages;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -12,8 +12,6 @@ public static class StorageDataLoaders
 		IReadOnlyList<string> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetStoragesByCodesQuery(keys), cancellationToken)).Storages
+		=> (await sender.Send(new GetStoragesByCodesQuery(keys), cancellationToken)).Storages
 			.ToDictionary(x => x.Code, x => x);
-	}
 }

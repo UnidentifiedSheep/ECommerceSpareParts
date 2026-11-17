@@ -1,23 +1,24 @@
 using System.Text.Json;
 using Abstractions;
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
+using Application.Common;
+using Application.Common.Interfaces;
 using Cronos;
 using Domain.CommonEntities.Job;
-using Main.Application.Lrts;
-using Main.Application.Lrts.RemoveExpiredDocuments;
-using Main.Application.Lrts.RunServiceTask;
-using Main.Persistence.Context;
+using Main.Modules.Currency.Application.Lrts;
+using Main.Modules.Documents.Application.Lrts.RemoveExpiredDocuments;
+using Main.Modules.Identity.Application.Lrts;
+using Main.Modules.Jobs.Application.LRT.RunServiceTask;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
 
-public class ScheduledLrtSeed : ISeed<DContext>
+public class ScheduledLrtSeed : ISeed<UnifiedDbContext>
 {
 	public int ExecutionOrder => int.MaxValue;
 
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
 		DefaultSchedule[] defaults =
 		[
@@ -55,14 +56,15 @@ public class ScheduledLrtSeed : ISeed<DContext>
 			.Select(x => x.JobSystemName)
 			.ToList();
 
-		var existingSchedules = await context.JobSchedules
+		var existingSchedules = await context.Set<JobSchedule>()
 			.AsNoTracking()
 			.Where(schedule => systemNames.Contains(schedule.JobSystemName))
 			.Select(schedule => new { schedule.JobSystemName, schedule.InputState })
 			.ToHashSetAsync();
 
 		var missingSchedules = defaults
-			.Where(schedule => !existingSchedules.Contains(new { schedule.JobSystemName, schedule.InputState }))
+			.Where(schedule
+				=> !existingSchedules.Contains(new { schedule.JobSystemName, schedule.InputState }))
 			.ToArray();
 
 		if (missingSchedules.Length == 0) return;
@@ -78,9 +80,10 @@ public class ScheduledLrtSeed : ISeed<DContext>
 				3,
 				item.Cron);
 			schedule.Enable();
-			schedule.SetNextRunAt(CronExpression.Parse(item.Cron)
-				.GetNextOccurrence(now, JobSchedule.TimeZone));
-			context.JobSchedules.Add(schedule);
+			schedule.SetNextRunAt(
+				CronExpression.Parse(item.Cron)
+					.GetNextOccurrence(now, JobSchedule.TimeZone));
+			context.Set<JobSchedule>().Add(schedule);
 		}
 
 		await context.SaveChangesAsync();

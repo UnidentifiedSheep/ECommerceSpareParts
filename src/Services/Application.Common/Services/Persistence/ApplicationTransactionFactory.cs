@@ -3,7 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Common.Services.Persistence;
 
-public sealed class ApplicationTransactionFactory(IServiceScopeFactory scopeFactory) : IApplicationTransactionFactory
+public sealed class ApplicationTransactionFactory(IServiceScopeFactory scopeFactory)
+	: IApplicationTransactionFactory
 {
 	public IApplicationTransaction Create()
 	{

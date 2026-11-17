@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Dtos.Sale;
 
 namespace Main.Api.GraphQl.Types.Inputs.Sale;
 
@@ -25,13 +25,14 @@ public sealed record GqlEditSaleContentInput
 	public string? Comment { get; init; }
 
 	[GraphQLIgnore]
-	public EditSaleContentDto ToDto() => new()
-	{
-		Id = Id,
-		ProductId = ProductId,
-		Count = Count,
-		Price = Price,
-		PriceWithDiscount = PriceWithDiscount,
-		Comment = Comment
-	};
+	public EditSaleContentDto ToDto()
+		=> new()
+		{
+			Id = Id,
+			ProductId = ProductId,
+			Count = Count,
+			Price = Price,
+			PriceWithDiscount = PriceWithDiscount,
+			Comment = Comment
+		};
 }

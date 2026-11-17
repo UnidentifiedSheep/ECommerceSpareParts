@@ -10,9 +10,6 @@ public record InternalServicesOptions
 	public required ServiceOptions Main { get; init; }
 
 	[Required]
-	public required ServiceOptions Pricing { get; init; }
-
-	[Required]
 	public required ServiceOptions Search { get; init; }
 
 	[Required]

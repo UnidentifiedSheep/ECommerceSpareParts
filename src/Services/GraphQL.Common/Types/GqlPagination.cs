@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 
 namespace GraphQL.Common.Types;
@@ -12,6 +11,6 @@ public record GqlPagination
 	[GraphQLName("size")]
 	public required int Size { get; init; }
 
-	public static implicit operator Pagination(GqlPagination pagination) =>
-		new(pagination.Page, pagination.Size);
+	public static implicit operator Pagination(GqlPagination pagination)
+		=> new(pagination.Page, pagination.Size);
 }

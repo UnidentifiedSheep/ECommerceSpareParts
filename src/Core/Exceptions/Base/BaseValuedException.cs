@@ -7,10 +7,7 @@ public abstract class BaseValuedException : Exception, IValuedException, IStatus
 {
 	private readonly object? _errorValues;
 
-	protected BaseValuedException(string? message, object key) : base(message)
-	{
-		_errorValues = key;
-	}
+	protected BaseValuedException(string? message, object key) : base(message) => _errorValues = key;
 
 	protected BaseValuedException(string? message) : base(message)
 	{

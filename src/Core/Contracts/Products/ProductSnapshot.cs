@@ -14,8 +14,17 @@ public record ProductSnapshot
 }
 
 public record ProductCharacteristicSnapshot(int CharacteristicId, string Value);
-public record ProductCharacteristicsSnapshot(int ProductId, IReadOnlyList<ProductCharacteristicSnapshot> Characteristics);
+
+public record ProductCharacteristicsSnapshot(int ProductId,
+	IReadOnlyList<ProductCharacteristicSnapshot> Characteristics);
+
 public record ProductDimensionsSnapshot(int ProductId, ProductDimensionsData? Dimensions);
+
 public record ProductWeightSnapshot(int ProductId, ProductWeightData? Weight);
-public record ProductDimensionsData(decimal Length, decimal Width, decimal Height, DimensionUnit Unit);
+
+public record ProductDimensionsData(decimal Length,
+	decimal Width,
+	decimal Height,
+	DimensionUnit Unit);
+
 public record ProductWeightData(decimal Value, WeightUnit Unit);

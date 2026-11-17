@@ -1,12 +1,11 @@
 using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Purchase;
 using Main.Api.GraphQl.Types.Purchase;
-using Main.Application.Handlers.Purchases.DeletePurchase;
-using Main.Application.Handlers.Purchases.CreatePurchase;
-using Main.Application.Handlers.Purchases.EditPurchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases.CreatePurchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases.EditPurchase;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;
@@ -30,8 +29,6 @@ public sealed class PurchaseMutations
 				input.Contents.Select(content => content.ToDto()).ToArray(),
 				input.Comment,
 				input.PayedSum,
-				input.WithLogistics ?? false,
-				input.StorageFrom,
 				input.ForcePayment ?? false),
 			cancellationToken);
 
@@ -51,9 +48,7 @@ public sealed class PurchaseMutations
 				input.PurchaseId,
 				input.CurrencyId,
 				input.Comment,
-				input.PurchaseDateTime,
-				input.WithLogistics ?? false,
-				input.StorageFrom),
+				input.PurchaseDateTime),
 			cancellationToken);
 
 		return new GqlPurchase(input.PurchaseId);

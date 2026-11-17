@@ -8,18 +8,14 @@ public abstract class NamedObjectGroupRegistryBase : INamedObjectGroupRegistry
 	public IReadOnlyDictionary<string, Type> Map => _map;
 
 	public Type GetRegistryType(string groupName)
-	{
-		return _map.TryGetValue(groupName, out var type)
+		=> _map.TryGetValue(groupName, out var type)
 			? type
 			: throw new KeyNotFoundException(
 				$"Named object group '{groupName}' not found");
-	}
 
 	protected void Register<TNamedObjectBase>(string groupName)
 		where TNamedObjectBase : class, INamedObject
-	{
-		Register(groupName, typeof(INamedObjectRegistry<TNamedObjectBase>));
-	}
+		=> Register(groupName, typeof(INamedObjectRegistry<TNamedObjectBase>));
 
 	protected void Register(string groupName, Type registryType)
 	{

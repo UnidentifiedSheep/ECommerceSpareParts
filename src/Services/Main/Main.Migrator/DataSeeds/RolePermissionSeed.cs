@@ -1,23 +1,34 @@
 using Enums;
 using LinqKit;
 using Main.Entities.Auth;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class RolePermissionSeed : ISeed<DContext>
+public class RolePermissionSeed : ISeed<UnifiedDbContext>
 {
-	public async Task SeedAsync(DContext context)
+
+	private static IReadOnlyList<(string, string)> RetiredPermissions { get; } =
+		new List<(Role, PermissionCodes)>
+			{
+				(Role.Member, PermissionCodes.JOBS_CREATE),
+				(Role.Member, PermissionCodes.JOBS_GET)
+			}
+			.Select(x => (RoleNames.Normalize(x.Item1.ToString()),
+				Permission.ToNormalizedPermission(x.Item2)))
+			.ToList();
+
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		var roles = await context.Roles.ToListAsync();
+		var roles = await context.Set<Entities.Auth.Role>().ToListAsync();
 
 		if (roles.Count == 0)
 			return;
 
-		var permissions = await context.Permissions.ToDictionaryAsync(p => p.Name);
+		var permissions = await context.Set<Permission>().ToDictionaryAsync(p => p.Name);
 
 		var rolePermissions = BuildRolePermissions();
 		var existingRolePermissions = (await context
@@ -62,7 +73,7 @@ public class RolePermissionSeed : ISeed<DContext>
 
 	public int ExecutionOrder => 1;
 
-	private static async Task ClearRetiredRolePermissions(DContext context)
+	private static async Task ClearRetiredRolePermissions(UnifiedDbContext context)
 	{
 		var predicate = PredicateBuilder.New<RolePermission>(false);
 
@@ -73,17 +84,8 @@ public class RolePermissionSeed : ISeed<DContext>
 		context.RemoveRange(rp);
 	}
 
-	private static IReadOnlyList<(string, string)> RetiredPermissions { get; } = new List<(Role, PermissionCodes)>
-	{
-		(Role.Member, PermissionCodes.JOBS_CREATE),
-		(Role.Member, PermissionCodes.JOBS_GET)
-	}
-	.Select(x => (RoleNames.Normalize(x.Item1.ToString()), Permission.ToNormalizedPermission(x.Item2)))
-	.ToList();
-
 	private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
-	{
-		return new Dictionary<Role, PermissionCodes[]>
+		=> new Dictionary<Role, PermissionCodes[]>
 		{
 			[Role.Admin] =
 			[
@@ -91,11 +93,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_CONTENT_GET_ALL,
 				PermissionCodes.STORAGES_GET,
 				PermissionCodes.USERS_PERMISSIONS_CREATE,
-				PermissionCodes.USERS_VEHICLES_CREATE_ME,
-				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
-				PermissionCodes.USERS_STORAGES_ADD,
-				PermissionCodes.USERS_STORAGES_GET,
-				PermissionCodes.USERS_STORAGES_DELETE,
 				PermissionCodes.ARTICLES_CREATE,
 				PermissionCodes.USERS_MAILS_CREATE,
 				PermissionCodes.USERS_ROLES_CREATE,
@@ -178,11 +175,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
 				PermissionCodes.OPTIONS_GET,
 				PermissionCodes.OPTIONS_EDIT,
-				PermissionCodes.STORAGE_ROUTES_GET,
-				PermissionCodes.STORAGE_ROUTES_EDIT,
-				PermissionCodes.STORAGE_ROUTES_CREATE,
-				PermissionCodes.STORAGE_ROUTES_DELETE,
-				PermissionCodes.LOGISTICS_CALCULATE,
 				PermissionCodes.UPLOADS_CREATE,
 				PermissionCodes.JOBS_CREATE,
 				PermissionCodes.JOBS_GET,
@@ -251,11 +243,8 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
 				PermissionCodes.STORAGES_CONTENT_GET_ALL,
 				PermissionCodes.STORAGES_GET,
-				PermissionCodes.USERS_VEHICLES_CREATE_ME,
-				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
 				PermissionCodes.USERS_GET,
 				PermissionCodes.USERS_INFO_GET,
-				PermissionCodes.USERS_STORAGES_GET,
 				PermissionCodes.ORGANIZATIONS_GET,
 				PermissionCodes.ARTICLES_DELETE,
 				PermissionCodes.ARTICLES_EDIT,
@@ -268,8 +257,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.PRODUCERS_EDIT,
 				PermissionCodes.PRODUCERS_DELETE,
 				PermissionCodes.OPTIONS_GET,
-				PermissionCodes.STORAGE_ROUTES_EDIT,
-				PermissionCodes.LOGISTICS_CALCULATE,
 				PermissionCodes.UPLOADS_CREATE,
 				PermissionCodes.JOBS_CREATE,
 				PermissionCodes.JOBS_GET,
@@ -287,7 +274,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.BALANCES_TRANSACTION_GET_ME,
 				PermissionCodes.BALANCES_FINANCES_GET_ME,
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-				PermissionCodes.USERS_VEHICLES_CREATE_ME,
 				PermissionCodes.ARTICLES_GET_MAIN,
 				PermissionCodes.ARTICLES_DETAILS_GET,
 				PermissionCodes.ORDERS_GET_OWN,
@@ -303,11 +289,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_CONTENT_GET_ALL,
 				PermissionCodes.STORAGES_GET,
 				PermissionCodes.USERS_PERMISSIONS_CREATE,
-				PermissionCodes.USERS_VEHICLES_CREATE_ME,
-				PermissionCodes.USERS_VEHICLES_CREATE_ALL,
-				PermissionCodes.USERS_STORAGES_ADD,
-				PermissionCodes.USERS_STORAGES_GET,
-				PermissionCodes.USERS_STORAGES_DELETE,
 				PermissionCodes.USERS_ROLES_CREATE,
 				PermissionCodes.ARTICLES_CREATE,
 				PermissionCodes.USERS_MAILS_CREATE,
@@ -390,11 +371,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
 				PermissionCodes.OPTIONS_GET,
 				PermissionCodes.OPTIONS_EDIT,
-				PermissionCodes.STORAGE_ROUTES_GET,
-				PermissionCodes.STORAGE_ROUTES_EDIT,
-				PermissionCodes.STORAGE_ROUTES_CREATE,
-				PermissionCodes.STORAGE_ROUTES_DELETE,
-				PermissionCodes.LOGISTICS_CALCULATE,
 				PermissionCodes.UPLOADS_CREATE,
 				PermissionCodes.JOBS_CREATE,
 				PermissionCodes.JOBS_GET,
@@ -412,7 +388,6 @@ public class RolePermissionSeed : ISeed<DContext>
 				PermissionCodes.ORDERS_CANCEL
 			]
 		};
-	}
 
 	private static List<RolePermission> ResolvePermissions(
 		string role,

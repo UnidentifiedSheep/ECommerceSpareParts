@@ -82,12 +82,10 @@ public static class CacheExtensions
 		string key,
 		IEnumerable<T> values,
 		TimeSpan? ttl = null)
-	{
-		return cache.SetEnumerableAsync(
+		=> cache.SetEnumerableAsync(
 			key,
 			values,
 			ttl);
-	}
 
 	public static Task AddRelationsAsync<TKey>(
 		this ICache cache,

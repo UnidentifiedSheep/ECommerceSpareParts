@@ -16,7 +16,11 @@ internal static class CatalogueSearchQueryBuilder
 		Field? mappedProductIdField = null,
 		Field? productGroupIdField = null) where TDocument : class
 	{
-		var filters = BuildFilters<TDocument>(criteria, producerIdField, mappedProductIdField, productGroupIdField);
+		var filters = BuildFilters<TDocument>(
+			criteria,
+			producerIdField,
+			mappedProductIdField,
+			productGroupIdField);
 		if (string.IsNullOrWhiteSpace(criteria.Query))
 			return filters.Count == 0 ? query.MatchAll() : query.Bool(boolean => boolean.Filter(filters));
 
@@ -136,8 +140,7 @@ internal static class CatalogueSearchQueryBuilder
 	}
 
 	private static string EscapeWildcard(string value)
-	{
-		return value
+		=> value
 			.Replace(
 				"\\",
 				"\\\\",
@@ -150,7 +153,6 @@ internal static class CatalogueSearchQueryBuilder
 				"?",
 				"\\?",
 				StringComparison.Ordinal);
-	}
 
 	private static List<Func<QueryContainerDescriptor<TDocument>, QueryContainer>> BuildFilters<TDocument>(
 		CatalogueSearchCriteria criteria,

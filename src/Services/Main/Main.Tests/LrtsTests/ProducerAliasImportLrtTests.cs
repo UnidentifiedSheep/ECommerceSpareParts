@@ -1,6 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.ProducerAliasesImport;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Lrts.ProducerAliasesImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -12,9 +13,7 @@ namespace Tests.LrtsTests;
 public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<ProducerAliasImportLrt>
 {
 	public ProducerAliasImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -43,7 +42,7 @@ public sealed class ProducerAliasImportLrtTests : CsvLrtIntegrationTest<Producer
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProducerAliasesImportState>();
 		state.Errors.Should().HaveCount(3);
-		var aliases = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
+		var aliases = await Context.Set<ProducerAlias>().AsNoTracking().ToListAsync(CancellationToken);
 		aliases.Should().ContainSingle(x => x.Alias == "NEW ALIAS");
 	}
 }

@@ -1,6 +1,6 @@
 using HotChocolate;
-using Main.Application.Dtos.Users;
-using Main.Enums;
+using Main.Entities.Enums;
+using Main.Modules.Identity.Application.Dtos.Users;
 
 namespace Main.Api.GraphQl.Types.Inputs.User;
 
@@ -19,11 +19,12 @@ public sealed record GqlCreateUserPhoneInput
 	[GraphQLName("isConfirmed")]
 	public required bool IsConfirmed { get; init; }
 
-	public UserPhoneDto ToDto() => new()
-	{
-		Number = Number,
-		Type = Type,
-		IsPrimary = IsPrimary,
-		IsConfirmed = IsConfirmed
-	};
+	public UserPhoneDto ToDto()
+		=> new()
+		{
+			Number = Number,
+			Type = Type,
+			IsPrimary = IsPrimary,
+			IsConfirmed = IsConfirmed
+		};
 }

@@ -1,8 +1,8 @@
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
-using Main.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue.BuildCatalogueCandidates;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -14,9 +14,7 @@ namespace Tests.LrtsTests;
 public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildCatalogueCandidatesLrt>
 {
 	public BuildCatalogueCandidatesLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -42,12 +40,12 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.AssignedRows.Should().Be(2);
 		state.SkippedRows.Should().Be(0);
 
-		var candidate = await Context.CatalogueCandidates.AsNoTracking().SingleAsync(CancellationToken);
+		var candidate = await Context.Set<CatalogueCandidate>().AsNoTracking().SingleAsync(CancellationToken);
 		candidate.ProducerId.Should().Be(producer.Id);
 		candidate.Sku.NormalizedValue.Should().Be("ABC123");
 
 		var candidateIds = await Context
-			.SupplierProducts
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.Select(x => x.CatalogueCandidateId)
 			.ToListAsync(CancellationToken);
@@ -72,11 +70,11 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded);
 		state.AssignedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<CatalogueCandidate>().CountAsync(CancellationToken)).Should().Be(1);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.SupplierProducts
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().Be(candidate.Id);
@@ -98,11 +96,11 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		state.ProcessedRows.Should().Be(1);
 		state.AssignedRows.Should().Be(0);
 		state.SkippedRows.Should().Be(1);
-		(await Context.CatalogueCandidates.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<CatalogueCandidate>().CountAsync(CancellationToken)).Should().Be(0);
 
 		Context.ChangeTracker.Clear();
 		var persistedProduct = await Context
-			.SupplierProducts
+			.Set<SupplierProduct>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == supplierProduct.Id, CancellationToken);
 		persistedProduct.CatalogueCandidateId.Should().BeNull();
@@ -112,11 +110,9 @@ public sealed class BuildCatalogueCandidatesLrtTests : LrtIntegrationTest<BuildC
 		string sku,
 		string producer,
 		Supplier supplier)
-	{
-		return new SupplierProductBuilder(Faker)
+		=> new SupplierProductBuilder(Faker)
 			.WithSku(sku)
 			.WithProducer(producer)
 			.WithSupplier(supplier)
 			.BuildAndAddToDb(Context, CancellationToken);
-	}
 }

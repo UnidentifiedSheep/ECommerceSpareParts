@@ -24,14 +24,6 @@
         },
         "AuthorizationPolicy": "DenyAll"
       },
-      "route-pricing-internal-deny": {
-        "ClusterId": "blackhole-cluster",
-        "Order": -100,
-        "Match": {
-          "Path": "/pricing/internal/{**catch-all}"
-        },
-        "AuthorizationPolicy": "DenyAll"
-      },
       "route-api": {
         "ClusterId": "main-cluster",
         "Order": 0,
@@ -53,18 +45,6 @@
         "Transforms": [
           {
             "PathRemovePrefix": "/search"
-          }
-        ]
-      },
-      "route-pricing": {
-        "ClusterId": "pricing-cluster",
-        "Order": 0,
-        "Match": {
-          "Path": "/pricing/{**catch-all}"
-        },
-        "Transforms": [
-          {
-            "PathRemovePrefix": "/pricing"
           }
         ]
       }
@@ -90,14 +70,6 @@
         "Destinations": {
           "search-api": {
             "Address": "http://search-api:8080/"
-          }
-        }
-      },
-      "pricing-cluster": {
-        "LoadBalancingPolicy": "RoundRobin",
-        "Destinations": {
-          "pricing-api": {
-            "Address": "http://pricing-api:8080/"
           }
         }
       }

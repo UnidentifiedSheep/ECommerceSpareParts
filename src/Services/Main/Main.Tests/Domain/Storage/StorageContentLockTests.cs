@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Storage.Enums;
+using Main.Entities.Storage.Storage;
 
 namespace Tests.Domain.Storage;
 
@@ -11,7 +11,11 @@ public class StorageContentLockTests
 	{
 		var id = Guid.NewGuid();
 		var expiresAt = DateTime.UtcNow.AddHours(1);
-		var item = StorageContentLock.Create(42, 3, expiresAt, id);
+		var item = StorageContentLock.Create(
+			42,
+			3,
+			expiresAt,
+			id);
 
 		item.Id.Should().Be(id);
 		item.StorageContentId.Should().Be(42);
@@ -38,18 +42,27 @@ public class StorageContentLockTests
 	[InlineData(-1, 1)]
 	[InlineData(1, 0)]
 	[InlineData(1, -1)]
-	public void Create_RejectsInvalidIdentifiersAndQuantity(int storageContentId, int quantity) =>
-		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(storageContentId, quantity));
+	public void Create_RejectsInvalidIdentifiersAndQuantity(int storageContentId, int quantity)
+		=> Assert.Throws<InvalidOperationException>(()
+			=> StorageContentLock.Create(storageContentId, quantity));
 
 	[Fact]
-	public void Create_RejectsEmptyIdentity() =>
-		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(42, 3, id: Guid.Empty));
+	public void Create_RejectsEmptyIdentity()
+		=> Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(
+			42,
+			3,
+			id: Guid.Empty));
 
 	[Fact]
 	public void Create_RejectsPastExpirationAndNonUtcExpiration()
 	{
-		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(42, 3, DateTime.UtcNow.AddMinutes(-1)));
-		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(42, 3,
+		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(
+			42,
+			3,
+			DateTime.UtcNow.AddMinutes(-1)));
+		Assert.Throws<InvalidOperationException>(() => StorageContentLock.Create(
+			42,
+			3,
 			DateTime.SpecifyKind(DateTime.UtcNow.AddHours(1), DateTimeKind.Unspecified)));
 	}
 
@@ -57,7 +70,10 @@ public class StorageContentLockTests
 	public void SetQuantity_RejectsInvalidOrExpiredChangesWithoutMutatingQuantity()
 	{
 		var expiresAt = DateTime.UtcNow.AddHours(1);
-		var item = StorageContentLock.Create(42, 3, expiresAt);
+		var item = StorageContentLock.Create(
+			42,
+			3,
+			expiresAt);
 		var now = expiresAt.AddMinutes(-1);
 		item.SetQuantity(5, now);
 
@@ -74,18 +90,31 @@ public class StorageContentLockTests
 	public void Closing_IsIdempotentAndRejectsOtherTransitions(StorageContentLockState state)
 	{
 		var expiresAt = DateTime.UtcNow.AddHours(1);
-		var item = StorageContentLock.Create(42, 3, expiresAt);
+		var item = StorageContentLock.Create(
+			42,
+			3,
+			expiresAt);
 		var now = state == StorageContentLockState.Expired ? expiresAt : expiresAt.AddMinutes(-1);
-		Close(item, state, now);
-		Close(item, state, now.AddSeconds(1));
+		Close(
+			item,
+			state,
+			now);
+		Close(
+			item,
+			state,
+			now.AddSeconds(1));
 
 		item.State.Should().Be(state);
 		item.ClosedAt.Should().Be(now);
 		item.Quantity.Should().Be(3);
 		item.IsActiveAt(now).Should().BeFalse();
 		Assert.Throws<InvalidOperationException>(() => item.SetQuantity(1, now));
-		foreach (var other in Enum.GetValues<StorageContentLockState>().Where(value => value != state && value != StorageContentLockState.Active))
-			Assert.Throws<InvalidOperationException>(() => Close(item, other, expiresAt));
+		foreach (var other in Enum.GetValues<StorageContentLockState>()
+					.Where(value => value != state && value != StorageContentLockState.Active))
+			Assert.Throws<InvalidOperationException>(() => Close(
+				item,
+				other,
+				expiresAt));
 		item.State.Should().Be(state);
 		item.ClosedAt.Should().Be(now);
 	}
@@ -94,7 +123,10 @@ public class StorageContentLockTests
 	public void ExpiredLock_CannotBeConsumedBeforeBackgroundExpiration()
 	{
 		var expiresAt = DateTime.UtcNow.AddHours(1);
-		var item = StorageContentLock.Create(42, 3, expiresAt);
+		var item = StorageContentLock.Create(
+			42,
+			3,
+			expiresAt);
 
 		Assert.Throws<InvalidOperationException>(() => item.Consume(expiresAt));
 
@@ -108,7 +140,10 @@ public class StorageContentLockTests
 	public void Expire_RejectsEarlyAndPermanentLocks()
 	{
 		var expiresAt = DateTime.UtcNow.AddHours(1);
-		var temporary = StorageContentLock.Create(42, 3, expiresAt);
+		var temporary = StorageContentLock.Create(
+			42,
+			3,
+			expiresAt);
 		var permanent = StorageContentLock.Create(42, 3);
 
 		Assert.Throws<InvalidOperationException>(() => temporary.Expire(expiresAt.AddTicks(-1)));
@@ -132,13 +167,22 @@ public class StorageContentLockTests
 		item.ClosedAt.Should().BeNull();
 	}
 
-	private static void Close(StorageContentLock item, StorageContentLockState state, DateTime now)
+	private static void Close(
+		StorageContentLock item,
+		StorageContentLockState state,
+		DateTime now)
 	{
 		switch (state)
 		{
-			case StorageContentLockState.Consumed: item.Consume(now); break;
-			case StorageContentLockState.Released: item.Release(now); break;
-			case StorageContentLockState.Expired: item.Expire(now); break;
+			case StorageContentLockState.Consumed:
+				item.Consume(now);
+				break;
+			case StorageContentLockState.Released:
+				item.Release(now);
+				break;
+			case StorageContentLockState.Expired:
+				item.Expire(now);
+				break;
 			default: throw new ArgumentOutOfRangeException(nameof(state));
 		}
 	}

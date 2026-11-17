@@ -1,0 +1,16 @@
+﻿using System.Text.Json.Serialization;
+using Enums.Units;
+
+namespace Main.Modules.Product.Application.Dtos.Product;
+
+public record ProductWeightDto
+{
+	[JsonPropertyName("productId")]
+	public required int ProductId { get; init; }
+
+	[JsonPropertyName("weight")]
+	public required decimal Weight { get; init; }
+
+	[JsonPropertyName("unit")]
+	public required WeightUnit Unit { get; init; }
+}

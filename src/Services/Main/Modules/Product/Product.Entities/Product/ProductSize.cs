@@ -1,0 +1,116 @@
+using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
+using Domain;
+using Domain.Interfaces;
+using Domain.Validation;
+using Enums.Units;
+using Extensions;
+using Main.Entities.Product.DomainEvents.Product;
+
+namespace Main.Entities.Product.Product;
+
+public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, int>
+{
+	private ProductSize()
+	{
+	}
+
+	private ProductSize(
+		int productId,
+		decimal length,
+		decimal width,
+		decimal height,
+		DimensionUnit unit)
+	{
+		ProductId = productId;
+		SetLength(length);
+		SetWidth(width);
+		SetHeight(height);
+		SetUnit(unit);
+	}
+
+	[Validate]
+	public int ProductId { get; }
+
+	public decimal Length { get; private set; }
+
+	public decimal Width { get; private set; }
+
+	public decimal Height { get; private set; }
+
+	public DimensionUnit Unit { get; private set; }
+
+	public decimal VolumeM3 { get; private set; }
+
+	public static Expression<Func<ProductSize, int>> GetKeySelector() => x => x.ProductId;
+
+	public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
+		=> x =>
+			x.ProductId == key;
+
+	public static ProductSize Create(
+		int productId,
+		decimal length,
+		decimal width,
+		decimal height,
+		DimensionUnit unit)
+	{
+		var size = new ProductSize(
+			productId,
+			length,
+			width,
+			height,
+			unit);
+		return size;
+	}
+
+	public void SetLength(decimal length)
+	{
+		length
+			.EnsureGreaterThan(0, ArticleSizeLengthMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeLengthMaxTwoDecimalsMessage.Instance);
+
+		Length = length;
+		RecalculateVolume();
+	}
+
+	public void SetWidth(decimal width)
+	{
+		width
+			.EnsureGreaterThan(0, ArticleSizeWidthMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeWidthMaxTwoDecimalsMessage.Instance);
+		Width = width;
+		RecalculateVolume();
+	}
+
+	public void SetHeight(decimal height)
+	{
+		height
+			.EnsureGreaterThan(0, ArticleSizeHeightMustBeGreaterThanZeroMessage.Instance)
+			.EnsureMaxDecimalPlaces(2, ArticleSizeHeightMaxTwoDecimalsMessage.Instance);
+
+		Height = height;
+		RecalculateVolume();
+	}
+
+	public void SetUnit(DimensionUnit unit)
+	{
+		Unit = unit;
+		RecalculateVolume();
+	}
+
+	private void RecalculateVolume()
+		=> VolumeM3 = DimensionExtensions.ToCubicMeters(
+			Length,
+			Width,
+			Height,
+			Unit);
+
+	public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
+
+	public override void OnCreated() => OnUpdated();
+
+	public override void OnDeleted() => OnUpdated();
+
+	public override int GetId() => ProductId;
+}

@@ -1,8 +1,8 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Application.Handlers.Storages.DeleteStorage;
-using Main.Entities.Exceptions;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Handlers.Storages.DeleteStorage;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
@@ -11,9 +11,7 @@ namespace Tests.HandlersTests.Storages;
 public class DeleteStorageTests : IntegrationTest
 {
 	public DeleteStorageTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageContentTestContext>();
-	}
+		=> RegisterBasicContext<StorageContentTestContext>();
 
 	[Fact]
 	public async Task DeleteStorage_NotExisting_ThrowsStorageNotFoundException()
@@ -33,7 +31,7 @@ public class DeleteStorageTests : IntegrationTest
 		var command = new DeleteStorageCommand(storage.Code);
 		await Mediator.Send(command, CancellationToken);
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage.Code, CancellationToken);
+		var exists = await Context.Set<Storage>().AnyAsync(x => x.Code == storage.Code, CancellationToken);
 		Assert.False(exists);
 	}
 
@@ -46,7 +44,7 @@ public class DeleteStorageTests : IntegrationTest
 		await Assert.ThrowsAsync<DbUpdateException>(async () =>
 			await Mediator.Send(command, CancellationToken));
 
-		var exists = await Context.Storages.AnyAsync(x => x.Code == storage, CancellationToken);
+		var exists = await Context.Set<Storage>().AnyAsync(x => x.Code == storage, CancellationToken);
 		Assert.True(exists);
 	}
 }

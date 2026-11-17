@@ -1,12 +1,13 @@
 using Enums;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Producer;
-using Main.Application.Dtos.Product.References;
+using Main.Modules.Product.Application.Dtos.Product.References;
 
 namespace Main.Api.GraphQl.Types.Product;
 
 [GraphQLName("ResolvedProductReference")]
-public sealed record GqlResolvedProductReference([property: GraphQLIgnore] ResolvedProductReferenceDto Reference)
+public sealed record GqlResolvedProductReference([property: GraphQLIgnore]
+	ResolvedProductReferenceDto Reference)
 {
 	[GraphQLName("sku")]
 	public string Sku => Reference.Sku;

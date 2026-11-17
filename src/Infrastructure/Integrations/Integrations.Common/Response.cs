@@ -15,22 +15,18 @@ public record Response<T>
 	public string? Error { get; init; }
 
 	public static Response<T> Ok(T? value, HttpStatusCode statusCode = HttpStatusCode.OK)
-	{
-		return new Response<T>
+		=> new()
 		{
 			Success = true, Value = value, StatusCode = statusCode
 		};
-	}
 
 	public static Response<T> Fail(HttpStatusCode statusCode, string? error = null)
-	{
-		return new Response<T>
+		=> new()
 		{
 			Success = false,
 			StatusCode = statusCode,
 			Error = error
 		};
-	}
 
 	public static Response<T> FromFail<TOther>(Response<TOther> fail) => Fail(fail.StatusCode, fail.Error);
 }

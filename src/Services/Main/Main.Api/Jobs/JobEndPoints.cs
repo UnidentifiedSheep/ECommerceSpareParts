@@ -1,0 +1,195 @@
+using System.Text.Json.Serialization;
+using Api.Common.Extensions;
+using Api.Common.Models.Requests;
+using Application.Common.Dtos;
+using Application.Common.Interfaces.Services;
+using Carter;
+using Domain.CommonEnums;
+using Enums;
+using Main.Modules.Jobs.Application.Domains;
+using Main.Modules.Jobs.Application.Handlers.Jobs;
+using Main.Modules.Jobs.Application.Handlers.Jobs.GetJobs;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Main.Api.Jobs;
+
+public record GetAvailableJobsResponse
+{
+	[JsonPropertyName("jobs")]
+	public required IReadOnlyList<JobInfoDto> Jobs { get; init; }
+}
+
+public record GetJobsRequest : SortablePaginationQueryModel
+{
+	[FromQuery(Name = "systemName")]
+	public string[] SystemNames { get; init; } = [];
+
+	[FromQuery(Name = "status")]
+	public JobStatus[] Statuses { get; init; } = [];
+}
+
+public record GetJobsResponse
+{
+	[JsonPropertyName("jobs")]
+	public required IReadOnlyList<JobDto> Jobs { get; init; }
+}
+
+public record CreateJobRequest
+{
+	[JsonPropertyName("systemName")]
+	public required string SystemName { get; init; }
+
+	[JsonPropertyName("inputState")]
+	public required string InputState { get; init; }
+
+	[JsonPropertyName("maxAttempts")]
+	public int MaxAttempts { get; init; } = 3;
+}
+
+public record CreateJobResponse
+{
+	[JsonPropertyName("job")]
+	public required JobDto Job { get; init; }
+}
+
+public record GetJobResponse(JobDto Job);
+
+public record GetJobStateResponse
+{
+	[JsonPropertyName("state")]
+	public required string State { get; init; }
+}
+
+public class JobEndPoints : ICarterModule
+{
+	public void AddRoutes(IEndpointRouteBuilder app)
+	{
+		if (!app.HasCommonDomain<JobsDomain>())
+			return;
+
+		var jobs = app.MapGroup("/jobs").WithTags("Jobs").AddScheduleEndPoints();
+
+		jobs
+			.MapGet(
+				"/available",
+				async (ISender sender, CancellationToken ct) =>
+				{
+					var result = await sender.Send(new GetAllAvailableJobsQuery(), ct);
+
+					return Results.Ok(
+						new GetAvailableJobsResponse
+						{
+							Jobs = result.Jobs
+						});
+				})
+			.WithName("GetAvailableJobs")
+			.WithDisplayName("Get all available jobs")
+			.Produces<GetAvailableJobsResponse>()
+			.RequireAllPermissions(PermissionCodes.JOBS_GET);
+
+		jobs
+			.MapGet(
+				"",
+				async (
+					ISender sender, [AsParameters] GetJobsRequest request,
+					CancellationToken ct) =>
+				{
+					var result = await sender.Send(
+						new GetJobsQuery(
+							request,
+							request.SystemNames,
+							request.Statuses,
+							request.ToSortExpressions()),
+						ct);
+
+					return Results.Ok(
+						new GetJobsResponse
+						{
+							Jobs = result.Jobs
+						});
+				})
+			.WithName("GetJobs")
+			.WithDisplayName("Get current jobs")
+			.Produces<GetJobsResponse>()
+			.RequireAllPermissions(PermissionCodes.JOBS_GET);
+
+		jobs
+			.MapGet(
+				"{id:guid}",
+				async (
+					ISender sender, Guid id,
+					CancellationToken ct) =>
+				{
+					var result = await sender.Send(new GetJobQuery(id), ct);
+					return Results.Ok(new GetJobResponse(result.Job));
+				})
+			.WithName("GetJob")
+			.WithDisplayName("Get job by id")
+			.Produces<GetJobResponse>()
+			.ProducesProblem(StatusCodes.Status404NotFound)
+			.RequireAllPermissions(PermissionCodes.JOBS_GET);
+
+		jobs
+			.MapGet(
+				"{id:guid}/cancel",
+				async (
+					IJobService jobService, Guid id,
+					CancellationToken ct) =>
+				{
+					await jobService.CancelJobAsync(id, ct);
+					return Results.Accepted();
+				})
+			.WithName("CancelJobState")
+			.WithDisplayName("Cancel job")
+			.Produces(202)
+			.RequireAllPermissions(PermissionCodes.JOBS_CREATE);
+
+		jobs
+			.MapGet(
+				"{id:guid}/state",
+				async (
+					ISender sender, Guid id,
+					CancellationToken ct) =>
+				{
+					var result = await sender.Send(new GetJobStateQuery(id), ct);
+
+					return Results.Ok(
+						new GetJobStateResponse
+						{
+							State = result.State
+						});
+				})
+			.WithName("GetJobState")
+			.WithDisplayName("Get current jobs state")
+			.Produces<GetJobStateResponse>()
+			.RequireAllPermissions(PermissionCodes.JOBS_GET);
+
+		jobs
+			.MapPost(
+				"",
+				async (
+					ISender sender,
+					CreateJobRequest request, CancellationToken ct) =>
+				{
+					var created = await sender.Send(
+						new CreateJobCommand(
+							request.SystemName,
+							request.InputState,
+							request.MaxAttempts),
+						ct);
+					var job = await sender.Send(new GetJobQuery(created.JobId), ct);
+
+					return Results.Created(
+						$"/jobs/{created.JobId}",
+						new CreateJobResponse
+						{
+							Job = job.Job
+						});
+				})
+			.WithName("CreateJob")
+			.WithDisplayName("Creates a new job")
+			.Produces<CreateJobResponse>()
+			.RequireAllPermissions(PermissionCodes.JOBS_CREATE);
+	}
+}

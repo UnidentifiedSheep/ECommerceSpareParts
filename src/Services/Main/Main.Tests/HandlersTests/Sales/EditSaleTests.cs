@@ -1,18 +1,19 @@
-using Tests.Stubs;
-using Microsoft.Extensions.DependencyInjection;
-using Application.Common.Interfaces.Events;
 using Contracts;
-using Tests.Extensions;
+using Enums;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Sales.EditSale;
-using Main.Entities.Exceptions;
-using Main.Entities.Sale;
-using Main.Entities.Storage;
-using Main.Enums;
-using Main.Enums.Balances;
+using Main.Entities.Analytics;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Product.Stock;
+using Main.Entities.Sale.Exceptions;
+using Main.Entities.Sale.Sale;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Handlers.Sales.EditSale;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
@@ -21,14 +22,14 @@ namespace Tests.HandlersTests.Sales;
 public class EditSaleTests : IntegrationTest
 {
 	public EditSaleTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
 
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public async Task EditSale_ValidSale_UpdatesSaleContentsAndRecreatesTransaction()
@@ -61,11 +62,11 @@ public class EditSaleTests : IntegrationTest
 		var editedSale = await ReloadSale();
 		var editedContent = editedSale.Contents.Should().ContainSingle().Subject;
 		var oldTransaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == oldTransactionId, CancellationToken);
 		var newTransaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == editedSale.TransactionId, CancellationToken);
 
@@ -76,7 +77,9 @@ public class EditSaleTests : IntegrationTest
 		editedContent.DiscountedPrice.Should().Be(90m);
 		editedContent.TotalSum.Should().Be(90m);
 		editedContent.OriginalPrice.Should().Be(120);
-		var analytics = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
+		var analytics = await Context.Set<SaleContentAnalytics>()
+			.AsNoTracking()
+			.SingleAsync(item => item.SaleContentId == editedContent.Id, CancellationToken);
 		analytics.OriginalAmountInBaseCurrency.Should().Be(120m * editedContent.Count);
 		analytics.RevenueInBaseCurrency.Should().Be(90m * editedContent.Count);
 		editedContent.Comment.Should().Be("edited");
@@ -119,7 +122,7 @@ public class EditSaleTests : IntegrationTest
 
 		var saleAfterFailedEdit = await ReloadSale();
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == sale.TransactionId, CancellationToken);
 
@@ -129,8 +132,7 @@ public class EditSaleTests : IntegrationTest
 
 	[Fact]
 	public async Task EditSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
-	{
-		await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
+		=> await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
 			new EditSaleCommand(
 				Guid.NewGuid(),
 				1,
@@ -147,7 +149,6 @@ public class EditSaleTests : IntegrationTest
 				DateTime.UtcNow,
 				null),
 			CancellationToken));
-	}
 
 	[Fact]
 	public async Task EditSale_AddsNewContent()
@@ -222,7 +223,7 @@ public class EditSaleTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task EditSale_WhenContentProductChanged_ThrowsArticleDoesntMatchContentException()
+	public async Task EditSale_WhenContentProductChanged_ThrowsSaleContentProductMismatchException()
 	{
 		var sale = await ReloadSale();
 		var content = sale.Contents.Single();
@@ -244,7 +245,7 @@ public class EditSaleTests : IntegrationTest
 			sale.SaleDatetime,
 			sale.Comment);
 
-		await Assert.ThrowsAsync<ArticleDoesntMatchContentException>(() =>
+		await Assert.ThrowsAsync<SaleContentProductMismatchException>(() =>
 			Mediator.Send(command, CancellationToken));
 
 		var saleAfterFailedEdit = await ReloadSale();
@@ -254,7 +255,7 @@ public class EditSaleTests : IntegrationTest
 	[Fact]
 	public async Task EditSale_WhenSaleDeleted_ThrowsSaleNotFoundException()
 	{
-		var sale = await Context.Sales.SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
+		var sale = await Context.Set<Sale>().SingleAsync(x => x.Id == SaleContext.Sale.Id, CancellationToken);
 		sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 		Context.ChangeTracker.Clear();
@@ -314,18 +315,15 @@ public class EditSaleTests : IntegrationTest
 	}
 
 	private Task<Sale> ReloadSale()
-	{
-		return Context
-			.Sales
+		=> Context
+			.Set<Sale>()
 			.Include(x => x.Contents)
 			.ThenInclude(x => x.Details)
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == SaleContext.Sale.Id);
-	}
 
 	private static EditSaleContentDto ToDto(SaleContent content)
-	{
-		return new EditSaleContentDto
+		=> new()
 		{
 			Id = content.Id,
 			ProductId = content.ProductId,
@@ -334,55 +332,51 @@ public class EditSaleTests : IntegrationTest
 			PriceWithDiscount = content.DiscountedPrice,
 			Comment = content.Comment
 		};
-	}
 
 	private static EditSaleContentDto NewDto(int productId)
-	{
-		return new EditSaleContentDto
+		=> new()
 		{
 			ProductId = productId,
 			Count = 1,
 			Price = 100m,
 			PriceWithDiscount = 90m
 		};
-	}
 
 	private Task<StorageContent> OtherStorageContent()
-	{
-		return Context
-			.StorageContents
+		=> Context
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.Count > 0)
 			.Where(x => x.StorageCode == SaleContext.StorageContent.StorageCode)
 			.Where(x => x.ProductId != SaleContext.Product.Id)
 			.FirstAsync();
-	}
 
 	private Task<int> StorageProductCount(int productId, string storageCode)
-	{
-		return Context
-			.StorageContents
+		=> Context
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.Where(x => x.ProductId == productId && x.StorageCode == storageCode)
 			.SumAsync(x => x.Count);
-	}
 
-	private Task<int> ProductStock(int productId) =>
-		Context.GetProductStockQuantityAsync(productId, CancellationToken);
+	private Task<int> ProductStock(int productId)
+		=> Context.GetProductStockQuantityAsync(productId, CancellationToken);
 
 	private async Task AddAvailableCount(
 		int productId,
 		int storageContentId,
 		int count)
 	{
-		var storageContent = await Context.StorageContents.SingleAsync(x => x.Id == storageContentId);
+		var storageContent = await Context.Set<StorageContent>().SingleAsync(x => x.Id == storageContentId);
 
 		storageContent.IncreaseCount(count, StorageMovementType.SaleEditing);
-		var stock = await Context.ProductStocks.SingleAsync(
-			item => item.ProductId == productId && item.StorageCode == storageContent.StorageCode, CancellationToken);
+		var stock = await Context.Set<ProductStock>()
+			.SingleAsync(
+				item => item.ProductId == productId && item.StorageCode == storageContent.StorageCode,
+				CancellationToken);
 		stock.SetQuantity(stock.Quantity + count);
 
 		await Context.SaveChangesAsync();
+		DiscardPendingDomainEvents();
 		Context.ChangeTracker.Clear();
 	}
 }

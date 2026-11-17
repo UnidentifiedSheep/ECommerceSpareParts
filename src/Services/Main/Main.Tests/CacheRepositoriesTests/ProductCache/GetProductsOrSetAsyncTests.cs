@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Interfaces;
-using Main.Application.Static;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Static;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -13,9 +13,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class GetProductsOrSetAsyncTests : IntegrationTest
 {
 	public GetProductsOrSetAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -85,16 +83,14 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 
 	private IProductProvider GetRepository() => Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
-	private Task RemoveCachedProducts(IEnumerable<int> productIds) =>
-		Task.WhenAll(productIds.Select(RemoveCachedProduct));
+	private Task RemoveCachedProducts(IEnumerable<int> productIds)
+		=> Task.WhenAll(productIds.Select(RemoveCachedProduct));
 
 	private async Task RemoveCachedProduct(int productId)
-	{
-		await Scope
+		=> await Scope
 			.ServiceProvider
 			.GetRequiredService<ICache>()
-			.RemoveKeyAsync(CacheKeys.ProductCache.Product(productId));
-	}
+			.RemoveKeyAsync(ProductCacheKeys.Product(productId));
 
 	private void AssertProduct(ProductDto dto, Product product)
 	{

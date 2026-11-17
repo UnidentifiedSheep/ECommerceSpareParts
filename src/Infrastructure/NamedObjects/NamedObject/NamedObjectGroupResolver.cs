@@ -4,15 +4,28 @@ using NamedObject.Core.Interfaces;
 namespace NamedObject;
 
 internal class NamedObjectGroupResolver(
-	INamedObjectGroupRegistry registry,
+	IEnumerable<INamedObjectGroupRegistry> registries,
 	IServiceProvider serviceProvider)
 	: INamedObjectGroupResolver
 {
 	public INamedObjectRegistry GetByGroupName(string groupName)
 	{
-		var registryType = registry.GetRegistryType(groupName);
+		foreach (var registry in registries)
+		{
+			Type registryType;
+			try
+			{
+				registryType = registry.GetRegistryType(groupName);
+			}
+			catch (KeyNotFoundException)
+			{
+				continue;
+			}
 
-		return (INamedObjectRegistry?)serviceProvider.GetRequiredService(registryType) ??
-			throw new KeyNotFoundException($"Named object group '{groupName}' not found");
+			return (INamedObjectRegistry?)serviceProvider.GetRequiredService(registryType) ??
+				throw new KeyNotFoundException($"Named object group '{groupName}' not found");
+		}
+
+		throw new KeyNotFoundException($"Named object group '{groupName}' not found");
 	}
 }

@@ -6,8 +6,6 @@ public static class ServicesDefinitions
 {
 	public static readonly Main Main = new();
 
-	public static readonly Pricing Pricing = new();
-
 	public static readonly Search Search = new();
 
 	public static readonly Gateway Gateway = new();
@@ -16,11 +14,6 @@ public static class ServicesDefinitions
 public sealed class Main : IServiceDefinition
 {
 	public string ServiceName => "main";
-}
-
-public sealed class Pricing : IServiceDefinition
-{
-	public string ServiceName => "pricing";
 }
 
 public sealed class Search : IServiceDefinition

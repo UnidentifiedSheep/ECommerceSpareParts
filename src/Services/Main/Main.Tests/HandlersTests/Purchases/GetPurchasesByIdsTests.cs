@@ -1,7 +1,7 @@
+using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Purchases;
-using Main.Entities.Purchase;
-using Main.Enums.Balances;
+using Main.Entities.Purchase.Purchase;
+using Main.Modules.Purchase.Application.Handlers.Purchases;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
 using Tests.Extensions;
@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Purchases;
 public sealed class GetPurchasesByIdsTests : IntegrationTest
 {
 	public GetPurchasesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<PurchaseTestContext>();
-	}
+		=> RegisterBasicContext<PurchaseTestContext>();
 
 	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
 
@@ -27,7 +25,8 @@ public sealed class GetPurchasesByIdsTests : IntegrationTest
 		var second = await CreatePurchase();
 
 		var result = await Mediator.Send(
-			new GetPurchasesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]), CancellationToken);
+			new GetPurchasesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Purchases.Keys.Should().BeEquivalentTo([first.Id, second.Id]);
 	}

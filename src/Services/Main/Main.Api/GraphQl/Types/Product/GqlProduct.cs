@@ -6,13 +6,13 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Producer;
-using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Sales.GetProductSaleHistory;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
+using Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
+using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
+using Main.Modules.Storage.Application.Products.Queries;
 using MediatR;
-using Main.Application.Handlers.StorageContents.GetProductStorageContents;
-using Main.Application.Products.Queries;
-using Main.Application.Products.Queries.GetProductCrosses;
-using Main.Entities.Exceptions;
 
 namespace Main.Api.GraphQl.Types.Product;
 
@@ -21,15 +21,9 @@ public record GqlProduct
 {
 	private readonly ProductDto? _product;
 
-	public GqlProduct(int id)
-	{
-		Id = id;
-	}
+	public GqlProduct(int id) => Id = id;
 
-	public GqlProduct(ProductDto product) : this(product.Id)
-	{
-		_product = product;
-	}
+	public GqlProduct(ProductDto product) : this(product.Id) => _product = product;
 
 	[GraphQLName("id")]
 	[Shareable]
@@ -38,28 +32,32 @@ public record GqlProduct
 	[GraphQLName("sku")]
 	public async Task<string> GetSkuAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Sku;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).Sku;
 
 	[GraphQLName("name")]
 	public async Task<string> GetNameAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Name;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).Name;
 
 	[GraphQLName("description")]
 	public async Task<string?> GetDescriptionAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) =>
-		(await GetProductAsync(loader, cancellationToken)).Description;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).Description;
 
 	[GraphQLName("indicator")]
 	public async Task<string?> GetIndicatorAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Indicator;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).Indicator;
 
 	[GraphQLName("images")]
 	public async Task<List<string>> GetImagesAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).Images;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).Images;
 
 	[GraphQLName("eans")]
 	[RequireAllPermissions(PermissionCodes.ARTICLE_EANS_GET)]
@@ -71,7 +69,8 @@ public record GqlProduct
 	[GraphQLName("rowVersion")]
 	public async Task<uint> GetRowVersionAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => (await GetProductAsync(loader, cancellationToken)).RowVersion;
+		CancellationToken cancellationToken)
+		=> (await GetProductAsync(loader, cancellationToken)).RowVersion;
 
 	[GraphQLName("producer")]
 	public async Task<GqlProducer> GetProducerAsync(
@@ -172,16 +171,18 @@ public record GqlProduct
 	[GraphQLName("stock")]
 	public async Task<long> GetStockAsync(
 		IProductStockByIdDataLoader loader,
-		CancellationToken cancellationToken) => await loader.LoadAsync(Id, cancellationToken);
+		CancellationToken cancellationToken)
+		=> await loader.LoadAsync(Id, cancellationToken);
 
 
 	[GraphQLName("availableStock")]
 	public async Task<int> GetAvailableStockAsync(
 		IProductAvailableStockDataLoader loader,
 		GqlProductAvailableStocksInput input,
-		CancellationToken cancellationToken) => await loader.LoadAsync(
-		new GetAvailableProductsStockItem(Id, input.StorageCode),
-		cancellationToken);
+		CancellationToken cancellationToken)
+		=> await loader.LoadAsync(
+			new GetAvailableProductsStockItem(Id, input.StorageCode),
+			cancellationToken);
 
 	[GraphQLName("saleHistory")]
 	[RequireAllPermissions(PermissionCodes.SALES_GET)]
@@ -206,6 +207,7 @@ public record GqlProduct
 
 	private async Task<ProductDto> GetProductAsync(
 		IProductByIdDataLoader loader,
-		CancellationToken cancellationToken) => _product ?? await loader.LoadAsync(Id, cancellationToken) ??
-		throw new ProductNotFoundException(Id);
+		CancellationToken cancellationToken)
+		=> _product ?? await loader.LoadAsync(Id, cancellationToken) ??
+			throw new ProductNotFoundException(Id);
 }

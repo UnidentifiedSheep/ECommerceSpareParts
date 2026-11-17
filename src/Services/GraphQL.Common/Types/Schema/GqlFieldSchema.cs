@@ -1,4 +1,3 @@
-using HotChocolate;
 using SchemaGeneration.Abstractions.Enums;
 using SchemaGeneration.Abstractions.Models;
 
@@ -6,7 +5,8 @@ namespace GraphQL.Common.Types.Schema;
 
 [GraphQLName("FieldSchema")]
 public sealed record GqlFieldSchema(
-	[property: GraphQLIgnore] FieldSchema Field)
+	[property: GraphQLIgnore]
+	FieldSchema Field)
 {
 	[GraphQLName("name")]
 	public string Name => Field.Name;
@@ -36,12 +36,14 @@ public sealed record GqlFieldSchema(
 	public IReadOnlyList<string> Accepts => Field.Accepts;
 
 	[GraphQLName("dependency")]
-	public GqlSchemaDependency? Dependency => Field.Dependency is { } dependency
-		? new GqlSchemaDependency(dependency)
-		: null;
+	public GqlSchemaDependency? Dependency
+		=> Field.Dependency is { } dependency
+			? new GqlSchemaDependency(dependency)
+			: null;
 
 	[GraphQLName("nestedSchema")]
-	public GqlObjectSchema? NestedSchema => Field.NestedSchema is { } nestedSchema
-		? new GqlObjectSchema(nestedSchema)
-		: null;
+	public GqlObjectSchema? NestedSchema
+		=> Field.NestedSchema is { } nestedSchema
+			? new GqlObjectSchema(nestedSchema)
+			: null;
 }

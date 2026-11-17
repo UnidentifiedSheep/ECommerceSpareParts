@@ -10,9 +10,9 @@ public abstract class LocalizableNameObject : ILocalizableNamedObject
 	public abstract ILocalizableMessage NameLocalizationMessage { get; }
 	public abstract ILocalizableMessage DescriptionLocalizationMessage { get; }
 
-	public string GetLocalizedName(IContextualLocalizer stringLocalizer) =>
-		stringLocalizer.Get(NameLocalizationMessage);
+	public string GetLocalizedName(IContextualLocalizer stringLocalizer)
+		=> stringLocalizer.Get(NameLocalizationMessage);
 
-	public string GetLocalizedDescription(IContextualLocalizer stringLocalizer) =>
-		stringLocalizer.Get(DescriptionLocalizationMessage);
+	public string GetLocalizedDescription(IContextualLocalizer stringLocalizer)
+		=> stringLocalizer.Get(DescriptionLocalizationMessage);
 }

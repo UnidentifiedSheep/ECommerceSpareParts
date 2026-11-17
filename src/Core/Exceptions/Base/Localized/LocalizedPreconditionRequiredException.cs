@@ -9,8 +9,6 @@ public abstract class LocalizedPreconditionRequiredException : PreconditionRequi
 	protected LocalizedPreconditionRequiredException(ILocalizableMessage message, object relatedData) : base(
 		null,
 		relatedData)
-	{
-		LocalizableMessage = message;
-	}
+		=> LocalizableMessage = message;
 	public ILocalizableMessage LocalizableMessage { get; }
 }

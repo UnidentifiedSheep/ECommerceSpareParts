@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Products.Interfaces;
+using Main.Modules.Product.Application.Interfaces.Cache;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -10,9 +10,7 @@ namespace Tests.CacheRepositoriesTests.ProductCache;
 public class InvalidateProductAsyncTests : IntegrationTest
 {
 	public InvalidateProductAsyncTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -79,9 +77,9 @@ public class InvalidateProductAsyncTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 	}
 
-	private IProductProvider GetProductProvider() =>
-		Scope.ServiceProvider.GetRequiredService<IProductProvider>();
+	private IProductProvider GetProductProvider()
+		=> Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 
-	private IProductCacheInvalidator GetCacheInvalidator() =>
-		Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
+	private IProductCacheInvalidator GetCacheInvalidator()
+		=> Scope.ServiceProvider.GetRequiredService<IProductCacheInvalidator>();
 }

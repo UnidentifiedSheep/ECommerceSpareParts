@@ -1,7 +1,6 @@
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -12,9 +11,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 {
 	public GetCatalogueCandidatesForReviewTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CatalogueCandidateTestContext>();
-	}
+		=> RegisterBasicContext<CatalogueCandidateTestContext>();
 
 	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
 
@@ -52,11 +49,11 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 		var producerId = TestContext.Candidates[0].ProducerId;
 		var requestedProduct = await new ProductBuilder(Faker)
 			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var requestedCandidate = await new CatalogueCandidateBuilder(Faker)
 			.WithProducerId(producerId)
 			.WithProductId(requestedProduct.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery(requestedProduct.Id), CancellationToken);
 
@@ -70,11 +67,11 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 		var requestedCandidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku("AB-12 34")
 			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new CatalogueCandidateBuilder(Faker)
 			.WithSku("AB-12 345")
 			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery(sku: "ab_1234"), CancellationToken);
 
@@ -85,12 +82,12 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 	public async Task ProductIdAndSkuSpecified_AppliesBothFilters()
 	{
 		var producerId = TestContext.Candidates[0].ProducerId;
-		var product = await new ProductBuilder(Faker).WithProducerId(producerId).BuildAndAddToDb(Context);
+		var product = await new ProductBuilder(Faker).WithProducerId(producerId).BuildAndAddToDb(Context, CancellationToken);
 		await new CatalogueCandidateBuilder(Faker)
 			.WithSku("mapped-sku")
 			.WithProducerId(producerId)
 			.WithProductId(product.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery(product.Id, "missing-sku"), CancellationToken);
 
@@ -98,10 +95,8 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 	}
 
 	private static GetCatalogueCandidatesForReviewQuery CreateQuery(int? productId = null, string? sku = null)
-	{
-		return new GetCatalogueCandidatesForReviewQuery(
+		=> new(
 			productId,
 			sku,
 			new Pagination(0, 20));
-	}
 }

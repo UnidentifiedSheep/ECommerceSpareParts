@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
@@ -29,19 +29,106 @@
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Notifications\Notification\Notification.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
-        <ProjectReference Include="..\Main.Api\Main.Api.csproj" />
-        <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
-        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
+        <ProjectReference Include="..\Main.Api\Main.Api.csproj"/>
+        <ProjectReference Include="..\Persistence.Relations\Persistence.Relations.csproj"/>
         <ProjectReference Include="..\Main.Migrator\Main.Migrator.csproj"/>
+        <ProjectReference Include="..\Modules\Analytics\Analytics.Entities\Analytics.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Balance\Balance.Entities\Balance.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Order\Order.Entities\Order.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Organization\Organization.Entities\Organization.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Product\Product.Entities\Product.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Purchase\Purchase.Entities\Purchase.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Sale\Sale.Entities\Sale.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Storage\Storage.Entities\Storage.Entities.csproj"/>
+        <ProjectReference Include="..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <LocanResource Include="../Main.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Currency/Currency.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Product/Product.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Pricing/Pricing.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Storage/Storage.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Identity/Identity.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Purchase/Purchase.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Sale/Sale.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Analytics/Analytics.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Balance/Balance.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Platform/Platform.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Platform/Platform.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../../Modules.Common/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Suppliers/Suppliers.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Documents/Documents.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Documents/Documents.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Jobs/Jobs.Abstractions/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Cart/Cart.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Notifications/Notifications.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Order/Order.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Organization/Organization.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 
@@ -53,7 +140,7 @@
                        GenerateMessages="false"
                        CopyToOutput="true"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <Content Include="..\Main.Api\Templates\Emails\**\*">
             <Link>Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)</Link>

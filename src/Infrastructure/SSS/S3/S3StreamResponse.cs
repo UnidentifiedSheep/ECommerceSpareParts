@@ -7,8 +7,9 @@ internal sealed class S3StreamResponse(GetObjectResponse response) : IStreamResp
 {
 	private GetObjectResponse? _response = response;
 
-	public Stream Stream => _response?.ResponseStream ??
-		throw new ObjectDisposedException(nameof(S3StreamResponse));
+	public Stream Stream
+		=> _response?.ResponseStream ??
+			throw new ObjectDisposedException(nameof(S3StreamResponse));
 
 	public string? ETag => _response?.ETag;
 

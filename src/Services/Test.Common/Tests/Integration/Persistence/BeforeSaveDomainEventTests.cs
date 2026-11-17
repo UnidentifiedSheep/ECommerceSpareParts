@@ -15,10 +15,10 @@ namespace Tests.Tests.Integration.Persistence;
 
 public sealed class BeforeSaveDomainEventTests(CombinedContainerFixture fixture) : IAsyncLifetime
 {
-	private TestEnvironmentLease _lease = null!;
 	private DContext _context = null!;
-	private DomainEventScope _scope = null!;
 	private Func<object, Task> _handle = _ => Task.CompletedTask;
+	private TestEnvironmentLease _lease = null!;
+	private DomainEventScope _scope = null!;
 	private CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
 	public async ValueTask InitializeAsync()
@@ -29,12 +29,29 @@ public sealed class BeforeSaveDomainEventTests(CombinedContainerFixture fixture)
 			.Returns((object item, CancellationToken _) => _handle(item));
 		_scope = new DomainEventScope();
 		var collector = new DomainEventCollector<DContext>(_scope, () => _context);
-		var executor = new DomainEventExecutor(_scope, publisher.Object, collector);
-		_context = new DContext(new DbContextOptionsBuilder<DContext>()
-			.UseNpgsql(_lease.Slot.PostgresConnectionString)
-			.AddInterceptors(new DomainEventFlusherSaveChangesInterceptor(
-				collector, () => executor)).Options);
+		var executor = new DomainEventExecutor(
+			_scope,
+			publisher.Object,
+			collector);
+		_context = new DContext(
+			new DbContextOptionsBuilder<DContext>()
+				.UseNpgsql(_lease.Slot.PostgresConnectionString)
+				.AddInterceptors(
+					new DomainEventFlusherSaveChangesInterceptor(
+						collector,
+						() => executor))
+				.Options);
 		await _context.Database.EnsureCreatedAsync(CancellationToken);
+	}
+
+	public async ValueTask DisposeAsync()
+	{
+		try { await _context.ClearDatabase(CancellationToken); }
+		finally
+		{
+			await _context.DisposeAsync();
+			await _lease.DisposeAsync();
+		}
 	}
 
 	[Theory]
@@ -63,7 +80,9 @@ public sealed class BeforeSaveDomainEventTests(CombinedContainerFixture fixture)
 		await _context.SaveChangesAsync(CancellationToken);
 		_context.ChangeTracker.Clear();
 
-		var values = await _context.Set<BeforeSaveTestEntity>().Select(item => item.Value).ToListAsync(CancellationToken);
+		var values = await _context.Set<BeforeSaveTestEntity>()
+			.Select(item => item.Value)
+			.ToListAsync(CancellationToken);
 		values.Should().BeEquivalentTo("prepared", "added by handler");
 		entity.CreatedCalls.Should().Be(1);
 		_scope.Flush().Should().ContainSingle().Which.Should().BeOfType<OrdinaryEvent>();
@@ -83,15 +102,22 @@ public sealed class BeforeSaveDomainEventTests(CombinedContainerFixture fixture)
 			else throw new InvalidOperationException("Handler failed");
 		};
 
-		await Assert.ThrowsAsync<InvalidOperationException>(() => _context.SaveChangesAsync(CancellationToken));
+		await Assert.ThrowsAsync<InvalidOperationException>(()
+			=> _context.SaveChangesAsync(CancellationToken));
 		(await _context.Set<BeforeSaveTestEntity>().CountAsync(CancellationToken)).Should().Be(0);
 		_scope.Flush().Should().BeEmpty();
 
 		entity.Raise(new BeforeEvent(entity));
-		_handle = _ => { entity.Value = "retried"; return Task.CompletedTask; };
+		_handle = _ =>
+		{
+			entity.Value = "retried";
+			return Task.CompletedTask;
+		};
 		await _context.SaveChangesAsync(CancellationToken);
 		_context.ChangeTracker.Clear();
-		(await _context.Set<BeforeSaveTestEntity>().SingleAsync(CancellationToken)).Value.Should().Be("retried");
+		(await _context.Set<BeforeSaveTestEntity>().SingleAsync(CancellationToken)).Value
+			.Should()
+			.Be("retried");
 	}
 
 	[Fact]
@@ -120,21 +146,24 @@ public sealed class BeforeSaveDomainEventTests(CombinedContainerFixture fixture)
 		entity.Raise(new BeforeEvent(entity));
 		_context.Add(entity);
 		Assert.Throws<NotSupportedException>(() => _context.SaveChanges());
-		_handle = _ => { entity.Value = "handled"; return Task.CompletedTask; };
+		_handle = _ =>
+		{
+			entity.Value = "handled";
+			return Task.CompletedTask;
+		};
 
 		await _context.SaveChangesAsync(CancellationToken);
 		_context.ChangeTracker.Clear();
 
-		(await _context.Set<BeforeSaveTestEntity>().SingleAsync(CancellationToken)).Value.Should().Be("handled");
-	}
-
-	public async ValueTask DisposeAsync()
-	{
-		try { await _context.ClearDatabase(CancellationToken); }
-		finally { await _context.DisposeAsync(); await _lease.DisposeAsync(); }
+		(await _context.Set<BeforeSaveTestEntity>().SingleAsync(CancellationToken)).Value
+			.Should()
+			.Be("handled");
 	}
 
 	private sealed record BeforeEvent(BeforeSaveTestEntity Entity) : IBeforeSaveDomainEvent;
-	private sealed record BatchBeforeEvent(BeforeSaveTestEntity Entity) : IBeforeSaveDomainEvent, IBatchableDomainEvent;
+
+	private sealed record BatchBeforeEvent(BeforeSaveTestEntity Entity)
+		: IBeforeSaveDomainEvent, IBatchableDomainEvent;
+
 	private sealed record OrdinaryEvent : IDomainEvent;
 }

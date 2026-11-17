@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Entities.Storage;
+using Main.Entities.Product.Stock;
 
 namespace Tests.Domain.Storage;
 
@@ -8,7 +8,10 @@ public class ProductStockTests
 	[Fact]
 	public void Create_StoresQuantityAndCompositeIdentity()
 	{
-		var stock = ProductStock.Create(" warehouse-1 ", 42, 12);
+		var stock = ProductStock.Create(
+			" warehouse-1 ",
+			42,
+			12);
 
 		stock.StorageCode.Should().Be("warehouse-1");
 		stock.ProductId.Should().Be(42);
@@ -36,10 +39,16 @@ public class ProductStockTests
 	[InlineData(int.MinValue)]
 	public void InvalidQuantity_IsRejectedWithoutChangingStock(int quantity)
 	{
-		var stock = ProductStock.Create("warehouse-1", 42, 5);
+		var stock = ProductStock.Create(
+			"warehouse-1",
+			42,
+			5);
 
 		Assert.Throws<InvalidOperationException>(() => stock.SetQuantity(quantity));
-		Assert.Throws<InvalidOperationException>(() => ProductStock.Create("warehouse-1", 42, quantity));
+		Assert.Throws<InvalidOperationException>(() => ProductStock.Create(
+			"warehouse-1",
+			42,
+			quantity));
 		stock.Quantity.Should().Be(5);
 	}
 
@@ -49,6 +58,6 @@ public class ProductStockTests
 	[InlineData("  ", 42)]
 	[InlineData("warehouse-1", 0)]
 	[InlineData("warehouse-1", -1)]
-	public void Create_RejectsInvalidIdentity(string? storageCode, int productId) =>
-		Assert.Throws<InvalidOperationException>(() => ProductStock.Create(storageCode!, productId));
+	public void Create_RejectsInvalidIdentity(string? storageCode, int productId)
+		=> Assert.Throws<InvalidOperationException>(() => ProductStock.Create(storageCode!, productId));
 }

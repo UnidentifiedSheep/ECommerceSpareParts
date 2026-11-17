@@ -7,9 +7,12 @@ namespace Search.Persistence.Queries.ProductFilters;
 
 internal static class ProductRangeQueryBuilder
 {
-	internal static QueryContainer Build<T>(Field field, RangeCriteria<T> range, decimal scale = 1m)
-		where T : struct, IComparable<T> =>
-		new QueryContainerDescriptor<Product>().Range(query =>
+	internal static QueryContainer Build<T>(
+		Field field,
+		RangeCriteria<T> range,
+		decimal scale = 1m)
+		where T : struct, IComparable<T>
+		=> new QueryContainerDescriptor<Product>().Range(query =>
 		{
 			query.Field(field);
 			if (range.Gt is { } gt) query.GreaterThan(Normalize(gt, scale));

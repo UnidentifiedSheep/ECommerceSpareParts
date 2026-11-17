@@ -42,8 +42,7 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 		Exception exception,
 		HttpContext httpContext,
 		int? statusCode = 500)
-	{
-		return new ProblemDetails
+		=> new()
 		{
 			Title = exception.GetType().Name,
 			Detail = exception.Message,
@@ -55,7 +54,6 @@ public abstract class ExceptionHandlerBase<THandler>(ILogger<THandler> logger) :
 				["traceId"] = httpContext.TraceIdentifier
 			}
 		};
-	}
 
 	protected void AddExceptionRelatedData(ProblemDetails problem, Exception ex)
 	{

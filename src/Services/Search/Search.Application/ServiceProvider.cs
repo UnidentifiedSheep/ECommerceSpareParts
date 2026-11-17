@@ -2,7 +2,7 @@ using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -26,7 +26,9 @@ public static class ServiceProvider
 		SortByConfig.Configure();
 		services.AddOptions<DeletedProductsCleanupOptions>()
 			.Bind(configuration.GetSection(DeletedProductsCleanupOptions.SectionName))
-			.Validate(settings => settings.RetentionDays is >= 0 and <= 36500, "RetentionDays must be between 0 and 36500.")
+			.Validate(
+				settings => settings.RetentionDays is >= 0 and <= 36500,
+				"RetentionDays must be between 0 and 36500.")
 			.Validate(settings => settings.BatchSize > 0, "BatchSize must be positive.")
 			.ValidateOnStart();
 		services.TryAddSingleton(TimeProvider.System);

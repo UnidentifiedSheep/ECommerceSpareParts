@@ -1,11 +1,15 @@
-using Main.Entities.Sale;
-using Tests.TestContexts.Sale;
-using Main.Application.Analytics.Analyzers;
-using Main.Application.Analytics.Analyzers.Markup;
-using Tests.DataBuilders.Sale;
 using FluentAssertions;
+using Main.Entities.Analytics;
+using Main.Entities.Sale.Enums;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Analytics.Abstractions.Analyzers;
+using Main.Modules.Analytics.Abstractions.Analyzers.Markup;
+using Main.Modules.Analytics.Application.Analyzers.Markup;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
+using Tests.TestContexts.Sale;
 
 namespace Tests.NamedObjects.Analyzers;
 
@@ -13,9 +17,7 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 {
 	private readonly List<(SaleContent Content, decimal Price, decimal Cost)> _samples = [];
 	public MarkupRangeAnalyzerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	[Fact]
 	public async Task EmptyHistory_ReturnsNoRanges()
@@ -28,10 +30,22 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task AdjacentBuckets_CoverTheGapBetweenObservedCosts()
 	{
-		await AddSamples(100, 0.1m, 0.1m);
-		await AddSamples(100, 0.2m, 0.1m);
-		await AddSamples(100, 0.22m, 0.6m);
-		await AddSamples(100, 0.4m, 0.6m);
+		await AddSamples(
+			100,
+			0.1m,
+			0.1m);
+		await AddSamples(
+			100,
+			0.2m,
+			0.1m);
+		await AddSamples(
+			100,
+			0.22m,
+			0.6m);
+		await AddSamples(
+			100,
+			0.4m,
+			0.6m);
 
 		var ranges = await Analyze();
 
@@ -47,7 +61,10 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	public async Task SparseHistory_DoesNotSplitOnCostRatioBeforeMinimumSampleSize()
 	{
 		for (var cost = 1; cost <= 8; cost++)
-			await AddSamples(1, cost, 0.2m);
+			await AddSamples(
+				1,
+				cost,
+				0.2m);
 
 		var ranges = await Analyze();
 
@@ -60,9 +77,18 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task SimilarMarkups_AllowWiderCostBuckets()
 	{
-		await AddSamples(100, 10m, 0.2m);
-		await AddSamples(100, 18m, 0.2m);
-		await AddSamples(100, 25m, 0.2m);
+		await AddSamples(
+			100,
+			10m,
+			0.2m);
+		await AddSamples(
+			100,
+			18m,
+			0.2m);
+		await AddSamples(
+			100,
+			25m,
+			0.2m);
 
 		var ranges = await Analyze();
 
@@ -76,7 +102,10 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	public async Task VariableMarkups_DoNotProduceBucketsSmallerThanMinimumSampleSize()
 	{
 		for (var index = 0; index < 200; index++)
-			await AddSamples(1, 10m + index * 0.001m, index % 2 == 0 ? 0.1m : 0.9m);
+			await AddSamples(
+				1,
+				10m + index * 0.001m,
+				index % 2 == 0 ? 0.1m : 0.9m);
 
 		var ranges = await Analyze();
 
@@ -88,9 +117,18 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task SmallTail_IsMergedWithPreviousBucketAndStatisticsAreRecalculated()
 	{
-		await AddSamples(100, 10m, 0.1m);
-		await AddSamples(100, 30m, 0.5m);
-		await AddSamples(10, 100m, 0.9m);
+		await AddSamples(
+			100,
+			10m,
+			0.1m);
+		await AddSamples(
+			100,
+			30m,
+			0.5m);
+		await AddSamples(
+			10,
+			100m,
+			0.9m);
 
 		var ranges = await Analyze();
 
@@ -109,8 +147,14 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task EqualCosts_AreNeverSplitBetweenBuckets()
 	{
-		await AddSamples(120, 10m, 0.1m);
-		await AddSamples(120, 10m, 0.9m);
+		await AddSamples(
+			120,
+			10m,
+			0.1m);
+		await AddSamples(
+			120,
+			10m,
+			0.9m);
 
 		var ranges = await Analyze();
 
@@ -123,8 +167,14 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task Batches_PreserveBucketAndCoverageAcrossCursorBoundary()
 	{
-		await AddSamples(1001, 10m, 0.1m);
-		await AddSamples(100, 30m, 0.5m);
+		await AddSamples(
+			1001,
+			10m,
+			0.1m);
+		await AddSamples(
+			100,
+			30m,
+			0.5m);
 
 		var ranges = await Analyze();
 
@@ -137,12 +187,40 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	[Fact]
 	public async Task Analyze_ExcludesDeletedOutOfPeriodAndInvalidMarkupSamples()
 	{
-		var date = new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc);
-		await AddSamples(1, 10m, 0.2m, date);
-		await AddSamples(1, 10m, 0m, date);
-		await AddSamples(1, 10m, 4m, date);
-		await AddSamples(1, 20m, 0.2m, date.AddDays(-1));
-		await AddSamples(1, 30m, 0.2m, date, deleted: true);
+		var date = new DateTime(
+			2026,
+			1,
+			15,
+			0,
+			0,
+			0,
+			DateTimeKind.Utc);
+		await AddSamples(
+			1,
+			10m,
+			0.2m,
+			date);
+		await AddSamples(
+			1,
+			10m,
+			0m,
+			date);
+		await AddSamples(
+			1,
+			10m,
+			4m,
+			date);
+		await AddSamples(
+			1,
+			20m,
+			0.2m,
+			date.AddDays(-1));
+		await AddSamples(
+			1,
+			30m,
+			0.2m,
+			date,
+			true);
 
 		var ranges = await Analyze(new MarkupAnalyzerInput { StartDate = date, EndDate = date });
 
@@ -156,12 +234,30 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 	{
 		GetContext<SaleTestContext>().Sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
+		await Context.Set<SaleContentAnalytics>().ExecuteDeleteAsync(CancellationToken);
 		foreach (var sample in _samples)
-			await Context.AddAsync(SaleContentAnalytics.Create(sample.Content.Id, sample.Price, sample.Price, sample.Cost), CancellationToken);
+		{
+			var row = SaleContentAnalytics.Create(
+				sample.Content.Id,
+				sample.Content.SaleId,
+				sample.Content.Sale.OrganizationId,
+				sample.Content.Sale.UserId,
+				sample.Content.Sale.SaleDatetime,
+				sample.Content.Count,
+				sample.Price,
+				sample.Price,
+				sample.Cost);
+			if (sample.Content.Sale.State == SaleState.Deleted)
+				row.Deactivate();
+			await Context.AddAsync(row, CancellationToken);
+		}
+
 		_samples.Clear();
 		await Context.SaveChangesAsync(CancellationToken);
-		var analyzer = Scope.ServiceProvider.GetServices<MarkupAnalyzerNamedObjectBase>()
-			.OfType<MarkupRangeAnalyzer>().Single();
+		var analyzer = Scope.ServiceProvider
+			.GetServices<MarkupAnalyzerNamedObjectBase>()
+			.OfType<MarkupRangeAnalyzer>()
+			.Single();
 		return await analyzer.AnalyzeAsync(input ?? new MarkupAnalyzerInput(), CancellationToken);
 	}
 
@@ -173,21 +269,31 @@ public sealed class MarkupRangeAnalyzerTests : IntegrationTest
 		bool deleted = false)
 	{
 		var context = GetContext<SaleTestContext>();
-		var contents = Enumerable.Range(0, count).Select(_ =>
-		{
-			var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
-				.WithCurrencyId(context.Sale.CurrencyId).WithStorageContentIds([context.StorageContent.Id])
-				.WithPurchasePrice(Math.Round(cost, 2)).Build();
-			var content = new SaleContentBuilder(Faker).WithProductId(context.Product.Id)
-				.WithPrices(Math.Round(cost * (1 + markup), 2), Math.Round(cost * (1 + markup), 2))
-				.WithDetails([detail]).Build();
-			_samples.Add((content, cost * (1 + markup), cost));
-			return content;
-		}).ToArray();
-		var sale = new SaleBuilder(Faker).WithUserId(context.Buyer.Id).WithOrganizationId(context.Buyer.Id)
-			.WithCurrencyId(context.Sale.CurrencyId).WithStorageCode(context.Sale.StorageCode)
-			.WithTransactionId(context.Transaction.Id).WithSaleDate(date ?? DateTime.UtcNow)
-			.WithContents(contents).Completed().Build();
+		var contents = Enumerable.Range(0, count)
+			.Select(_ =>
+			{
+				var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
+					.WithCurrencyId(context.Sale.CurrencyId)
+					.WithStorageContentIds([context.StorageContent.Id])
+					.WithPurchasePrice(Math.Round(cost, 2))
+					.Build();
+				var content = new SaleContentBuilder(Faker).WithProductId(context.Product.Id)
+					.WithPrices(Math.Round(cost * (1 + markup), 2), Math.Round(cost * (1 + markup), 2))
+					.WithDetails([detail])
+					.Build();
+				_samples.Add((content, cost * (1 + markup), cost));
+				return content;
+			})
+			.ToArray();
+		var sale = new SaleBuilder(Faker).WithUserId(context.Buyer.Id)
+			.WithOrganizationId(context.Buyer.Id)
+			.WithCurrencyId(context.Sale.CurrencyId)
+			.WithStorageCode(context.Sale.StorageCode)
+			.WithTransactionId(context.Transaction.Id)
+			.WithSaleDate(date ?? DateTime.UtcNow)
+			.WithContents(contents)
+			.Completed()
+			.Build();
 		if (deleted)
 			sale.Delete();
 		await Context.AddAsync(sale, CancellationToken);

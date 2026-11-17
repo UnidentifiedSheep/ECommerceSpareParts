@@ -1,4 +1,4 @@
-﻿{
+{
   "culture": "en",
   "messages": {
     "empty": "",
@@ -13,11 +13,6 @@
     "pagination.size.range.default": "Number of items must be between 1 and 100.",
     "pagination.size.range": "Number of items must be between {Start|int} and {End|int}.",
     "row.is.out.dated": "The data you are trying to update, is out dated. Pleas reload the data.",
-    "job.not.found": "Requested job not found.",
-    "job.schedule.not.found": "Requested job schedule not found.",
-    "setting.not.found": "Failed to find setting {Name|string}.",
-    "sorting.invalid": "Invalid sorting: {Sort|string}",
-    "operation.date.cannot.be.in.future": "The operation date cannot be in the future.",
-    "operation.date.too.old": "The operation date is too old."
+    "sorting.invalid": "Invalid sorting: {Sort|string}"
   }
 }

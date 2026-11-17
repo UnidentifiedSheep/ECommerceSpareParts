@@ -1,8 +1,8 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Users.MakeEmailPrimary;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Handlers.Users.MakeEmailPrimary;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
@@ -22,7 +22,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 			CancellationToken);
 
 		var emails = await Context
-			.UserEmails
+			.Set<UserEmail>()
 			.AsNoTracking()
 			.Where(x => x.UserId == user.Id)
 			.ToListAsync(CancellationToken);
@@ -42,7 +42,7 @@ public class MakeEmailPrimaryTests(CombinedContainerFixture fixture) : Integrati
 
 		Context.ChangeTracker.Clear();
 		var primaryEmail = await Context
-			.UserEmails
+			.Set<UserEmail>()
 			.AsNoTracking()
 			.SingleAsync(x => x.UserId == user.Id && x.IsPrimary, CancellationToken);
 		primaryEmail.Email.Value.Should().Be("current-primary@example.com");

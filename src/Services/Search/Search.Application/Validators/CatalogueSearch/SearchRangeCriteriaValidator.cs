@@ -5,11 +5,13 @@ using Search.Application.Models.CatalogueSearch.Criteria;
 
 namespace Search.Application.Validators.CatalogueSearch;
 
-public sealed class SearchRangeCriteriaValidator<T> : AbstractValidator<RangeCriteria<T>> where T : struct, IComparable<T>
+public sealed class SearchRangeCriteriaValidator<T> : AbstractValidator<RangeCriteria<T>>
+	where T : struct, IComparable<T>
 {
 	public SearchRangeCriteriaValidator()
 	{
-		RuleFor(range => range).Must(IsValidRange)
+		RuleFor(range => range)
+			.Must(IsValidRange)
 			.WithLocalizableError(CatalogueSearchCriteriaRangeInvalidMessage.Instance);
 	}
 

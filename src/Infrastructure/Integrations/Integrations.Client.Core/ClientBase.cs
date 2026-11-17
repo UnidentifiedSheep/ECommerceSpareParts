@@ -10,14 +10,9 @@ public abstract class ClientBase
 	private readonly JsonSerializerOptions _serializerOptions;
 
 	protected ClientBase(ProjectJsonOptions jsonOptions)
-	{
-		_serializerOptions = jsonOptions.SerializerOptions;
-	}
+		=> _serializerOptions = jsonOptions.SerializerOptions;
 
-	protected ClientBase(JsonSerializerOptions serializerOptions)
-	{
-		_serializerOptions = serializerOptions;
-	}
+	protected ClientBase(JsonSerializerOptions serializerOptions) => _serializerOptions = serializerOptions;
 
 	protected async Task<Response<T>> ReadResponse<T>(
 		HttpResponseMessage response,
@@ -68,10 +63,10 @@ public abstract class ClientBase
 			: $"{start}{string.Join("&", ids.Select(x => $"{paramName}={Uri.EscapeDataString(x.ToString())}"))}";
 	}
 
-	private static string? GetError(HttpResponseMessage response, string body) =>
-		string.IsNullOrWhiteSpace(body) ? response.ReasonPhrase : body;
+	private static string? GetError(HttpResponseMessage response, string body)
+		=> string.IsNullOrWhiteSpace(body) ? response.ReasonPhrase : body;
 
 	protected static void
-		AddQueryParameters(HttpRequestMessage request, Dictionary<string, string?> @params) =>
-		request.RequestUri = new Uri(QueryHelpers.AddQueryString(request.RequestUri!.ToString(), @params));
+		AddQueryParameters(HttpRequestMessage request, Dictionary<string, string?> @params)
+		=> request.RequestUri = new Uri(QueryHelpers.AddQueryString(request.RequestUri!.ToString(), @params));
 }

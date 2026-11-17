@@ -1,6 +1,6 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Enums;
+using Main.Entities.Enums;
 
 namespace Tests.Domain.User;
 

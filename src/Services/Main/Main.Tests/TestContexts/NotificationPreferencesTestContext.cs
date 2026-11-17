@@ -1,5 +1,5 @@
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Interfaces;
@@ -7,14 +7,14 @@ using Tests.Interfaces;
 namespace Tests.TestContexts;
 
 public class NotificationPreferencesTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UsersTestContext usersTestContext
-	) : TestContextBase<DContext>(context), IDependentTestContext
+) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
-	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public IReadOnlyList<User> Users { get; private set; } = null!;
 	public IReadOnlyList<UserNotificationPreference> Preferences { get; private set; } = null!;
+	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{

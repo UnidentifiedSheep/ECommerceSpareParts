@@ -1,11 +1,12 @@
 using HotChocolate;
-using Main.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Dtos.Users;
 
 namespace Main.Api.GraphQl.Types.User;
 
 [GraphQLName("UserInfo")]
 public record GqlUserInfo(
-	[property: GraphQLIgnore] UserInfoDto Info)
+	[property: GraphQLIgnore]
+	UserInfoDto Info)
 {
 	[GraphQLName("name")]
 	public string Name => Info.Name;

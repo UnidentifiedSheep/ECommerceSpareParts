@@ -1,14 +1,15 @@
 using System.Text.Json;
-using Contracts.Producer;
 using Domain.CommonEnums;
 using Enums;
 using FluentAssertions;
-using Main.Application.Lrts.ProducerSupplierMappingImport;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Events;
+using Main.Modules.Product.Application.Lrts.ProducerSupplierMappingImport;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
+using Tests.Jobs;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -21,9 +22,7 @@ public sealed class
 	private const string UploadsBucket = "uploads";
 
 	public ProducerSupplierMappingImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -44,13 +43,15 @@ public sealed class
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var mappings = await Context
-			.ProducerSupplierMappings
+			.Set<ProducerSupplierMapping>()
 			.AsNoTracking()
 			.Where(x => x.ProducerId == producer.Id)
 			.ToListAsync(CancellationToken);
 		mappings.Should().HaveCount(2);
 		((MessageBrokerStub)Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher)
-			.PublishedMessagesOfType<ProducerLookupChangedEvent>().Should().NotBeEmpty();
+			.PublishedMessagesOfType<ProducerLookupChangedEvent>()
+			.Should()
+			.NotBeEmpty();
 	}
 
 	[Fact]
@@ -70,7 +71,9 @@ public sealed class
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		Context.ChangeTracker.Clear();
-		var persisted = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
+		var persisted = await Context.Set<ProducerSupplierMapping>()
+			.AsNoTracking()
+			.SingleAsync(CancellationToken);
 		persisted.ProducerId.Should().Be(existing.ProducerId);
 	}
 
@@ -101,7 +104,9 @@ public sealed class
 		var state = execution.GetState<ProducerSupplierMappingImportState>();
 		state.Errors.Should().HaveCount(3);
 
-		var mapping = await Context.ProducerSupplierMappings.AsNoTracking().SingleAsync(CancellationToken);
+		var mapping = await Context.Set<ProducerSupplierMapping>()
+			.AsNoTracking()
+			.SingleAsync(CancellationToken);
 		mapping.Name.Should().Be("Bosch");
 		mapping.NormalizedName.Should().Be("BOSCH");
 	}
@@ -116,12 +121,12 @@ public sealed class
 				"Producer,Supplier,SupplierProducer"
 			}.Concat(rows));
 		Scope
-		.ServiceProvider
-		.GetRequiredService<S3StorageServiceStub>()
-		.SetFile(
-			UploadsBucket,
-			fileName,
-			csv);
+			.ServiceProvider
+			.GetRequiredService<S3StorageServiceStub>()
+			.SetFile(
+				UploadsBucket,
+				fileName,
+				csv);
 
 		return await ExecuteLrt(
 			JsonSerializer.Serialize(
@@ -134,7 +139,8 @@ public sealed class
 	private static string CsvRow(
 		string producer,
 		Supplier supplier,
-		string supplierProducerName) => $"{Escape(producer)},{supplier},{Escape(supplierProducerName)}";
+		string supplierProducerName)
+		=> $"{Escape(producer)},{supplier},{Escape(supplierProducerName)}";
 
 	private static string Escape(string value) => $"\"{value.Replace("\"", "\"\"")}\"";
 }

@@ -1,18 +1,15 @@
-using Security.Core.Interfaces;
 using Abstractions.Interfaces;
 using Application.Common;
 using Application.Common.Behaviors;
-using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Locan.Hosting;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Persistence.Common;
 using Persistence.Extensions;
 using Persistence.Interceptors;
+using Security.Core.Interfaces;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
@@ -39,9 +36,7 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 				null,
 				typeof(ApplicationServiceProvider).Assembly,
 				typeof(CacheBehavior<,>),
-				typeof(DbValidationBehavior<,>))
-			.AddLrtLayer()
-			.RegisterSettingsService();
+				typeof(DbValidationBehavior<,>));
 
 		services.AddScoped<AuditableEntitySaveChangesInterceptor>();
 		services.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
@@ -54,14 +49,12 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 		});
 
 		services.AddLocan();
-		services.AddJobRepositories<DContext>();
 		services.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
 		services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
 		services.AddUnitOfWork<DContext>();
 		services.AddScoped<IUserContext, UserContextMock>();
 		services.AddScoped<MessageBrokerStub>();
 		services.AddScoped<IPublishEndpoint>(sp => sp.GetRequiredService<MessageBrokerStub>());
-		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
 		services.AddSingleton<TestTimeProvider>();
 		services.Replace(
 			ServiceDescriptor.Singleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>()));
@@ -69,8 +62,8 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 		return services.BuildServiceProvider();
 	}
 
-	private static void RegisterGlobalBasicContexts() =>
-		TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
+	private static void RegisterGlobalBasicContexts()
+		=> TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
 
 	private sealed class CommonTestServiceDefinition : IServiceDefinition
 	{

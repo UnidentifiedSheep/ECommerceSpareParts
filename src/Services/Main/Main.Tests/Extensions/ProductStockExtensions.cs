@@ -1,12 +1,17 @@
-using Main.Persistence.Context;
+using Main.Entities.Product.Stock;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 
 namespace Tests.Extensions;
 
 public static class ProductStockExtensions
 {
 	public static Task<int> GetProductStockQuantityAsync(
-		this DContext context, int productId, CancellationToken cancellationToken) =>
-		context.ProductStocks.AsNoTracking().Where(stock => stock.ProductId == productId)
+		this UnifiedDbContext context,
+		int productId,
+		CancellationToken cancellationToken)
+		=> context.Set<ProductStock>()
+			.AsNoTracking()
+			.Where(stock => stock.ProductId == productId)
 			.SumAsync(stock => stock.Quantity, cancellationToken);
 }

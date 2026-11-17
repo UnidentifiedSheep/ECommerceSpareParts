@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Identity.Module</AssemblyName>
+        <RootNamespace>Main.Modules.Identity</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Identity.Application\Identity.Application.csproj"/>
+        <ProjectReference Include="..\Identity.Persistence\Identity.Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
+    </ItemGroup>
+
+</Project>

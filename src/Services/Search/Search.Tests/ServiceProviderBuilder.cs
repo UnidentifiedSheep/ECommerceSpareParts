@@ -16,18 +16,24 @@ public sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProv
 {
 	public IServiceProvider Build(ServiceProviderArguments args)
 	{
-		var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
-		{
-			[$"{OpenSearchOptions.SectionName}:Uri"] = args.OpenSearchEndpoint.ToString(),
-			[$"{OpenSearchOptions.SectionName}:IndexOptions:Products"] = args.IndexPrefix + "products",
-			[$"{OpenSearchOptions.SectionName}:IndexOptions:Producers"] = args.IndexPrefix + "producers",
-			[$"{OpenSearchOptions.SectionName}:IndexOptions:CatalogueCandidates"] = args.IndexPrefix + "catalogue-candidates",
-			[$"{RedisOptions.SectionName}:Url"] = args.RedisConnectionString
-		}).Build();
+		var configuration = new ConfigurationBuilder().AddInMemoryCollection(
+				new Dictionary<string, string?>
+				{
+					[$"{OpenSearchOptions.SectionName}:Uri"] = args.OpenSearchEndpoint.ToString(),
+					[$"{OpenSearchOptions.SectionName}:IndexOptions:Products"] =
+						args.IndexPrefix + "products",
+					[$"{OpenSearchOptions.SectionName}:IndexOptions:Producers"] =
+						args.IndexPrefix + "producers",
+					[$"{OpenSearchOptions.SectionName}:IndexOptions:CatalogueCandidates"] =
+						args.IndexPrefix + "catalogue-candidates",
+					[$"{RedisOptions.SectionName}:Url"] = args.RedisConnectionString
+				})
+			.Build();
 		var services = new ServiceCollection();
 		services.RegisterTestContexts();
 		services.AddLogging();
-		services.AddOptions<OpenSearchOptions>().Bind(configuration.GetSection(OpenSearchOptions.SectionName));
+		services.AddOptions<OpenSearchOptions>()
+			.Bind(configuration.GetSection(OpenSearchOptions.SectionName));
 		services.AddOptions<RedisOptions>().Bind(configuration.GetSection(RedisOptions.SectionName));
 		ApplicationServices.AddApplicationLayer(services, configuration);
 		PersistenceServices.AddPersistenceLayer(services);

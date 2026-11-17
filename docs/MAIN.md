@@ -15,18 +15,17 @@ Main owns the core business data and operations. Warehouse functionality is desc
 
 ## Main Areas
 
+The public API is GraphQL, composed through the gateway: catalog (products, producers, product media, sizes, weights,
+characteristics, content, crosses), warehouses and stock lots, uploads, organizations, finances, transactions, sales,
+purchases, users, roles, currencies, options, and Pricing.
+
+REST endpoints remain for authentication, product image upload (multipart), and internal service calls:
+
 | Prefix | Purpose |
 | --- | --- |
-| `/main/products` | Catalog, stock summary, properties, media, relations, and reservations. |
-| `/main/producers` | Producers, aliases, and supplier mappings. |
-| `/main/users` | Users, roles, permissions, contacts, discounts, and assigned warehouses. |
 | `/main/auth` | Registration, login, token refresh, password recovery, and email confirmation. |
-| `/main/cart` | User cart operations. |
-| `/main/purchases` | Purchases and incoming stock. |
-| `/main/sales` | Sales and outgoing stock. |
-| `/main/transactions` | Balance transactions and reversals. |
-| `/main/currencies` | Currencies, rates, and rate history. |
-| `/main/uploads` | Upload requests and completion. |
+| `/main/products/{id}/imgs` | Multipart upload of product images. Removal is available in GraphQL. |
+| `/main/internal` | Internal endpoints for Pricing, Search, and Analytics (not exposed by the gateway). |
 
 Exact schemas and permissions are available at <http://localhost:8080/docs>.
 

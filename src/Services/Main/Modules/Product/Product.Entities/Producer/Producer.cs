@@ -1,0 +1,92 @@
+using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
+using Domain;
+using Domain.Interfaces;
+using Domain.Validation;
+using Main.Entities.Product.DomainEvents.Producer;
+
+namespace Main.Entities.Product.Producer;
+
+public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
+{
+	private readonly List<ProducerAlias> _aliases = [];
+
+	private readonly List<ProducerSupplierMapping> _supplierMappings = [];
+
+	private Producer()
+	{
+	}
+
+	private Producer(
+		string name,
+		string? description = null,
+		string? imagePath = null)
+	{
+		SetName(name);
+		SetImagePath(imagePath);
+		SetDescription(description);
+	}
+
+	[Validate]
+	public int Id { get; private set; }
+
+	[Validate]
+	public string Name { get; private set; } = null!;
+
+	public string? ImagePath { get; private set; }
+
+	public string? Description { get; private set; }
+
+	public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
+
+	public IReadOnlyCollection<ProducerSupplierMapping> SupplierMappings => _supplierMappings;
+
+	public static Expression<Func<Producer, int>> GetKeySelector() => x => x.Id;
+
+	public static Expression<Func<Producer, bool>> GetEqualityExpression(int key) => x => x.Id == key;
+
+	public static Producer Create(
+		string name,
+		string? description = null,
+		string? imagePath = null)
+		=> new(
+			name,
+			description,
+			imagePath);
+
+	public void SetImagePath(string? imagePath)
+	{
+		imagePath = imagePath?.Trim().EnsureMaxLength(255, ProducerImageTooLongMessage.Instance);
+
+		ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
+	}
+
+	public void SetDescription(string? description)
+	{
+		description = description?.Trim().EnsureMaxLength(500, ProducerDescriptionMaxLengthMessage.Instance);
+
+		Description = string.IsNullOrEmpty(description) ? null : description;
+	}
+
+	public void SetName(string name)
+	{
+		var value = name.Trim();
+
+		value
+			.EnsureNotNullOrWhiteSpace(ProducerNameNotEmptyMessage.Instance)
+			.EnsureMinLength(2, ProducerNameMinLengthMessage.Instance)
+			.EnsureMaxLength(64, ProducerNameMaxLengthMessage.Instance);
+
+		Name = ToNormalizedName(value);
+	}
+
+	public override void OnDeleted() => AddDomainEvent(new ProducerDeletedDomainEvent(Id));
+
+	public override void OnCreated() => AddDomainEvent(new ProducerCreatedDomainEvent(this));
+
+	public override void OnUpdated() => AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
+
+	public static string ToNormalizedName(string value) => value.Trim().ToUpperInvariant();
+
+	public override int GetId() => Id;
+}

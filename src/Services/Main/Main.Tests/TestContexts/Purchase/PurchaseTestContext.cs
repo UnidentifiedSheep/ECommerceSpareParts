@@ -1,7 +1,8 @@
-using Main.Entities.Product;
-using Main.Entities.Storage;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Stock;
+using Main.Entities.Storage.Storage;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
@@ -11,16 +12,17 @@ using Tests.Extensions;
 using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
-using DomainPurchase = Main.Entities.Purchase.Purchase;
+using DomainPurchase = Main.Entities.Purchase.Purchase.Purchase;
 
 namespace Tests.TestContexts.Purchase;
 
 public class PurchaseTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	CurrencyTestContext currencyContext,
-	StorageRouteTestContext storageRouteContext) : TestContextBase<DContext>(context), IDependentTestContext
+	StorageTestContext storageContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Supplier { get; private set; } = null!;
 
@@ -32,7 +34,7 @@ public class PurchaseTestContext(
 
 	public static Type[] DependsOn { get; } =
 	[
-		typeof(ProductTestContext), typeof(CurrencyRatesTestContext), typeof(StorageRouteTestContext)
+		typeof(ProductTestContext), typeof(CurrencyRatesTestContext), typeof(StorageTestContext)
 	];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -68,14 +70,19 @@ public class PurchaseTestContext(
 		await DbContext.SaveChangesAsync(cancellationToken);
 
 		StorageContent = await new StorageContentBuilder(Faker)
-			.WithStorageCode(storageRouteContext.ActiveRoute.ToStorageCode)
+			.WithStorageCode(storageContext.Storages.Last().Code)
 			.WithProductIds(Product.Id)
 			.WithCurrencyId(currencyId)
 			.WithCount(2)
 			.WithBuyPrice(10m)
 			.BuildAndAddToDb(DbContext);
 
-		await DbContext.AddAsync(ProductStock.Create(StorageContent.StorageCode, Product.Id, StorageContent.Count), cancellationToken);
+		await DbContext.AddAsync(
+			ProductStock.Create(
+				StorageContent.StorageCode,
+				Product.Id,
+				StorageContent.Count),
+			cancellationToken);
 
 		var purchaseContent = new PurchaseContentBuilder(Faker)
 			.WithProductId(Product.Id)
@@ -89,7 +96,7 @@ public class PurchaseTestContext(
 			.WithSupplierOrganizationId(Supplier.Id)
 			.WithCurrencyId(currencyId)
 			.WithTransactionId(transaction.Id)
-			.WithStorage(storageRouteContext.ActiveRoute.ToStorageCode)
+			.WithStorage(storageContext.Storages.Last().Code)
 			.WithContent(purchaseContent)
 			.BuildAndAddToDb(DbContext);
 	}

@@ -9,9 +9,9 @@ namespace Application.Common.Services.Persistence;
 public sealed class ApplicationTransaction(IApplicationTransactionContext context) : IApplicationTransaction
 {
 	private IApplicationTransactionContext _context = context;
-	private TransactionalAttribute? _settings;
-	private Action<TransactionError>? _onException;
 	private bool _disposed;
+	private Action<TransactionError>? _onException;
+	private TransactionalAttribute? _settings;
 
 	public IApplicationTransactionContext Context
 	{
@@ -23,14 +23,6 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 	}
 
 	public bool IsExecuting { get; private set; }
-
-	internal void SetOwnedContext(OwnedApplicationTransactionContext ownedContext)
-	{
-		ObjectDisposedException.ThrowIf(_disposed, this);
-		if (IsExecuting || _context is OwnedApplicationTransactionContext)
-			throw new InvalidOperationException("The transaction context has already been initialized or is executing.");
-		_context = ownedContext;
-	}
 
 	public IApplicationTransaction WithSettings(TransactionalAttribute? settings)
 	{
@@ -54,11 +46,13 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 		CancellationToken cancellationToken = default)
 	{
 		ArgumentNullException.ThrowIfNull(action);
-		return ExecuteAsync(async (ctx, ct) =>
-		{
-			await action(ctx, ct);
-			return true;
-		}, cancellationToken);
+		return ExecuteAsync(
+			async (ctx, ct) =>
+			{
+				await action(ctx, ct);
+				return true;
+			},
+			cancellationToken);
 	}
 
 	public async Task<TResult> ExecuteAsync<TResult>(
@@ -76,6 +70,7 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 		var historyContext = Context.GetRequiredService<IEntityHistoryContext>();
 		IsExecuting = true;
 		var handlers = _onException;
+
 		Task<TResult> ExecuteAttemptAsync()
 		{
 			historyContext.Clear();
@@ -89,7 +84,9 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 			return _settings is null
 				? await ExecuteAttemptAsync()
 				: await Context.UnitOfWork.ExecuteWithTransaction(
-					_settings, ExecuteAttemptAsync, cancellationToken);
+					_settings,
+					ExecuteAttemptAsync,
+					cancellationToken);
 		}
 		catch (Exception exception) when (exception is not OperationCanceledException &&
 										!cancellationToken.IsCancellationRequested &&
@@ -104,35 +101,6 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 			_settings = null;
 			_onException = null;
 			IsExecuting = false;
-		}
-	}
-
-	private async Task<TResult> ExecuteBoundaryAsync<TResult>(
-		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
-		CancellationToken cancellationToken)
-	{
-		var context = Context;
-		try
-		{
-			var result = await context.DomainEventExecutor.ExecuteAsync(
-				() => action(context, cancellationToken), cancellationToken);
-
-			var events = context.IntegrationEventScope.Flush();
-			foreach (var @event in events)
-				if (@event.RoutingKey is null)
-					await context.Publisher.Publish(@event.Message, cancellationToken);
-				else
-					await context.Publisher.Publish(@event.Message,
-						pubContext => pubContext.SetRoutingKey(@event.RoutingKey), cancellationToken);
-
-			if (events.Count != 0 && !context.UnitOfWork.Context.SuppressAutoSave)
-				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-			return result;
-		}
-		catch
-		{
-			context.IntegrationEventScope.Flush();
-			throw;
 		}
 	}
 
@@ -152,5 +120,46 @@ public sealed class ApplicationTransaction(IApplicationTransactionContext contex
 		_settings = null;
 		_onException = null;
 		return _context.DisposeAsync();
+	}
+
+	internal void SetOwnedContext(OwnedApplicationTransactionContext ownedContext)
+	{
+		ObjectDisposedException.ThrowIf(_disposed, this);
+		if (IsExecuting || _context is OwnedApplicationTransactionContext)
+			throw new InvalidOperationException(
+				"The transaction context has already been initialized or is executing.");
+		_context = ownedContext;
+	}
+
+	private async Task<TResult> ExecuteBoundaryAsync<TResult>(
+		Func<IApplicationTransactionContext, CancellationToken, Task<TResult>> action,
+		CancellationToken cancellationToken)
+	{
+		var context = Context;
+		try
+		{
+			var result = await context.DomainEventExecutor.ExecuteAsync(
+				() => action(context, cancellationToken),
+				cancellationToken);
+
+			var events = context.IntegrationEventScope.Flush();
+			foreach (var @event in events)
+				if (@event.RoutingKey is null)
+					await context.Publisher.Publish(@event.Message, cancellationToken);
+				else
+					await context.Publisher.Publish(
+						@event.Message,
+						pubContext => pubContext.SetRoutingKey(@event.RoutingKey),
+						cancellationToken);
+
+			if (events.Count != 0 && !context.UnitOfWork.Context.SuppressAutoSave)
+				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+			return result;
+		}
+		catch
+		{
+			context.IntegrationEventScope.Flush();
+			throw;
+		}
 	}
 }

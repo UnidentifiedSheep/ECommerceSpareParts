@@ -7,25 +7,36 @@ namespace Tests.TestContainers.Combined;
 public sealed class CombinedContainerFixture : IAsyncLifetime
 {
 	private const int SlotCount = AssemblyFixture.MaxThreads;
+	private readonly Lazy<Task> _initialization;
+	private readonly Lazy<PostgresContainerFixture> _postgres = new(() => new PostgresContainerFixture());
 
 	private readonly List<PostgresDatabaseLease> _postgresLeases = [];
+	private readonly Lazy<RedisContainerFixture> _redis = new(() => new RedisContainerFixture());
 	private readonly List<RedisDatabaseLease> _redisLeases = [];
 
 	private Channel<TestEnvironmentSlot> _slots = null!;
-	private readonly Lazy<Task> _initialization;
-	private readonly Lazy<PostgresContainerFixture> _postgres = new(() => new());
-	private readonly Lazy<RedisContainerFixture> _redis = new(() => new());
 
-	public CombinedContainerFixture()
-	{
-		_initialization = new Lazy<Task>(InitializeCoreAsync);
-	}
+	public CombinedContainerFixture() => _initialization = new Lazy<Task>(InitializeCoreAsync);
 
 	public PostgresContainerFixture Postgres => _postgres.Value;
 
 	public RedisContainerFixture Redis => _redis.Value;
 
 	public ValueTask InitializeAsync() => ValueTask.CompletedTask;
+
+	public async ValueTask DisposeAsync()
+	{
+		if (!_initialization.IsValueCreated) return;
+
+		try
+		{
+			await _initialization.Value;
+		}
+		finally
+		{
+			await DisposeCoreAsync();
+		}
+	}
 
 	private async Task InitializeCoreAsync()
 	{
@@ -52,20 +63,6 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 					i,
 					postgresLease.Database.ConnectionString,
 					redisLease.Database.ConnectionString));
-		}
-	}
-
-	public async ValueTask DisposeAsync()
-	{
-		if (!_initialization.IsValueCreated) return;
-
-		try
-		{
-			await _initialization.Value;
-		}
-		finally
-		{
-			await DisposeCoreAsync();
 		}
 	}
 

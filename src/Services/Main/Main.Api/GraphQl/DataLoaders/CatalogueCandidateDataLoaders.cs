@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Product.Enrichment;
-using Main.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Dtos.Product.Enrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -22,16 +22,18 @@ public static class CatalogueCandidateDataLoaders
 	public static async Task<Dictionary<int, List<SupplierProductDto>>> GetSupplierProductCrossesByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken) => (await sender.Send(
-		new GetSupplierProductCrossesBatchQuery(keys),
-		cancellationToken)).Crosses;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(
+			new GetSupplierProductCrossesBatchQuery(keys),
+			cancellationToken)).Crosses;
 
 	[DataLoader]
 	public static async Task<Dictionary<Guid, GetCatalogueCandidateCrossesResultItem>>
 		GetCandidateCrossesByIdAsync(
 			IReadOnlyList<Guid> keys,
 			ISender sender,
-			CancellationToken cancellationToken) => (await sender.Send(
-		new GetCatalogueCandidateCrossesQuery(keys),
-		cancellationToken)).Items;
+			CancellationToken cancellationToken)
+		=> (await sender.Send(
+			new GetCatalogueCandidateCrossesQuery(keys),
+			cancellationToken)).Items;
 }

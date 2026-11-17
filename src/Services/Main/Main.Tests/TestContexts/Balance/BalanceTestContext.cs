@@ -1,7 +1,6 @@
-using Main.Entities.Balance;
-using Main.Entities.Organization;
+using Main.Entities.Balance.Balance;
 using Main.Entities.User;
-using Main.Persistence.Context;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.Interfaces;
@@ -10,9 +9,10 @@ using Tests.TestContexts.Currency;
 namespace Tests.TestContexts.Balance;
 
 public class BalanceTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UsersTestContext usersTestContext,
-	CurrencyTestContext currencyTestContext) : TestContextBase<DContext>(context), IDependentTestContext
+	CurrencyTestContext currencyTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	private readonly List<Transaction> _transactions = [];
 

@@ -1,8 +1,0 @@
-﻿{
-  "Database": {
-    "Host": "host.docker.internal",
-    "Database": "pricing",
-    "Username": "postgres",
-    "Password": "PleasKillMe21"
-  }
-}

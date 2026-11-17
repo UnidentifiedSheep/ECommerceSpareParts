@@ -1,16 +1,16 @@
 ﻿using Main.Entities.Auth;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 using RoleEnum = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
-public class RoleSeed : ISeed<DContext>
+public class RoleSeed : ISeed<UnifiedDbContext>
 {
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		var existingRoles = await context.Roles.Select(x => x.Name).ToHashSetAsync();
+		var existingRoles = await context.Set<Role>().Select(x => x.Name).ToHashSetAsync();
 
 		var roles = new[]
 		{
@@ -25,7 +25,7 @@ public class RoleSeed : ISeed<DContext>
 		if (notExistingRoles.Count == 0)
 			return;
 
-		await context.Roles.AddRangeAsync(notExistingRoles);
+		await context.Set<Role>().AddRangeAsync(notExistingRoles);
 		await context.SaveChangesAsync();
 	}
 

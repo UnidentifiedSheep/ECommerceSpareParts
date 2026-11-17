@@ -1,16 +1,28 @@
 using Enums;
 using FluentAssertions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 
 namespace Tests.Domain.Producer;
 
 public sealed class ProducerSupplierMappingTests
 {
 	[Theory]
-	[InlineData("  Bosch  ", "Bosch", "BOSCH")]
-	[InlineData(" Robert Bosch ", "Robert Bosch", "ROBERT BOSCH")]
-	[InlineData(" производитель ", "производитель", "ПРОИЗВОДИТЕЛЬ")]
-	public void Create_PreservesSupplierNameAndNormalizesLookupName(string input, string original, string normalized)
+	[InlineData(
+		"  Bosch  ",
+		"Bosch",
+		"BOSCH")]
+	[InlineData(
+		" Robert Bosch ",
+		"Robert Bosch",
+		"ROBERT BOSCH")]
+	[InlineData(
+		" производитель ",
+		"производитель",
+		"ПРОИЗВОДИТЕЛЬ")]
+	public void Create_PreservesSupplierNameAndNormalizesLookupName(
+		string input,
+		string original,
+		string normalized)
 	{
 		var mapping = ProducerSupplierMapping.Create(
 			1,

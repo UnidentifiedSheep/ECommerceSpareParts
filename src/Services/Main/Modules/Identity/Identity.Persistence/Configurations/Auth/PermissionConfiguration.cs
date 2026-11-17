@@ -1,0 +1,17 @@
+﻿using Main.Entities.Auth;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Main.Modules.Identity.Persistence.Configurations.Auth;
+
+public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
+{
+	public void Configure(EntityTypeBuilder<Permission> builder)
+	{
+		builder.ToTable("permissions", "auth");
+
+		builder.HasKey(e => e.Name).HasName("permissions_pk");
+
+		builder.Property(e => e.Name).HasColumnName("name");
+	}
+}

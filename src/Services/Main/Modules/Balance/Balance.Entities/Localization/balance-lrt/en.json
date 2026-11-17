@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "lrt.organization.approximate.balance.recalculate.name": "Organization approximate balance recalculation",
+    "lrt.organization.approximate.balance.recalculate.description": "Recalculates approximate organization balances in the base currency."
+  }
+}

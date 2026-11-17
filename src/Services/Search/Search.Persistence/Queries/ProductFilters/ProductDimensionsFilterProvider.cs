@@ -14,13 +14,33 @@ public sealed class ProductDimensionsFilterProvider : IProductSearchFilterProvid
 		if (criteria.Dimensions is not { } dimensions) return [];
 		var scale = dimensions.Unit.GetMetersScale();
 		return new List<QueryContainer>()
-			.ApplyWhenNotNull(dimensions.Length, length =>
-				ProductRangeQueryBuilder.Build(Infer.Field<Product>(product => product.Dimensions!.LengthM), length, scale))
-			.ApplyWhenNotNull(dimensions.Width, width =>
-				ProductRangeQueryBuilder.Build(Infer.Field<Product>(product => product.Dimensions!.WidthM), width, scale))
-			.ApplyWhenNotNull(dimensions.Height, height =>
-				ProductRangeQueryBuilder.Build(Infer.Field<Product>(product => product.Dimensions!.HeightM), height, scale))
-			.ApplyWhenNotNull(dimensions.Volume, volume =>
-				ProductRangeQueryBuilder.Build(Infer.Field<Product>(product => product.Dimensions!.VolumeM3), volume, scale * scale * scale));
+			.ApplyWhenNotNull(
+				dimensions.Length,
+				length =>
+					ProductRangeQueryBuilder.Build(
+						Infer.Field<Product>(product => product.Dimensions!.LengthM),
+						length,
+						scale))
+			.ApplyWhenNotNull(
+				dimensions.Width,
+				width =>
+					ProductRangeQueryBuilder.Build(
+						Infer.Field<Product>(product => product.Dimensions!.WidthM),
+						width,
+						scale))
+			.ApplyWhenNotNull(
+				dimensions.Height,
+				height =>
+					ProductRangeQueryBuilder.Build(
+						Infer.Field<Product>(product => product.Dimensions!.HeightM),
+						height,
+						scale))
+			.ApplyWhenNotNull(
+				dimensions.Volume,
+				volume =>
+					ProductRangeQueryBuilder.Build(
+						Infer.Field<Product>(product => product.Dimensions!.VolumeM3),
+						volume,
+						scale * scale * scale));
 	}
 }

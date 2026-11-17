@@ -11,23 +11,31 @@ public static class ServiceCollectionExtensions
 	public static IServiceCollection AddS3(this IServiceCollection collection)
 	{
 		collection.AddKeyedSingleton<IAmazonS3>(
-			serviceKey: Visibility.Internal,
-			implementationFactory: (sp, _) =>
+			Visibility.Internal,
+			(sp, _) =>
 			{
 				var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
 				return new AmazonS3Client(
-					options.Login, options.Password,
-					CreateConfig(options.InternalUrl, options.Region, options.ForcePathStyle));
+					options.Login,
+					options.Password,
+					CreateConfig(
+						options.InternalUrl,
+						options.Region,
+						options.ForcePathStyle));
 			});
 
 		collection.AddKeyedSingleton<IAmazonS3>(
-			serviceKey: Visibility.External,
-			implementationFactory: (sp, _) =>
+			Visibility.External,
+			(sp, _) =>
 			{
 				var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
 				return new AmazonS3Client(
-					options.Login, options.Password,
-					CreateConfig(options.ExternalUrl, options.Region, options.ForcePathStyle));
+					options.Login,
+					options.Password,
+					CreateConfig(
+						options.ExternalUrl,
+						options.Region,
+						options.ForcePathStyle));
 			});
 
 		collection.AddSingleton<IS3Service, S3Service>();

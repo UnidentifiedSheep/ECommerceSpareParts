@@ -2,10 +2,11 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
 using Contracts.Storage;
+using Enums;
 using FluentAssertions;
-using Main.Entities.DomainEvents.StorageContent;
-using Main.Entities.Storage;
-using Main.Enums;
+using Main.Entities.Product.Stock;
+using Main.Entities.Storage.DomainEvents.StorageContent;
+using Main.Entities.Storage.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Storage;
@@ -26,27 +27,41 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 		RegisterBasicContext<CurrencyRatesTestContext>();
 	}
 
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public async Task NewParties_PublishCurrentTotalsGroupedByStorage()
 	{
 		var first = NewContent(5);
 		var second = NewContent(7);
-		var anotherProduct = NewContent(4, product: 1);
+		var anotherProduct = NewContent(4, 1);
 		var anotherStorage = NewContent(3, storage: 1);
 		var before = Broker.PublishedMessages.Count;
 
-		await Add(first, second, anotherProduct, anotherStorage);
+		await Add(
+			first,
+			second,
+			anotherProduct,
+			anotherStorage);
 
 		var messages = PublishedSince(before);
 		messages.Should().HaveCount(2);
-		messages.Single(message => message.StorageCode == first.StorageCode).Items
-			.Select(item => (item.ProductId, item.Quantity)).Should()
+		messages.Single(message => message.StorageCode == first.StorageCode)
+			.Items
+			.Select(item => (item.ProductId, item.Quantity))
+			.Should()
 			.BeEquivalentTo([(first.ProductId, 12), (anotherProduct.ProductId, 4)]);
-		messages.Single(message => message.StorageCode == anotherStorage.StorageCode).Items
-			.Should().ContainSingle().Which.Quantity.Should().Be(3);
+		messages.Single(message => message.StorageCode == anotherStorage.StorageCode)
+			.Items
+			.Should()
+			.ContainSingle()
+			.Which
+			.Quantity
+			.Should()
+			.Be(3);
 		messages.Should().OnlyContain(message => message.OccurredAt.Kind == DateTimeKind.Utc);
 	}
 
@@ -71,7 +86,9 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 		var item = message.Items.Should().ContainSingle().Which;
 		item.ProductId.Should().Be(first.ProductId);
 		item.Quantity.Should().Be(19);
-		(await Context.ProductStocks.AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(item.Quantity);
+		(await Context.Set<ProductStock>().AsNoTracking().SingleAsync(CancellationToken)).Quantity
+			.Should()
+			.Be(item.Quantity);
 	}
 
 	[Fact]
@@ -103,9 +120,16 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 
 		await Execute((context, _) =>
 		{
-			context.GetRequiredService<IDomainEventScope>().Add(new StorageContentCountUpdatedDomainEvent(
-				content.ProductId, content.StorageCode, content.CurrencyId, content.Count,
-				content.BuyPrice, StorageMovementType.StorageContentAddition, 0));
+			context.GetRequiredService<IDomainEventScope>()
+				.Add(
+					new StorageContentCountUpdatedDomainEvent(
+						content.ProductId,
+						content.StorageCode,
+						content.CurrencyId,
+						content.Count,
+						content.BuyPrice,
+						StorageMovementType.StorageContentAddition,
+						0));
 			return Task.CompletedTask;
 		});
 
@@ -127,26 +151,39 @@ public class PublishIntegrationEventsHandlerTests : IntegrationTest
 		}));
 
 		PublishedSince(before).Should().BeEmpty();
-		(await Context.ProductStocks.AsNoTracking().SingleAsync(CancellationToken)).Quantity.Should().Be(5);
-		(await Context.StorageContents.AsNoTracking().SingleAsync(CancellationToken)).Count.Should().Be(5);
+		(await Context.Set<ProductStock>().AsNoTracking().SingleAsync(CancellationToken)).Quantity
+			.Should()
+			.Be(5);
+		(await Context.Set<StorageContent>().AsNoTracking().SingleAsync(CancellationToken)).Count
+			.Should()
+			.Be(5);
 	}
 
-	private IReadOnlyList<ProductStocksUpdatedEvent> PublishedSince(int before) =>
-		Broker.PublishedMessages.Skip(before).OfType<ProductStocksUpdatedEvent>().ToArray();
+	private IReadOnlyList<ProductStocksUpdatedEvent> PublishedSince(int before)
+		=> Broker.PublishedMessages.Skip(before).OfType<ProductStocksUpdatedEvent>().ToArray();
 
-	private StorageContent NewContent(int count, int product = 0, int storage = 0) => new StorageContentBuilder(Faker)
-		.WithProductIds(GetContext<ProductTestContext>().Products[product].Id)
-		.WithStorageCode(GetContext<StorageTestContext>().Storages.ElementAt(storage).Code)
-		.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
-		.WithBuyPrice(10m).WithCount(count).Build();
+	private StorageContent NewContent(
+		int count,
+		int product = 0,
+		int storage = 0)
+		=> new StorageContentBuilder(Faker)
+			.WithProductIds(GetContext<ProductTestContext>().Products[product].Id)
+			.WithStorageCode(GetContext<StorageTestContext>().Storages.ElementAt(storage).Code)
+			.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
+			.WithBuyPrice(10m)
+			.WithCount(count)
+			.Build();
 
-	private Task Add(params StorageContent[] contents) => Execute(async (context, token) =>
-	{
-		await context.UnitOfWork.AddRangeAsync(contents, token);
-		await context.UnitOfWork.SaveChangesAsync(token);
-	});
+	private Task Add(params StorageContent[] contents)
+		=> Execute(async (context, token) =>
+		{
+			await context.UnitOfWork.AddRangeAsync(contents, token);
+			await context.UnitOfWork.SaveChangesAsync(token);
+		});
 
-	private Task Execute(Func<IApplicationTransactionContext, CancellationToken, Task> action) =>
-		Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
-			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(action, CancellationToken);
+	private Task Execute(Func<IApplicationTransactionContext, CancellationToken, Task> action)
+		=> Scope.ServiceProvider
+			.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0))
+			.ExecuteAsync(action, CancellationToken);
 }

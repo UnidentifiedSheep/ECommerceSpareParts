@@ -1,6 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Handlers.Currencies;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

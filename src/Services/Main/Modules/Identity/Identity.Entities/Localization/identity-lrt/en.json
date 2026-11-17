@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "lrt.user.tokens.clear.expired.name": "Clear expired tokens",
+    "lrt.user.tokens.clear.expired.description": "Deletes user tokens that have expired."
+  }
+}

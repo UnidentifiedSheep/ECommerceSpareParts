@@ -2,8 +2,8 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
-using Main.Application.Products.Commands.CreateProductEan;
-using Main.Application.Products.Commands.DeleteProductEan;
+using Main.Modules.Product.Application.Products.Commands.CreateProductEan;
+using Main.Modules.Product.Application.Products.Commands.DeleteProductEan;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

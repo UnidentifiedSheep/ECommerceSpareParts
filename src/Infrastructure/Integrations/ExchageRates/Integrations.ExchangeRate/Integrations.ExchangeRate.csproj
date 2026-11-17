@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core\Enums\Enums.csproj" />
-      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
+        <ProjectReference Include="..\..\..\..\Core\Enums\Enums.csproj"/>
+        <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj"/>
     </ItemGroup>
 
 </Project>

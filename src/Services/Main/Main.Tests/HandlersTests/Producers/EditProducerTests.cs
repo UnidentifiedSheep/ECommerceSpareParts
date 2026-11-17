@@ -1,12 +1,10 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers.EditProducer;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Handlers.Producers.EditProducer;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,9 +13,7 @@ namespace Tests.HandlersTests.Producers;
 public class EditProducerTests : IntegrationTest
 {
 	public EditProducerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -31,7 +27,7 @@ public class EditProducerTests : IntegrationTest
 		await act.Should().NotThrowAsync();
 
 		var dbProducer = await Context
-			.Producers
+			.Set<Producer>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == producer.Id, CancellationToken);
 		dbProducer.Should().NotBeNull();
@@ -59,7 +55,7 @@ public class EditProducerTests : IntegrationTest
 		var edited = await Mediator.Send(command, CancellationToken);
 
 		var dbProducer = await Context
-			.Producers
+			.Set<Producer>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == producer.Id, CancellationToken);
 		dbProducer.Should().NotBeNull();

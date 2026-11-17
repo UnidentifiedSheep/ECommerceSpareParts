@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "lrt.service.task.run.name": "Запуск задачи сервиса",
+    "lrt.service.task.run.description": "Запускает задачу в выбранном сервисе."
+  }
+}

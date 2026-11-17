@@ -1,7 +1,7 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProducerAliases;
-using Main.Entities.Exceptions;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Handlers.ProducerAliases;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -15,9 +15,7 @@ public class DeleteAliasTests : IntegrationTest
 	private ProducerAlias _alias = null!;
 
 	public DeleteAliasTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	public override async ValueTask InitializeAsync()
 	{
@@ -51,7 +49,7 @@ public class DeleteAliasTests : IntegrationTest
 		var act = () => Mediator.Send(command);
 		await act.Should().NotThrowAsync();
 
-		var dbAliass = await Context.ProducersAliases.AsNoTracking().ToListAsync(CancellationToken);
+		var dbAliass = await Context.Set<ProducerAlias>().AsNoTracking().ToListAsync(CancellationToken);
 		dbAliass.Should().HaveCount(0);
 	}
 }

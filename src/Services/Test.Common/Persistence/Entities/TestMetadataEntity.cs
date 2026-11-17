@@ -5,16 +5,17 @@ namespace Tests.Persistence.Entities;
 
 internal sealed class TestMetadataEntity : Entity<TestMetadataEntity, Guid, TestMetadata>
 {
-	public Guid Id { get; private set; } = Guid.NewGuid();
+	public Guid Id { get; } = Guid.NewGuid();
 
 	public override Guid GetId() => Id;
 
 	public void ReplaceMetadata(TestMetadata metadata) => Metadata = metadata;
 }
 
-internal sealed class TestAuditableMetadataEntity : AuditableEntity<TestAuditableMetadataEntity, Guid, TestMetadata>
+internal sealed class
+	TestAuditableMetadataEntity : AuditableEntity<TestAuditableMetadataEntity, Guid, TestMetadata>
 {
-	public Guid Id { get; private set; } = Guid.NewGuid();
+	public Guid Id { get; } = Guid.NewGuid();
 
 	public override Guid GetId() => Id;
 }

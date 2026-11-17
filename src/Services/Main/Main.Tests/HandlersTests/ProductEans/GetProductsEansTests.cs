@@ -1,8 +1,8 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
-using Main.Application.Products.Queries.GetProductsEans;
-using Main.Entities.Product;
+using FluentValidation.TestHelper;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Queries.GetProductsEans;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -10,8 +10,8 @@ namespace Tests.HandlersTests.ProductEans;
 
 public class GetProductsEansTests : IntegrationTest
 {
-	public GetProductsEansTests(CombinedContainerFixture fixture) : base(fixture) =>
-		RegisterBasicContext<ProductEanTestContext>();
+	public GetProductsEansTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<ProductEanTestContext>();
 
 	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
 
@@ -20,7 +20,7 @@ public class GetProductsEansTests : IntegrationTest
 	{
 		var productIds = TestContext.ProductTestContext.Products.Take(4).Select(x => x.Id).ToArray();
 		const string extraEan = "9999999999999";
-		Context.ProductEans.Add(ProductEan.Create(productIds[0], extraEan));
+		Context.Set<ProductEan>().Add(ProductEan.Create(productIds[0], extraEan));
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
@@ -29,12 +29,21 @@ public class GetProductsEansTests : IntegrationTest
 
 		result.Eans.Keys.Should().BeEquivalentTo(productIds.Take(2));
 		result.Eans.Should().NotContainKey(productIds[3]);
-		result.Eans[productIds[0]].Should().Equal(
-			TestContext.ProductEans.Where(x => x.ProductId == productIds[0])
-				.Select(x => x.Ean).Append(extraEan).Order());
-		result.Eans[productIds[1]].Should().Equal(
-			TestContext.ProductEans.Where(x => x.ProductId == productIds[1])
-				.Select(x => x.Ean).Order());
+		result.Eans[productIds[0]]
+			.Should()
+			.Equal(
+				TestContext.ProductEans
+					.Where(x => x.ProductId == productIds[0])
+					.Select(x => x.Ean)
+					.Append(extraEan)
+					.Order());
+		result.Eans[productIds[1]]
+			.Should()
+			.Equal(
+				TestContext.ProductEans
+					.Where(x => x.ProductId == productIds[1])
+					.Select(x => x.Ean)
+					.Order());
 	}
 
 	[Fact]
@@ -52,8 +61,6 @@ public class GetProductsEansTests : IntegrationTest
 
 		result.Eans.Should().BeEmpty();
 	}
-
-
 }
 
 public class GetProductsEansValidationTests : ValidationTest<GetProductsEansValidation, GetProductsEansQuery>

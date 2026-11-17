@@ -1,0 +1,43 @@
+using System.Text.Json.Serialization;
+using Domain.CommonEntities;
+using Domain.Interfaces;
+using Enums;
+using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
+
+namespace Main.Entities.Currency.Settings;
+
+public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
+{
+	public CurrencySetting(string json) : base(SettingName, json)
+	{
+	}
+
+	public CurrencySetting(CurrencySettingData data) : base(SettingName, data)
+	{
+	}
+
+	public static string SettingName => "CurrencySetting";
+
+	public static CurrencySetting Default => new(new CurrencySettingData());
+}
+
+public record CurrencySettingData
+{
+	[JsonPropertyName("baseCurrencyId")]
+	[RequiredSchemaField]
+	[SchemaInputControl(InputControlType.EntitySelector)]
+	[SchemaDependsOnEntity("Currency")]
+	[SchemaFieldLabel(CurrencySettingBaseCurrencyNameMessage.Key)]
+	[SchemaFieldDescription(CurrencySettingBaseCurrencyDescriptionMessage.Key)]
+	public int BaseCurrencyId { get; init; } = 1;
+
+	[JsonPropertyName("rateProvider")]
+	[RequiredSchemaField]
+	[SchemaInputControl(InputControlType.EnumSelector)]
+	[SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
+	[SchemaFieldLabel(CurrencySettingRateProviderNameMessage.Key)]
+	[SchemaFieldDescription(CurrencySettingRateProviderDescriptionMessage.Key)]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public ExchangeRateProvider RateProvider { get; init; } = ExchangeRateProvider.Cbr;
+}

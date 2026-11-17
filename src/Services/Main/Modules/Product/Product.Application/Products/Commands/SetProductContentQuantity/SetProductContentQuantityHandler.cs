@@ -1,0 +1,33 @@
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using Attributes;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using MediatR;
+
+namespace Main.Modules.Product.Application.Products.Commands.SetProductContentQuantity;
+
+[AutoSave]
+[Transactional]
+public record SetProductsContentCountCommand(int ParentProductId, int ChildProductId, int Quantity)
+	: ICommand;
+
+public class SetProductContentQuantityHandler(
+	IRepository<ProductContent, (int, int)> contentRepository)
+	: ICommandHandler<SetProductsContentCountCommand>
+{
+	public async Task<Unit> Handle(
+		SetProductsContentCountCommand request,
+		CancellationToken cancellationToken)
+	{
+		var content =
+			await contentRepository.GetById(
+				(request.ParentProductId, request.ChildProductId),
+				cancellationToken) ?? throw new ProductContentNotFoundException(
+				request.ParentProductId,
+				request.ChildProductId);
+		content.SetQuantity(request.Quantity);
+
+		return Unit.Value;
+	}
+}

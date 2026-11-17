@@ -5,11 +5,10 @@ using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Sale;
 using Main.Api.GraphQl.Types.Sale;
-using Main.Application.Handlers.Sales.GetSale;
-using Main.Application.Handlers.Sales.GetSales;
+using Main.Modules.Sale.Application.Handlers.Sales.GetSale;
+using Main.Modules.Sale.Application.Handlers.Sales.GetSales;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

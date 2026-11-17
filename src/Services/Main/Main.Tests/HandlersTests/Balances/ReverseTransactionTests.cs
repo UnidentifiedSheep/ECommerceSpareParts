@@ -1,12 +1,13 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
+using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Balance.ReverseTransaction;
-using Main.Entities.Balance;
-using Main.Entities.Exceptions;
-using Main.Enums.Balances;
+using FluentValidation.TestHelper;
+using Main.Entities;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Entities.Balance.Exceptions;
+using Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Balance;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -17,9 +18,7 @@ namespace Tests.HandlersTests.Balances;
 public class ReverseTransactionTests : IntegrationTest
 {
 	public ReverseTransactionTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<BalanceTestContext>();
-	}
+		=> RegisterBasicContext<BalanceTestContext>();
 
 	private BalanceTestContext TestContext => GetContext<BalanceTestContext>();
 
@@ -32,7 +31,7 @@ public class ReverseTransactionTests : IntegrationTest
 		await Mediator.Send(new ReverseTransactionCommand(transaction.Id), CancellationToken);
 
 		var reversed = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
@@ -42,13 +41,13 @@ public class ReverseTransactionTests : IntegrationTest
 		reversed.ReversedAt.Should().NotBeNull();
 
 		var senderBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId,
 				CancellationToken);
 		var receiverBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId,
@@ -81,7 +80,7 @@ public class ReverseTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var reversed = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == transaction.Id, CancellationToken);
 
@@ -106,10 +105,12 @@ public class ReverseTransactionTests : IntegrationTest
 		var receiverId = TestContext.Users[1].Id;
 
 		var senderBalance =
-			await Context.UserBalances.FirstAsync(x =>
-				x.OrganizationId == senderId && x.CurrencyId == currencyId);
-		var receiverBalance = await Context.UserBalances.FirstAsync(x =>
-			x.OrganizationId == receiverId && x.CurrencyId == currencyId);
+			await Context.Set<OrganizationBalance>()
+				.FirstAsync(x =>
+					x.OrganizationId == senderId && x.CurrencyId == currencyId);
+		var receiverBalance = await Context.Set<OrganizationBalance>()
+			.FirstAsync(x =>
+				x.OrganizationId == receiverId && x.CurrencyId == currencyId);
 
 		var transaction = new TransactionBuilder(Faker)
 			.WithSenderId(senderId)
@@ -122,20 +123,24 @@ public class ReverseTransactionTests : IntegrationTest
 			.Applied()
 			.Build();
 
-		await Context.Transactions.AddAsync(transaction);
+		await Context.Set<Transaction>().AddAsync(transaction);
 		await Context.SaveChangesAsync();
 
 		return transaction;
 	}
 }
 
-public class ReverseTransactionValidationTests : ValidationTest<ReverseTransactionValidation, ReverseTransactionCommand>
+public class
+	ReverseTransactionValidationTests : ValidationTest<ReverseTransactionValidation,
+	ReverseTransactionCommand>
 {
 	[Fact]
 	public async Task ReverseTransaction_EmptyTransactionId_FailsValidation()
 	{
 		var result = await ValidateAsync(new ReverseTransactionCommand(Guid.Empty));
 		result.ShouldHaveValidationErrorFor(x => x.TransactionId)
-			.WithErrorCode(TransactionIdRequiredMessage.Instance.MessageKey).WithCustomState(TransactionIdRequiredMessage.Instance).Only();
+			.WithErrorCode(TransactionIdRequiredMessage.Instance.MessageKey)
+			.WithCustomState(TransactionIdRequiredMessage.Instance)
+			.Only();
 	}
 }

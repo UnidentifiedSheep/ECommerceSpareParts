@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Products.Queries;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Products.Queries;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
@@ -13,9 +13,7 @@ namespace Tests.HandlersTests.Products;
 public class GetAvailableProductsStockTests : IntegrationTest
 {
 	public GetAvailableProductsStockTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<StorageContentTestContext>();
-	}
+		=> RegisterBasicContext<StorageContentTestContext>();
 
 	private StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
 
@@ -88,10 +86,15 @@ public class GetAvailableProductsStockTests : IntegrationTest
 	{
 		var content = TestContext.StorageContents.First(item => item.Count > 0);
 		var item = new GetAvailableProductsStockItem(content.ProductId, content.StorageCode);
-		var expected = TestContext.StorageContents.Where(source => source.ProductId == item.ProductId &&
-			source.StorageCode == item.StorageCode).Sum(source => source.Count) - content.Count + 7;
-		await new StorageContentBuilder(Faker).WithProductIds(content.ProductId).WithStorageCode(content.StorageCode)
-			.WithCurrencyId(content.CurrencyId).WithCount(7).BuildAndAddToDb(Context, CancellationToken);
+		var expected = TestContext.StorageContents
+			.Where(source => source.ProductId == item.ProductId &&
+				source.StorageCode == item.StorageCode)
+			.Sum(source => source.Count) - content.Count + 7;
+		await new StorageContentBuilder(Faker).WithProductIds(content.ProductId)
+			.WithStorageCode(content.StorageCode)
+			.WithCurrencyId(content.CurrencyId)
+			.WithCount(7)
+			.BuildAndAddToDb(Context, CancellationToken);
 		await Context.AddAsync(StorageContentLock.Create(content.Id, content.Count + 3), CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
@@ -105,17 +108,27 @@ public class GetAvailableProductsStockTests : IntegrationTest
 	{
 		var content = TestContext.StorageContents.First(source => source.Count > 0);
 		var item = new GetAvailableProductsStockItem(content.ProductId, content.StorageCode);
-		var expected = TestContext.StorageContents.Where(source => source.ProductId == item.ProductId &&
-			source.StorageCode == item.StorageCode).Sum(source => source.Count) - 1;
+		var expected = TestContext.StorageContents
+			.Where(source => source.ProductId == item.ProductId &&
+				source.StorageCode == item.StorageCode)
+			.Sum(source => source.Count) - 1;
 		var clock = Scope.ServiceProvider.GetRequiredService<TestTimeProvider>();
 		var now = clock.GetUtcNow().UtcDateTime;
 		var released = StorageContentLock.Create(content.Id, content.Count);
 		released.Release(now);
-		await Context.AddRangeAsync([
-			released,
-			StorageContentLock.Create(content.Id, content.Count, now.AddHours(1)),
-			StorageContentLock.Create(content.Id, 1, now.AddHours(2))
-		], CancellationToken);
+		await Context.AddRangeAsync(
+			[
+				released,
+				StorageContentLock.Create(
+					content.Id,
+					content.Count,
+					now.AddHours(1)),
+				StorageContentLock.Create(
+					content.Id,
+					1,
+					now.AddHours(2))
+			],
+			CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		clock.SetUtcNow(now.AddHours(1));
 
@@ -123,5 +136,4 @@ public class GetAvailableProductsStockTests : IntegrationTest
 
 		result.Stocks[item].Should().Be(expected);
 	}
-
 }

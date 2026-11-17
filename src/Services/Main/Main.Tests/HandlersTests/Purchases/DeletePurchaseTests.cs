@@ -1,28 +1,24 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Tests.Stubs;
-using Application.Common.Interfaces.Events;
-using Contracts;
-using FluentAssertions;
-using Main.Application.Handlers.Purchases.DeletePurchase;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Application.Interfaces.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Main.Application.Models.Storage;
-using Main.Entities.Exceptions;
-using Main.Enums;
-using Main.Enums.Balances;
+using Contracts;
+using Enums;
+using FluentAssertions;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Purchase.Exceptions;
+using Main.Entities.Purchase.Purchase;
+using Main.Entities.Storage.Exceptions;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
-using Tests.DataBuilders.Balance;
-using Tests.DataBuilders.Purchase;
-using Tests.DataBuilders.Storage;
+using Microsoft.Extensions.DependencyInjection;
+using Tests.Abstractions.Test;
 using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
-using Tests.TestContexts.Currency;
 using Tests.TestContexts.Purchase;
-using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.Purchases;
 
@@ -36,8 +32,10 @@ public class DeletePurchaseTests : IntegrationTest
 
 	private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public async Task DeletePurchase_ValidPurchase_RemovesPurchaseAndRevertsStockAndTransaction()
@@ -52,18 +50,20 @@ public class DeletePurchaseTests : IntegrationTest
 		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
 
 		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
+			await Context.Set<Purchase>()
+				.AsNoTracking()
+				.AnyAsync(x => x.Id == purchase.Id, CancellationToken);
 		var purchaseContentExists = await Context
-			.PurchaseContents
+			.Set<PurchaseContent>()
 			.AsNoTracking()
 			.AnyAsync(x => x.PurchaseId == purchase.Id, CancellationToken);
 		var storageContent = await Context
-			.StorageContents
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
 		var productStockQuantity = await Context.GetProductStockQuantityAsync(productId, CancellationToken);
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 
@@ -78,111 +78,6 @@ public class DeletePurchaseTests : IntegrationTest
 		published.OfType<PurchaseDeletedEvent>().Should().ContainSingle().Which.Id.Should().Be(purchase.Id);
 		published.OfType<PurchaseCreatedEvent>().Should().BeEmpty();
 		published.OfType<PurchaseUpdatedEvent>().Should().BeEmpty();
-	}
-
-	[Fact]
-	public async Task DeletePurchase_WithLogisticsTransaction_RevertsPurchaseAndLogisticsTransactions()
-	{
-		var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-		var currencyId = GetContext<CurrencyTestContext>().Currencies[0].Id;
-		var systemUserId = GetContext<UserContextTestContext>().SystemUser.Id;
-		var supplier = PurchaseContext.Supplier;
-		var product = PurchaseContext.Product;
-		var productStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
-		var originalStock = productStockQuantity;
-
-		var supplierBalance = await Context.UserBalances.SingleAsync(
-			x => x.OrganizationId == supplier.Id && x.CurrencyId == currencyId,
-			CancellationToken);
-		var systemBalance = await Context.UserBalances.SingleAsync(
-			x => x.OrganizationId == systemUserId && x.CurrencyId == currencyId,
-			CancellationToken);
-		var carrierBalance = new UserBalanceBuilder(Faker)
-			.WithUserId(route.CarrierId!.Value)
-			.WithCurrencyId(currencyId)
-			.Build();
-
-		var purchaseTransaction = new TransactionBuilder(Faker)
-			.WithSenderId(supplier.Id)
-			.WithReceiverId(systemUserId)
-			.WithCurrencyId(currencyId)
-			.WithAmount(20m)
-			.WithSourceType(TransactionSourceType.Purchase)
-			.WithBalances(supplierBalance, systemBalance)
-			.Completed()
-			.Applied()
-			.Build();
-		var logisticsTransaction = new TransactionBuilder(Faker)
-			.WithSenderId(route.CarrierId.Value)
-			.WithReceiverId(systemUserId)
-			.WithCurrencyId(currencyId)
-			.WithAmount(5m)
-			.WithSourceType(TransactionSourceType.Logistic)
-			.WithBalances(carrierBalance, systemBalance)
-			.Completed()
-			.Applied()
-			.Build();
-
-		await Context.AddRangeAsync(
-			carrierBalance,
-			purchaseTransaction,
-			logisticsTransaction);
-		await Context.SaveChangesAsync(CancellationToken);
-
-		var storageContent = await new StorageContentBuilder(Faker)
-			.WithStorageCode(route.ToStorageCode)
-			.WithProductIds(product.Id)
-			.WithCurrencyId(currencyId)
-			.WithCount(2)
-			.WithBuyPrice(10m)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var stock = await Context.ProductStocks.SingleAsync(
-			item => item.ProductId == product.Id && item.StorageCode == storageContent.StorageCode, CancellationToken);
-		stock.SetQuantity(stock.Quantity + storageContent.Count);
-
-		var purchaseContent = new PurchaseContentBuilder(Faker)
-			.WithProductId(product.Id)
-			.WithCount(2)
-			.WithPrice(10m)
-			.WithStorageContentId(storageContent.Id)
-			.Build();
-		purchaseContent.SetLogistic(
-			1m,
-			1m,
-			5m);
-
-		var purchase = await new PurchaseBuilder(Faker)
-			.WithSupplierUserId(supplier.Id)
-			.WithSupplierOrganizationId(supplier.Id)
-			.WithCurrencyId(currencyId)
-			.WithTransactionId(purchaseTransaction.Id)
-			.WithStorage(route.ToStorageCode)
-			.WithContent(purchaseContent)
-			.WithLogistic(route, logisticsTransaction.Id)
-			.BuildAndAddToDb(Context, CancellationToken);
-
-		await Mediator.Send(new DeletePurchaseCommand(purchase.Id), CancellationToken);
-
-		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
-		var purchaseTransactionAfterDelete = await Context
-			.Transactions
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == purchaseTransaction.Id, CancellationToken);
-		var logisticsTransactionAfterDelete = await Context
-			.Transactions
-			.AsNoTracking()
-			.SingleAsync(x => x.Id == logisticsTransaction.Id, CancellationToken);
-		var productAfterDeleteStockQuantity = await Context.GetProductStockQuantityAsync(product.Id, CancellationToken);
-
-		purchaseExists.Should().BeFalse();
-		purchaseTransactionAfterDelete.IsReversed.Should().BeTrue();
-		purchaseTransactionAfterDelete.IsReversalApplied.Should().BeTrue();
-		purchaseTransactionAfterDelete.SourceType.Should().Be(TransactionSourceType.Purchase);
-		logisticsTransactionAfterDelete.IsReversed.Should().BeTrue();
-		logisticsTransactionAfterDelete.IsReversalApplied.Should().BeTrue();
-		logisticsTransactionAfterDelete.SourceType.Should().Be(TransactionSourceType.Logistic);
-		productAfterDeleteStockQuantity.Should().Be(originalStock);
 	}
 
 	[Fact]
@@ -203,13 +98,20 @@ public class DeletePurchaseTests : IntegrationTest
 		var storageContentId = content.StorageContentId;
 		var transactionId = purchase.TransactionId;
 
-		await Scope.ServiceProvider.GetRequiredService<IApplicationTransaction>()
-			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0)).ExecuteAsync(async (context, token) =>
-		{
-			await context.GetRequiredService<IStorageContentService>().SubtractByContentsAsync(
-				[new SubtractStorageContentItem(storageContentId, 1)], StorageMovementType.Sale, token);
-			await context.UnitOfWork.SaveChangesAsync(token);
-		}, CancellationToken);
+		await Scope.ServiceProvider
+			.GetRequiredService<IApplicationTransaction>()
+			.WithSettings(TransactionalAttribute.ReadCommitted(0, 0))
+			.ExecuteAsync(
+				async (context, token) =>
+				{
+					await context.GetRequiredService<IStorageContentService>()
+						.SubtractByContentsAsync(
+							[new SubtractStorageContentItem(storageContentId, 1)],
+							StorageMovementType.Sale,
+							token);
+					await context.UnitOfWork.SaveChangesAsync(token);
+				},
+				CancellationToken);
 
 		var publishedBefore = Broker.PublishedMessages.Count;
 		await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() => Mediator.Send(
@@ -217,14 +119,17 @@ public class DeletePurchaseTests : IntegrationTest
 			CancellationToken));
 
 		var purchaseExists =
-			await Context.Purchases.AsNoTracking().AnyAsync(x => x.Id == purchase.Id, CancellationToken);
+			await Context.Set<Purchase>()
+				.AsNoTracking()
+				.AnyAsync(x => x.Id == purchase.Id, CancellationToken);
 		var storageContent = await Context
-			.StorageContents
+			.Set<StorageContent>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == storageContentId, CancellationToken);
-		var productStockQuantity = await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
+		var productStockQuantity =
+			await Context.GetProductStockQuantityAsync(content.ProductId, CancellationToken);
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == transactionId, CancellationToken);
 

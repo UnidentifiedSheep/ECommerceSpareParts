@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Interfaces.Persistence;
 using Main.Entities.User;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders.User;
@@ -20,7 +20,7 @@ public sealed class UserRepositoryTests(CombinedContainerFixture fixture) : Inte
 		Context.ChangeTracker.Clear();
 		var repository = Scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
-		var users = await repository.Search(Context.Users, "repository")
+		var users = await repository.Search(Context.Set<User>(), "repository")
 			.Where(user => user.Id == expected.Id)
 			.Take(1)
 			.ToListAsync(CancellationToken);
@@ -32,16 +32,29 @@ public sealed class UserRepositoryTests(CombinedContainerFixture fixture) : Inte
 	public async Task SearchWithRank_RespectsSourceFiltersAndReturnsUntrackedUsersInRelevanceOrder()
 	{
 		var identityMatch = await new UserBuilder(Faker).WithUserName("rank-identity-match")
-			.WithUserInfo("Космонавтов", "Петров", null).BuildAndAddToDb(Context);
+			.WithUserInfo(
+				"Космонавтов",
+				"Петров",
+				null)
+			.BuildAndAddToDb(Context);
 		var descriptionMatch = await new UserBuilder(Faker).WithUserName("rank-description-match")
-			.WithUserInfo("Николай", "Иванов", "Космонавтов").BuildAndAddToDb(Context);
+			.WithUserInfo(
+				"Николай",
+				"Иванов",
+				"Космонавтов")
+			.BuildAndAddToDb(Context);
 		var excluded = await new UserBuilder(Faker).WithUserName("rank-excluded-match")
-			.WithUserInfo("Космонавтов", "Сидоров", null).BuildAndAddToDb(Context);
+			.WithUserInfo(
+				"Космонавтов",
+				"Сидоров",
+				null)
+			.BuildAndAddToDb(Context);
 		Context.ChangeTracker.Clear();
 		var repository = Scope.ServiceProvider.GetRequiredService<IUserRepository>();
 
 		var matches = await repository.SearchWithRank(
-			Context.Users.Where(user => user.Id != excluded.Id), "космонавтов")
+				Context.Set<User>().Where(user => user.Id != excluded.Id),
+				"космонавтов")
 			.ToListAsync(CancellationToken);
 
 		matches.Select(match => match.User.Id).Should().Equal(identityMatch.Id, descriptionMatch.Id);
@@ -49,5 +62,4 @@ public sealed class UserRepositoryTests(CombinedContainerFixture fixture) : Inte
 		matches[0].Rank.Should().BeGreaterThan(matches[1].Rank);
 		Context.ChangeTracker.Entries<User>().Should().BeEmpty();
 	}
-
 }

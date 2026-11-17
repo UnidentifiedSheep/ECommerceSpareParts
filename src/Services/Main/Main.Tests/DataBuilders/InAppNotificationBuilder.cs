@@ -1,14 +1,14 @@
 using Bogus;
-using Notification.Core.Entities;
+using Main.Entities.Notification;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
 
 public class InAppNotificationBuilder(Faker faker) : BuilderBase<InAppNotification>(faker)
 {
-	private Guid? _userId;
-	private string? _text;
 	private bool _seen;
+	private string? _text;
+	private Guid? _userId;
 
 	public InAppNotificationBuilder WithUserId(Guid userId)
 	{

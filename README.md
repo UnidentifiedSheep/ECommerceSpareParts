@@ -10,7 +10,7 @@ analytics.
 | Service     | Responsibility                                                         |
 |-------------|------------------------------------------------------------------------|
 | `Gateway`   | Public YARP reverse proxy and aggregated API documentation.            |
-| `Main`      | Catalog, users, WMS, purchases, sales, logistics, and files.           |
+| `Main`      | Catalog, users, WMS, purchases, sales, and files.                      |
 | `Pricing`   | Supplier/internal offers, markup rules, price generation, and ranking. |
 | `Search`    | Product and producer search backed by OpenSearch.                      |
 | `Analytics` | Metrics, sale analysis, and automatic markup generation.               |
@@ -22,7 +22,7 @@ exchange integration events through RabbitMQ and use the EF Core outbox pattern.
 
 - [Main service](docs/MAIN.md) — catalog, users, commercial operations, finances, currencies, imports, and files.
 - [Pricing and markup](docs/PRICING.md) — offer collection, price rules, automatic markups, and recalculation.
-- [Warehouse management](docs/WMS.md) — stock lots, purchases, sales, reservations, and logistics.
+- [Warehouse management](docs/WMS.md) — stock lots, purchases, sales, and reservations.
 - [Search service](docs/SEARCH.md) — product/SKU search, filters, producers, aliases, and index synchronization.
 - [Analytics service](docs/ANALYTICS.md) — purchase/sale facts, product metrics, and markup analysis.
 - Favorit supplier integration and Armtek client infrastructure.

@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Application.Common.Models;
+﻿using Application.Common.Models;
 
 namespace Application.Common.Extensions;
 
@@ -19,5 +18,6 @@ public static class EnumerableExtensions
 
 	public static IEnumerable<TModel> ApplyPagination<TModel>(
 		this IEnumerable<TModel> queryable,
-		Pagination pagination) => queryable.Skip(pagination.Page * pagination.Size).Take(pagination.Size);
+		Pagination pagination)
+		=> queryable.Skip(pagination.Page * pagination.Size).Take(pagination.Size);
 }

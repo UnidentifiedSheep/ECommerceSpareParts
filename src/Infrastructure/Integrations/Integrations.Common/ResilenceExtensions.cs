@@ -7,8 +7,7 @@ public static class ResilenceExtensions
 {
 	public static IHttpStandardResiliencePipelineBuilder AddDefaultResilenceHandler(
 		this IHttpClientBuilder clientBuilder)
-	{
-		return clientBuilder.AddStandardResilienceHandler(options =>
+		=> clientBuilder.AddStandardResilienceHandler(options =>
 		{
 			options.Retry.MaxRetryAttempts = 3;
 			options.Retry.Delay = TimeSpan.FromMilliseconds(500);
@@ -20,5 +19,4 @@ public static class ResilenceExtensions
 			options.CircuitBreaker.FailureRatio = 0.5;
 			options.CircuitBreaker.MinimumThroughput = 10;
 		});
-	}
 }

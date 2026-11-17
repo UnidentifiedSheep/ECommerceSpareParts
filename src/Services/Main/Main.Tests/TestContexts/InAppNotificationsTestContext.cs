@@ -1,19 +1,19 @@
+using Main.Entities.Notification;
 using Main.Entities.User;
-using Main.Persistence.Context;
-using Notification.Core.Entities;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class InAppNotificationsTestContext(DContext context, UsersTestContext usersTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class InAppNotificationsTestContext(UnifiedDbContext context, UsersTestContext usersTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
-	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public IReadOnlyList<User> Users { get; private set; } = null!;
 	public IReadOnlyList<InAppNotification> Notifications { get; private set; } = null!;
+	public static Type[] DependsOn { get; } = [typeof(UsersTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
 	{
@@ -24,9 +24,10 @@ public class InAppNotificationsTestContext(DContext context, UsersTestContext us
 					.WithUserId(user.Id)
 					.WithSeen()
 					.BuildMany(2)
-				.Concat(new InAppNotificationBuilder(Faker)
-					.WithUserId(user.Id)
-					.BuildMany(3)))
+					.Concat(
+						new InAppNotificationBuilder(Faker)
+							.WithUserId(user.Id)
+							.BuildMany(3)))
 			.ToArray();
 
 		await DbContext.AddRangeAsync(notifications, cancellationToken);

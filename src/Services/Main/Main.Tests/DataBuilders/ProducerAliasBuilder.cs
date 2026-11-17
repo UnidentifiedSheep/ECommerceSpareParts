@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -36,7 +36,8 @@ public class ProducerAliasBuilder(Faker faker) : BuilderBase<ProducerAlias>(fake
 		return this;
 	}
 
-	public override ProducerAlias Build() => ProducerAlias.Create(
-		Faker.PickRandom<int>(_producerIds),
-		Alias ?? Faker.Lorem.Letter(20));
+	public override ProducerAlias Build()
+		=> ProducerAlias.Create(
+			Faker.PickRandom<int>(_producerIds),
+			Alias ?? Faker.Lorem.Letter(20));
 }

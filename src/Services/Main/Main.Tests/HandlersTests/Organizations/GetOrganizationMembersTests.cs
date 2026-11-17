@@ -1,13 +1,10 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
-using Abstractions.Models;
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Organizations.GetOrganizationMembers;
-using Main.Application.Static;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -18,9 +15,7 @@ namespace Tests.HandlersTests.Organizations;
 public class GetOrganizationMembersTests : IntegrationTest
 {
 	public GetOrganizationMembersTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	[Fact]
 	public async Task GetOrganizationMembers_ReturnsUsersWithOrganizationAndRole()
@@ -32,9 +27,9 @@ public class GetOrganizationMembersTests : IntegrationTest
 
 		result.Members.Should().HaveCount(3);
 		result.Members.Should().OnlyContain(x => x.OrganizationId == organization.Id);
-		result.Members.Should().Contain(x => x.User.Id == users[0].Id && x.Role == OrganizationRole.Owner);
-		result.Members.Should().Contain(x => x.User.Id == users[1].Id && x.Role == OrganizationRole.Admin);
-		result.Members.Should().Contain(x => x.User.Id == users[2].Id && x.Role == OrganizationRole.Member);
+		result.Members.Should().Contain(x => x.UserId == users[0].Id && x.Role == OrganizationRole.Owner);
+		result.Members.Should().Contain(x => x.UserId == users[1].Id && x.Role == OrganizationRole.Admin);
+		result.Members.Should().Contain(x => x.UserId == users[2].Id && x.Role == OrganizationRole.Member);
 	}
 
 	[Fact]
@@ -60,9 +55,9 @@ public class GetOrganizationMembersTests : IntegrationTest
 		secondPage.Members.Should().ContainSingle();
 		firstPage
 			.Members
-			.Select(x => x.User.Id)
+			.Select(x => x.UserId)
 			.Should()
-			.NotIntersectWith(secondPage.Members.Select(x => x.User.Id));
+			.NotIntersectWith(secondPage.Members.Select(x => x.UserId));
 	}
 
 	[Fact]
@@ -79,25 +74,26 @@ public class GetOrganizationMembersTests : IntegrationTest
 	private static GetOrganizationMembersQuery CreateQuery(
 		Guid organizationId,
 		int page = 0,
-		int size = 20) => new(organizationId, new Pagination(page, size));
+		int size = 20)
+		=> new(organizationId, new Pagination(page, size));
 
 	private async Task<Organization> CreateOrganization(Guid[] userIds)
-	{
-		return await new OrganizationBuilder(Faker)
+		=> await new OrganizationBuilder(Faker)
 			.WithOwnerId(userIds[0])
 			.WithName("Members organization")
 			.WithMember(userIds[1], OrganizationRole.Admin)
 			.WithMember(userIds[2])
 			.BuildAndAddToDb(Context);
-	}
 }
 
-public class GetOrganizationMembersValidationTests : ValidationTest<GetOrganizationMembersValidation, GetOrganizationMembersQuery>
+public class
+	GetOrganizationMembersValidationTests : ValidationTest<GetOrganizationMembersValidation,
+	GetOrganizationMembersQuery>
 {
 	[Fact]
 	public async Task GetOrganizationMembers_InvalidPagination_FailsValidation()
 	{
-		var query = new GetOrganizationMembersQuery(Guid.NewGuid(), new(-1, 20));
+		var query = new GetOrganizationMembersQuery(Guid.NewGuid(), new Pagination(-1, 20));
 
 		var result = await ValidateAsync(query);
 		result.ShouldHaveValidationErrorFor("Pagination.Page");

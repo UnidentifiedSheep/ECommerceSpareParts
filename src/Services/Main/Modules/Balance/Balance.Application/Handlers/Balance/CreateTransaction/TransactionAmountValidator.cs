@@ -1,0 +1,20 @@
+using Application.Common.Extensions;
+using FluentValidation;
+using Main.Entities;
+
+namespace Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
+
+public class TransactionAmountValidator : AbstractValidator<decimal>
+{
+	public TransactionAmountValidator()
+	{
+		RuleFor(x => x).GreaterThan(0).WithLocalizableError(TransactionAmountMustBePositiveMessage.Instance);
+
+		RuleFor(x => x)
+			.PrecisionScale(
+				18,
+				2,
+				true)
+			.WithLocalizableError(TransactionAmountMaxTwoDecimalPlacesMessage.Instance);
+	}
+}

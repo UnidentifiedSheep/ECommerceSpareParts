@@ -1,15 +1,13 @@
 using System.Text.Json;
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
-using Api.Common.HostedServices;
 using Api.Common.Models.Options;
-using Application.Common.Models.Options;
-using Application.Common.Models.Options.S3;
 using Cache;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Persistence;
 using RabbitMq;
 using S3;
+using S3.Core.Options;
 using Security;
 
 namespace Api.Common;
@@ -21,8 +19,8 @@ public static class ServiceProvider
 	public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
 	{
 		collection.TryAddSingleton<ProjectJsonOptions>();
-		collection.TryAddSingleton<JsonSerializerOptions>(
-			sp => sp.GetRequiredService<ProjectJsonOptions>().SerializerOptions);
+		collection.TryAddSingleton<JsonSerializerOptions>(sp
+			=> sp.GetRequiredService<ProjectJsonOptions>().SerializerOptions);
 
 		return collection;
 	}
@@ -83,36 +81,6 @@ public static class ServiceProvider
 		collection
 			.AddOptions<S3Options>()
 			.BindConfiguration(S3Options.SectionName)
-			.ValidateDataAnnotations()
-			.ValidateOnStart();
-
-		return collection;
-	}
-
-	public static IServiceCollection AddLrtOptions(this IServiceCollection collection)
-	{
-		collection
-			.AddOptions<LrtExecutorOptions>()
-			.BindConfiguration(LrtExecutorOptions.SectionName)
-			.ValidateDataAnnotations()
-			.ValidateOnStart();
-
-		return collection;
-	}
-
-	public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
-	{
-		return serviceCollection
-			.AddHostedService<LrtExecutorHostedService>()
-			.AddHostedService<ScheduledJobEnqueuerHostedService>()
-			.AddHostedService<ExpiredJobsWiperHostedService>();
-	}
-
-	public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
-	{
-		collection
-			.AddOptions<ScheduledJobEnqueuerOptions>()
-			.BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
 			.ValidateDataAnnotations()
 			.ValidateOnStart();
 

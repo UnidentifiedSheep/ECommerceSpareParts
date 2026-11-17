@@ -1,13 +1,13 @@
-using Security.Core.Interfaces;
 using FluentAssertions;
-using Main.Application.Handlers.Auth.EmailVerification;
-using Main.Application.Interfaces.Services.PayloadProvider;
-using Main.Application.Models.Auth;
+using Main.Entities.Enums.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums.Auth;
+using Main.Modules.Identity.Application.Handlers.Auth.EmailVerification;
+using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
+using Main.Modules.Identity.Application.Models.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Security.Core.Interfaces;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -20,9 +20,7 @@ public class VerifyEmailTests : IntegrationTest
 	private const string Email = "verification@example.com";
 
 	public VerifyEmailTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserContextTestContext>();
-	}
+		=> RegisterBasicContext<UserContextTestContext>();
 
 	[Fact]
 	public async Task VerifyEmail_ValidToken_ConfirmsEmail()
@@ -36,7 +34,9 @@ public class VerifyEmailTests : IntegrationTest
 		await Mediator.Send(new VerifyEmailCommand(token), CancellationToken);
 
 		var email =
-			await Context.UserEmails.AsNoTracking().SingleAsync(x => x.Email == Email, CancellationToken);
+			await Context.Set<UserEmail>()
+				.AsNoTracking()
+				.SingleAsync(x => x.Email == Email, CancellationToken);
 		email.Confirmed.Should().BeTrue();
 		email.ConfirmedAt.Should().NotBeNull();
 	}
@@ -133,14 +133,14 @@ public class VerifyEmailTests : IntegrationTest
 		string email)
 	{
 		var payload = await GetPayloadProvider()
-		.GetPayload(
-			userId,
-			type,
-			email);
+			.GetPayload(
+				userId,
+				type,
+				email);
 		var signer = Scope.ServiceProvider.GetRequiredService<IJsonSigner>();
 		return (payload, signer.Sign(payload));
 	}
 
-	private IVerificationPayloadProvider GetPayloadProvider() =>
-		Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
+	private IVerificationPayloadProvider GetPayloadProvider()
+		=> Scope.ServiceProvider.GetRequiredService<IVerificationPayloadProvider>();
 }

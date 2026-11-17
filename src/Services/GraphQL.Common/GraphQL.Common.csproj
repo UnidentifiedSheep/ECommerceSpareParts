@@ -7,17 +7,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HotChocolate.AspNetCore" Version="16.6.7" />
-        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="16.6.7" />
-        <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="16.6.7" />
-        <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.6.7" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="16.6.7"/>
+        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="16.6.7"/>
+        <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="16.6.7"/>
+        <PackageReference Include="HotChocolate.Types.Analyzers" Version="16.6.7"/>
         <PackageReference Include="Locan.Core" Version="1.0.6"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Infrastructure\Security\Security.Core\Security.Core.csproj"/>
-        <ProjectReference Include="..\..\Infrastructure\Security\Security\Security.csproj" />
-		<ProjectReference Include="..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\Security\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\SchemaGeneration\SchemaGeneration.Abstractions\SchemaGeneration.Abstractions.csproj"/>
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 

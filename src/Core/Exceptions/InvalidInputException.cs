@@ -8,8 +8,6 @@ public class InvalidInputException : BadRequestException, ILocalizableException
 {
 	public InvalidInputException(ILocalizableMessage localizableMessage, string? message = null) : base(
 		message)
-	{
-		LocalizableMessage = localizableMessage;
-	}
+		=> LocalizableMessage = localizableMessage;
 	public ILocalizableMessage LocalizableMessage { get; }
 }

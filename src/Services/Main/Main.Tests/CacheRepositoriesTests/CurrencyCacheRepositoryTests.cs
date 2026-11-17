@@ -1,9 +1,9 @@
 using Application.Common.Interfaces.Cache;
 using FluentAssertions;
-using Main.Application.Dtos.Currencies;
-using Main.Application.Interfaces.Cache;
-using Main.Application.Static;
 using Main.Entities.Currency;
+using Main.Modules.Currency.Application;
+using Main.Modules.Currency.Application.Dtos;
+using Main.Modules.Currency.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
@@ -14,9 +14,7 @@ namespace Tests.CacheRepositoriesTests;
 public class CurrencyCacheRepositoryTests : IntegrationTest
 {
 	public CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CurrencyTestContext>();
-	}
+		=> RegisterBasicContext<CurrencyTestContext>();
 
 	private CurrencyTestContext TestContext => GetContext<CurrencyTestContext>();
 
@@ -33,7 +31,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		result.Should().NotBeNull();
 		AssertCurrency(result!, currency);
 
-		var cached = await GetCache().GetAsync<CurrencyDto>(CacheKeys.CurrencyCache.Currency(currency.Id));
+		var cached = await GetCache().GetAsync<CurrencyDto>(CurrencyCacheKeys.Currency(currency.Id));
 		cached.Should().BeEquivalentTo(result);
 	}
 
@@ -79,7 +77,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		foreach (var currency in currencies)
 			AssertCurrency(result.Single(x => x.Id == currency.Id), currency);
 
-		var cachedIds = await GetCache().GetFromSetAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
 		cachedIds.Select(int.Parse).Should().BeEquivalentTo(currencies.Select(x => x.Id));
 	}
 
@@ -137,25 +135,25 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 		await UpdateCurrencyName(currency.Id, "Invalidated all currency");
 
 		var result = await repository.GetCurrency(currency.Id, CancellationToken);
-		var cachedIds = await GetCache().GetFromSetAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
 
 		result!.Name.Should().Be("Invalidated all currency");
 		cachedIds.Should().BeEmpty();
 	}
 
-	private ICurrencyCacheRepository GetRepository() =>
-		Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
+	private ICurrencyCacheRepository GetRepository()
+		=> Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
 
 	private ICache GetCache() => Scope.ServiceProvider.GetRequiredService<ICache>();
 
 	private async Task RemoveAllCachedCurrencies(IEnumerable<int> currencyIds)
 	{
-		await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.AllCurrencies());
+		await GetCache().RemoveKeyAsync(CurrencyCacheKeys.AllCurrencies());
 		await Task.WhenAll(currencyIds.Select(RemoveCachedCurrency));
 	}
 
-	private async Task RemoveCachedCurrency(int currencyId) =>
-		await GetCache().RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(currencyId));
+	private async Task RemoveCachedCurrency(int currencyId)
+		=> await GetCache().RemoveKeyAsync(CurrencyCacheKeys.Currency(currencyId));
 
 	private async Task UpdateCurrencyName(int currencyId, string name)
 	{

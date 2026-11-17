@@ -1,6 +1,7 @@
 using HotChocolate;
-using Main.Api.GraphQl.Analytics.Queries;
 using HotChocolate.Types.Composite;
+using Main.Api.GraphQl.Analytics.Queries;
+using Pricing.Api.GraphQl.Queries;
 
 namespace Main.Api.GraphQl.Queries;
 
@@ -12,6 +13,12 @@ public sealed class RootQuery
 
 	[GraphQLName("users")]
 	public UserQueries Users => new();
+
+	[GraphQLName("roles")]
+	public RoleQueries Roles => new();
+
+	[GraphQLName("options")]
+	public OptionQueries Options => new();
 
 	[GraphQLName("organizations")]
 	public OrganizationQueries Organizations => new();
@@ -45,6 +52,12 @@ public sealed class RootQuery
 	[Shareable]
 	public ProducerQueries Producer => new();
 
+	[GraphQLName("storages")]
+	public StorageQueries Storages => new();
+
+	[GraphQLName("uploads")]
+	public UploadQueries Uploads => new();
+
 	[GraphQLName("storageContents")]
 	public StorageContentQueries StorageContent => new();
 
@@ -56,4 +69,10 @@ public sealed class RootQuery
 
 	[GraphQLName("currencies")]
 	public CurrencyQueries Currencies => new();
+
+	[GraphQLName("markupGroups")]
+	public MarkupGroupQueries MarkupGroups => new();
+
+	[GraphQLName("priceAppliers")]
+	public PriceApplierQueries PriceAppliers => new();
 }

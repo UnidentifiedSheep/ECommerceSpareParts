@@ -5,7 +5,9 @@ public sealed class SearchTestEnvironmentLease : IAsyncDisposable
 	private readonly Func<SearchTestEnvironmentSlot, ValueTask> _release;
 	private bool _disposed;
 
-	internal SearchTestEnvironmentLease(SearchTestEnvironmentSlot slot, Func<SearchTestEnvironmentSlot, ValueTask> release)
+	internal SearchTestEnvironmentLease(
+		SearchTestEnvironmentSlot slot,
+		Func<SearchTestEnvironmentSlot, ValueTask> release)
 	{
 		Slot = slot;
 		_release = release;

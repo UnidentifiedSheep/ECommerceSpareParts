@@ -1,37 +1,41 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Enums;
 using Exceptions;
 using FluentAssertions;
-using FluentValidation;
-using Main.Application.Orders.Queries.GetOrders;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Exceptions;
+using Main.Modules.Order.Application.Orders.Queries;
+using Main.Modules.Order.Application.Orders.Queries.GetOrders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
+using Tests.Abstractions.Test;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
-using Tests.TestContexts;
 using Tests.TestContexts.Order;
-using DomainOrder = Main.Entities.Order.Order;
-using Product = Main.Entities.Product.Product;
+using DomainOrder = Main.Entities.Order.Order.Order;
+using Product = Main.Entities.Product.Product.Product;
 
 namespace Tests.HandlersTests.Orders;
 
 public sealed class GetOrdersTests : IntegrationTest
 {
 	public GetOrdersTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<OrderTestContext>();
-	}
+		=> RegisterBasicContext<OrderTestContext>();
 
 	private OrderTestContext TestContext => GetContext<OrderTestContext>();
-	private UserContextMock UserContext => (UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>();
-	private DomainOrder[] Orders => [TestContext.OnlineOrder, TestContext.ManualOrder, TestContext.EmptyOrder, TestContext.ConfirmedOrder];
+
+	private UserContextMock UserContext
+		=> (UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>();
+
+	private DomainOrder[] Orders
+		=>
+		[
+			TestContext.OnlineOrder, TestContext.ManualOrder, TestContext.EmptyOrder,
+			TestContext.ConfirmedOrder
+		];
 
 	[Fact]
 	public async Task AllPermission_ReturnsAllOrdersIncludingUnassigned()
@@ -52,7 +56,9 @@ public sealed class GetOrdersTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_UserFilterCannotExposeAnotherUsersOrders()
 	{
-		var result = await Search(Query() with { UserIds = [TestContext.OtherUser.Id] }, PermissionCodes.ORDERS_GET_OWN);
+		var result = await Search(
+			Query() with { UserIds = [TestContext.OtherUser.Id] },
+			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Orders.Should().BeEmpty();
 	}
@@ -60,7 +66,9 @@ public sealed class GetOrdersTests : IntegrationTest
 	[Fact]
 	public async Task OwnPermission_SearchCannotExposeAnotherUsersOrder()
 	{
-		var result = await Search(Query() with { SearchTerm = TestContext.ConfirmedOrder.Id.ToString() }, PermissionCodes.ORDERS_GET_OWN);
+		var result = await Search(
+			Query() with { SearchTerm = TestContext.ConfirmedOrder.Id.ToString() },
+			PermissionCodes.ORDERS_GET_OWN);
 
 		result.Orders.Should().BeEmpty();
 	}
@@ -122,7 +130,8 @@ public sealed class GetOrdersTests : IntegrationTest
 	[Fact]
 	public async Task DifferentFilters_AreCombinedWithAnd()
 	{
-		var result = await Search(Query() with { Sources = [OrderSource.Online], Statuses = [OrderStatus.Confirmed] });
+		var result = await Search(
+			Query() with { Sources = [OrderSource.Online], Statuses = [OrderStatus.Confirmed] });
 
 		result.Orders.Should().BeEmpty();
 	}
@@ -130,24 +139,49 @@ public sealed class GetOrdersTests : IntegrationTest
 	[Fact]
 	public async Task MultipleProducts_DoNotDuplicateOrders()
 	{
-		var result = await Search(Query() with { ProductIds = TestContext.OnlineOrder.Items.Select(item => item.ProductId).ToArray() });
+		var result = await Search(
+			Query() with
+			{
+				ProductIds = TestContext.OnlineOrder.Items.Select(item => item.ProductId).ToArray()
+			});
 
-		result.Orders.Select(order => order.Id).Should().BeEquivalentTo([TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id]);
+		result.Orders
+			.Select(order => order.Id)
+			.Should()
+			.BeEquivalentTo([TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id]);
 	}
 
 	[Fact]
 	public async Task CreatedAtRange_IsInclusive()
 	{
-		var start = new DateTime(2026, 1, 10, 12, 0, 0, DateTimeKind.Utc);
-		await Context.Set<DomainOrder>().ExecuteUpdateAsync(set => set.SetProperty(order => order.CreatedAt, start.AddDays(-1)), CancellationToken);
-		await Context.Set<DomainOrder>().Where(order => order.Id == TestContext.OnlineOrder.Id)
+		var start = new DateTime(
+			2026,
+			1,
+			10,
+			12,
+			0,
+			0,
+			DateTimeKind.Utc);
+		await Context.Set<DomainOrder>()
+			.ExecuteUpdateAsync(
+				set => set.SetProperty(order => order.CreatedAt, start.AddDays(-1)),
+				CancellationToken);
+		await Context.Set<DomainOrder>()
+			.Where(order => order.Id == TestContext.OnlineOrder.Id)
 			.ExecuteUpdateAsync(set => set.SetProperty(order => order.CreatedAt, start), CancellationToken);
-		await Context.Set<DomainOrder>().Where(order => order.Id == TestContext.ConfirmedOrder.Id)
-			.ExecuteUpdateAsync(set => set.SetProperty(order => order.CreatedAt, start.AddDays(1)), CancellationToken);
+		await Context.Set<DomainOrder>()
+			.Where(order => order.Id == TestContext.ConfirmedOrder.Id)
+			.ExecuteUpdateAsync(
+				set => set.SetProperty(order => order.CreatedAt, start.AddDays(1)),
+				CancellationToken);
 
-		var result = await Search(Query() with { DateRange = new(start, start.AddDays(1)) });
+		var result = await Search(
+			Query() with { DateRange = new RangeModel<DateTime>(start, start.AddDays(1)) });
 
-		result.Orders.Select(order => order.Id).Should().BeEquivalentTo([TestContext.OnlineOrder.Id, TestContext.ConfirmedOrder.Id]);
+		result.Orders
+			.Select(order => order.Id)
+			.Should()
+			.BeEquivalentTo([TestContext.OnlineOrder.Id, TestContext.ConfirmedOrder.Id]);
 	}
 
 	[Theory]
@@ -159,7 +193,8 @@ public sealed class GetOrdersTests : IntegrationTest
 	public async Task SearchTerm_FindsOrderThroughRelatedData(string field)
 	{
 		var order = TestContext.ConfirmedOrder;
-		var product = await Context.Set<Product>().SingleAsync(item => item.Id == order.Items[0].ProductId, CancellationToken);
+		var product = await Context.Set<Product>()
+			.SingleAsync(item => item.Id == order.Items[0].ProductId, CancellationToken);
 		product.SetName("Order search pump");
 		product.SetSku("RP-00999");
 		await Context.SaveChangesAsync(CancellationToken);
@@ -196,19 +231,37 @@ public sealed class GetOrdersTests : IntegrationTest
 	{
 		var result = await Search();
 
-		result.Orders.Select(order => order.Id).Should().Equal(Orders.OrderByDescending(order => order.CreatedAt).ThenBy(order => order.Id).Select(order => order.Id));
+		result.Orders
+			.Select(order => order.Id)
+			.Should()
+			.Equal(
+				Orders.OrderByDescending(order => order.CreatedAt)
+					.ThenBy(order => order.Id)
+					.Select(order => order.Id));
 	}
 
 	[Fact]
 	public async Task Pagination_WithEqualDatesUsesIdAsStableTieBreaker()
 	{
-		var date = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-		await Context.Set<DomainOrder>().ExecuteUpdateAsync(set => set.SetProperty(order => order.CreatedAt, date), CancellationToken);
+		var date = new DateTime(
+			2026,
+			1,
+			1,
+			0,
+			0,
+			0,
+			DateTimeKind.Utc);
+		await Context.Set<DomainOrder>()
+			.ExecuteUpdateAsync(set => set.SetProperty(order => order.CreatedAt, date), CancellationToken);
 
-		var first = await Search(Query() with { Pagination = new(0, 2) });
-		var second = await Search(Query() with { Pagination = new(1, 2) });
+		var first = await Search(Query() with { Pagination = new Pagination(0, 2) });
+		var second = await Search(Query() with { Pagination = new Pagination(1, 2) });
 
-		first.Orders.Concat(second.Orders).Select(order => order.Id).Should().Equal(Orders.Select(order => order.Id).Order());
+		first.Orders
+			.Concat(second.Orders)
+			.Select(order => order.Id)
+			.Should()
+			.Equal(Orders.Select(order => order.Id).Order());
 	}
 
 	[Theory]
@@ -226,6 +279,7 @@ public sealed class GetOrdersTests : IntegrationTest
 			TestContext.EmptyOrder.Cancel();
 			await Context.SaveChangesAsync(CancellationToken);
 		}
+
 		if (field == "fulfillmentStatus")
 		{
 			TestContext.ManualOrder.SetFulfillmentStatus(OrderFulfillmentStatus.PartiallyAvailable);
@@ -239,7 +293,9 @@ public sealed class GetOrdersTests : IntegrationTest
 			"status" => Orders.OrderBy(order => order.Status).ThenBy(order => order.Id),
 			"fulfillmentStatus" => Orders.OrderBy(order => order.FulfillmentStatus).ThenBy(order => order.Id),
 			"source" => Orders.OrderBy(order => order.Source).ThenBy(order => order.Id),
-			"confirmedAt" => Orders.OrderBy(order => order.ConfirmedAt == null).ThenBy(order => order.ConfirmedAt).ThenBy(order => order.Id),
+			"confirmedAt" => Orders.OrderBy(order => order.ConfirmedAt == null)
+				.ThenBy(order => order.ConfirmedAt)
+				.ThenBy(order => order.Id),
 			_ => Orders.OrderBy(order => order.UpdatedAt).ThenBy(order => order.Id)
 		};
 		result.Orders.Select(order => order.Id).Should().Equal(expected.Select(order => order.Id));
@@ -247,9 +303,8 @@ public sealed class GetOrdersTests : IntegrationTest
 
 	[Fact]
 	public async Task InvalidSorting_ThrowsInvalidInputException()
-	{
-		await Assert.ThrowsAsync<InvalidInputException>(() => Search(Query() with { SortBy = [new SortExpression("unknown")] }));
-	}
+		=> await Assert.ThrowsAsync<InvalidInputException>(()
+			=> Search(Query() with { SortBy = [new SortExpression("unknown")] }));
 
 	[Fact]
 	public async Task RemovedItems_DoNotMatchProductFilterOrSearch()
@@ -257,12 +312,16 @@ public sealed class GetOrdersTests : IntegrationTest
 		var orders = GetContext<OrderTestContext>();
 		var order = orders.OnlineOrder;
 		var item = order.Items[1];
-		var sku = await Context.Products.Where(product => product.Id == item.ProductId)
-			.Select(product => product.Sku.Value).SingleAsync(CancellationToken);
+		var sku = await Context.Set<Product>()
+			.Where(product => product.Id == item.ProductId)
+			.Select(product => product.Sku.Value)
+			.SingleAsync(CancellationToken);
 		order.RemoveItem(item);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		(await Search(Query() with { ProductIds = [item.ProductId] })).Orders.Should().NotContain(x => x.Id == order.Id);
+		(await Search(Query() with { ProductIds = [item.ProductId] })).Orders
+			.Should()
+			.NotContain(x => x.Id == order.Id);
 		(await Search(Query() with { SearchTerm = sku })).Orders.Should().NotContain(x => x.Id == order.Id);
 	}
 
@@ -274,14 +333,31 @@ public sealed class GetOrdersTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		(await Search()).Orders.Should().NotContain(item => item.Id == order.Id);
-		(await Search(Query() with { Statuses = [OrderStatus.Deleted] })).Orders.Select(item => item.Id).Should().Equal(order.Id);
-		var byId = await Mediator.Send(new Main.Application.Orders.Queries.GetOrdersByIdsQuery(order.Id), CancellationToken);
+		(await Search(Query() with { Statuses = [OrderStatus.Deleted] })).Orders
+			.Select(item => item.Id)
+			.Should()
+			.Equal(order.Id);
+		var byId = await Mediator.Send(new GetOrdersByIdsQuery(order.Id), CancellationToken);
 		byId.Orders[order.Id].Status.Should().Be(OrderStatus.Deleted);
 	}
 
-	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
+	private static GetOrdersQuery Query()
+		=> new(
+			new RangeModel<DateTime>(),
+			new Pagination(0, 100),
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			null);
 
-	private Task<GetOrdersResult> Search(GetOrdersQuery? query = null, PermissionCodes? permission = PermissionCodes.ORDERS_GET)
+	private Task<GetOrdersResult> Search(
+		GetOrdersQuery? query = null,
+		PermissionCodes? permission = PermissionCodes.ORDERS_GET)
 	{
 		if (permission.HasValue)
 			UserContext.SetPermissions([Permission.ToNormalizedPermission(permission.Value)]);
@@ -291,7 +367,19 @@ public sealed class GetOrdersTests : IntegrationTest
 
 public class GetOrdersValidationTests : ValidationTest<GetOrdersValidation, GetOrdersQuery>
 {
-	private static GetOrdersQuery Query() => new(new(), new(0, 100), [], [], [], [], [], [], [], [], null);
+	private static GetOrdersQuery Query()
+		=> new(
+			new RangeModel<DateTime>(),
+			new Pagination(0, 100),
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			null);
 
 	[Theory]
 	[InlineData("pagination")]
@@ -304,8 +392,11 @@ public class GetOrdersValidationTests : ValidationTest<GetOrdersValidation, GetO
 	{
 		var query = input switch
 		{
-			"pagination" => Query() with { Pagination = new(-1, 10) },
-			"range" => Query() with { DateRange = new(DateTime.UtcNow.AddDays(1), DateTime.UtcNow) },
+			"pagination" => Query() with { Pagination = new Pagination(-1, 10) },
+			"range" => Query() with
+			{
+				DateRange = new RangeModel<DateTime>(DateTime.UtcNow.AddDays(1), DateTime.UtcNow)
+			},
 			"term" => Query() with { SearchTerm = new string('x', 201) },
 			"status" => Query() with { Statuses = [(OrderStatus)999] },
 			"fulfillment" => Query() with { FulfillmentStatuses = [(OrderFulfillmentStatus)999] },
@@ -313,10 +404,11 @@ public class GetOrdersValidationTests : ValidationTest<GetOrdersValidation, GetO
 		};
 
 		var result = await ValidateAsync(query);
-		result.ShouldHaveValidationErrorFor(input switch
-		{
-			"pagination" => "Pagination.Page", "range" => "DateRange", "term" => "SearchTerm",
-			"status" => "Statuses[0]", "fulfillment" => "FulfillmentStatuses[0]", _ => "Sources[0]"
-		});
+		result.ShouldHaveValidationErrorFor(
+			input switch
+			{
+				"pagination" => "Pagination.Page", "range" => "DateRange", "term" => "SearchTerm",
+				"status" => "Statuses[0]", "fulfillment" => "FulfillmentStatuses[0]", _ => "Sources[0]"
+			});
 	}
 }

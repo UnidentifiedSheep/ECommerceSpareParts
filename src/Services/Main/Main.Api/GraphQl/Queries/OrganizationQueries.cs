@@ -4,11 +4,10 @@ using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
-using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.Organization;
-using Main.Application.Handlers.Organizations;
-using Main.Application.Handlers.Organizations.GetOrganizations;
+using Main.Modules.Organization.Application.Handlers.Organizations;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;
@@ -65,5 +64,6 @@ public sealed class OrganizationQueries
 		string systemName,
 		ISender sender,
 		CancellationToken cancellationToken)
-		=> (await sender.Send(new IsOrganizationSystemNameAvailableQuery(systemName), cancellationToken)).IsAvailable;
+		=> (await sender.Send(new IsOrganizationSystemNameAvailableQuery(systemName), cancellationToken))
+			.IsAvailable;
 }

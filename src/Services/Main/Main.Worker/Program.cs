@@ -1,23 +1,45 @@
-using System.Reflection;
 using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
-using Application.Common.Consumer;
+using Application.Common.Host;
 using Cache;
+using Cache.OneTimeTokens;
 using Contracts.Job;
-using Contracts.Producer;
 using Contracts.Settings;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
-using Main.Application;
-using Main.Application.Consumers;
-using Main.Cache;
-using Main.Persistence;
-using Main.Persistence.Context;
+using Main.Modules.Analytics;
+using Main.Modules.Balance;
+using Main.Modules.Cart;
+using Main.Modules.Currency;
+using Main.Modules.Currency.Abstractions.Events;
+using Main.Modules.Currency.Application.Consumers;
+using Main.Modules.Documents;
+using Main.Modules.Identity;
+using Main.Modules.Jobs;
+using Main.Modules.Jobs.Application;
+using Main.Modules.Notifications;
+using Main.Modules.Notifications.Application.Delivery.Extensions;
+using Main.Modules.Order;
+using Main.Modules.Organization;
+using Main.Modules.Platform;
+using Main.Modules.Platform.Application.Consumer;
+using Main.Modules.Product;
+using Main.Modules.Product.Application.Consumers;
+using Main.Modules.Product.Application.Events;
+using Main.Modules.Purchase;
+using Main.Modules.Sale;
+using Main.Modules.Storage;
+using Main.Modules.Suppliers;
 using MassTransit;
-using Notification.Extensions;
+using Persistence.Common;
+using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Application.Consumers;
+using Pricing.Application.Events;
+using Pricing.Module;
 using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using S3;
@@ -39,8 +61,7 @@ builder
 	.AddJwtOptions()
 	.AddS3Options()
 	.AddS3BucketOptions()
-	.AddLrtOptions()
-	.AddScheduledJobEnqueuerOptions()
+	.AddJobsOptions()
 	.AddSystemOptions()
 	.AddSecretEncryptionOptions();
 
@@ -51,26 +72,44 @@ builder.AddLokiLogger(
 
 builder.Services.AddCommonWorkerInfrastructure(ServicesDefinitions.Main);
 
+builder.Services.AddModule<CurrencyModule>(builder.Configuration);
+builder.Services.AddModule<ProductModule>(builder.Configuration);
+builder.Services.AddModule<IdentityModule>(builder.Configuration);
+builder.Services.AddModule<PurchaseModule>(builder.Configuration);
+builder.Services.AddModule<SaleModule>(builder.Configuration);
+builder.Services.AddModule<AnalyticsModule>(builder.Configuration);
+builder.Services.AddModule<BalanceModule>(builder.Configuration);
+builder.Services.AddModule<CartModule>(builder.Configuration);
+builder.Services.AddModule<DocumentsModule>(builder.Configuration);
+builder.Services.AddModule<JobsModule>(builder.Configuration);
+builder.Services.AddModule<PlatformModule>(builder.Configuration);
+builder.Services.AddModule<SuppliersModule>(builder.Configuration);
+builder.Services.AddModule<NotificationsModule>(builder.Configuration);
+builder.Services.AddModule<OrderModule>(builder.Configuration);
+builder.Services.AddModule<OrganizationModule>(builder.Configuration);
+builder.Services.AddModule<StorageModule>(builder.Configuration);
+builder.Services.AddModule<PricingModule>(builder.Configuration);
+
 AddMassTransit(builder);
 
 builder
 	.Services
-	.AddPersistenceLayer()
+	.AddPersistenceCore()
+	.AddRelationsPersistence()
 	.AddCacheLayer("main")
-	.AddApplicationCache()
+	.AddOneTimeTokens()
 	.AddJsonSigner()
 	.AddSecretEncryptor()
 	.AddCommonLayer()
 	.AddS3()
-	.AddApplicationLayer(builder.Configuration)
 	.AddWorkerSecurityLayer()
 	.AddPasswordServices()
 	.AddExchangeRates()
-	.AddMainNotifications()
+	.UseEmailNotifications()
 	.AddInAppNotificationHostedService()
 	.AddEmailNotificationHostedService();
 
-builder.Services.AddLrtHostedServices();
+builder.Services.AddJobsHostedServices();
 
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
@@ -83,11 +122,14 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 	var uniqQueueName = $"queue-of-main-worker-{Environment.MachineName}";
 	hostBuilder.Services.AddMassTransit(x =>
 	{
-		x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+		x.AddConsumers(
+		[
+			.. builder.Services.GetModuleCatalog().ConsumerAssemblies
+		]);
 		x.AddConsumer<BackplaneConsumer>();
 		x.AddConsumer<SettingUpdatedConsumer>();
 
-		x.AddEntityFrameworkOutbox<DContext>(o =>
+		x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
 		{
 			o.UsePostgres();
 			o.UseBusOutbox();
@@ -116,8 +158,13 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
 					ep.ConfigureConsumer<BackplaneConsumer>(context);
 					ep.ConfigureConsumer<ProducerLookupChangedConsumer>(context);
+					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+					ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
+					ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
 					ep.Bind<BackplaneMessage>();
 					ep.Bind<ProducerLookupChangedEvent>();
+					ep.Bind<CurrencyRateChangedEvent>();
+					ep.Bind<MarkupRangesRefreshRequestedEvent>();
 				});
 
 			cfg.ReceiveEndpoint(
@@ -129,9 +176,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 					ep.ConcurrentMessageLimit = 4;
 					ep.PrefetchCount = 1;
 
-					ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-					ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 					ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
+					ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
+					ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
+					ep.ConfigureConsumer<ApplySupplierProductsConsumer>(context);
 				});
 		});
 	});

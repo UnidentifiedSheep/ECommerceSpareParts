@@ -1,17 +1,16 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
-using Application.Common.Models;
 using Application.Common.Interfaces.Events;
+using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.PatchProduct;
-using Main.Application.Products.Interfaces;
-using Main.Entities.Exceptions;
+using FluentValidation.TestHelper;
 using Main.Entities.Product;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.PatchProduct;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -22,9 +21,7 @@ namespace Tests.HandlersTests.Products;
 public class EditProductTests : IntegrationTest
 {
 	public EditProductTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -35,7 +32,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Name = PatchField<string>.From("Updated product name") },
 			updated => updated.Name.Value.Should().Be("Updated product name"));
 
-		reloaded.Should().BeEquivalentTo(before with { Name = "Updated product name" }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Name = "Updated product name" },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -45,7 +45,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Sku = PatchField<string>.From("SINGLE-FIELD-SKU") },
 			updated => updated.Sku.Value.Should().Be("SINGLE-FIELD-SKU"));
 
-		reloaded.Should().BeEquivalentTo(before with { Sku = "SINGLE-FIELD-SKU" }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Sku = "SINGLE-FIELD-SKU" },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -55,7 +58,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Description = PatchField<string?>.From("Updated description") },
 			updated => updated.Description.Should().Be("Updated description"));
 
-		reloaded.Should().BeEquivalentTo(before with { Description = "Updated description" }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Description = "Updated description" },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -65,7 +71,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Indicator = PatchField<string?>.From("Updated indicator") },
 			updated => updated.Indicator!.Value.Should().Be("Updated indicator"));
 
-		reloaded.Should().BeEquivalentTo(before with { Indicator = "Updated indicator" }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Indicator = "Updated indicator" },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -77,7 +86,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { ProducerId = PatchField<int>.From(producer.Id) },
 			updated => updated.ProducerId.Should().Be(producer.Id));
 
-		reloaded.Should().BeEquivalentTo(before with { ProducerId = producer.Id, ProducerName = producer.Name }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { ProducerId = producer.Id, ProducerName = producer.Name },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -88,7 +100,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { GroupId = PatchField<int?>.From(group.Id) },
 			updated => updated.ProductGroupId.Should().Be(group.Id));
 
-		reloaded.Should().BeEquivalentTo(before with { GroupId = group.Id }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { GroupId = group.Id },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -121,7 +136,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Description = PatchField<string?>.From(null) },
 			updated => updated.Description.Should().BeNull());
 
-		reloaded.Should().BeEquivalentTo(before with { Description = null }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Description = null },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -133,7 +151,10 @@ public class EditProductTests : IntegrationTest
 			new PatchProductDto { Indicator = PatchField<string?>.From(null) },
 			updated => ((string?)updated.Indicator).Should().BeNull());
 
-		reloaded.Should().BeEquivalentTo(before with { Indicator = null }, options => options.Excluding(product => product.RowVersion));
+		reloaded.Should()
+			.BeEquivalentTo(
+				before with { Indicator = null },
+				options => options.Excluding(product => product.RowVersion));
 	}
 
 	[Fact]
@@ -143,8 +164,11 @@ public class EditProductTests : IntegrationTest
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 		var before = await provider.GetProductOrSetAsync(id, CancellationToken);
 
-		var action = () => Mediator.Send(new PatchProductCommand(id,
-			new PatchProductDto { Name = PatchField<string>.From("ab") }), CancellationToken);
+		var action = () => Mediator.Send(
+			new PatchProductCommand(
+				id,
+				new PatchProductDto { Name = PatchField<string>.From("ab") }),
+			CancellationToken);
 
 		await action.Should().ThrowAsync<ValidationException>();
 		var updated = await GetProduct(id);
@@ -217,21 +241,26 @@ public class EditProductTests : IntegrationTest
 	}
 
 	private async Task<(ProductDto Reloaded, ProductDto Before)> PatchAndReload(
-		PatchProductDto patch, Action<Product> assertDatabase)
+		PatchProductDto patch,
+		Action<Product> assertDatabase)
 	{
 		var id = GetFirstId();
 		Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductProvider>();
 		var before = await provider.GetProductOrSetAsync(id, CancellationToken);
-		(await provider.GetProductAsync(id, CancellationToken)).Should().NotBeNull("the cache must be populated before the update");
+		(await provider.GetProductAsync(id, CancellationToken)).Should()
+			.NotBeNull("the cache must be populated before the update");
 		var otherId = TestContext.Products[1].Id;
 		var otherCached = await provider.GetProductOrSetAsync(otherId, CancellationToken);
 
 		await Mediator.Send(new PatchProductCommand(id, patch), CancellationToken);
 
-		var updated = await Context.Products.AsNoTracking().SingleAsync(product => product.Id == id, CancellationToken);
+		var updated = await Context.Set<Product>()
+			.AsNoTracking()
+			.SingleAsync(product => product.Id == id, CancellationToken);
 		assertDatabase(updated);
-		(await provider.GetProductAsync(id, CancellationToken)).Should().BeNull("the handler must invalidate the cached product");
+		(await provider.GetProductAsync(id, CancellationToken)).Should()
+			.BeNull("the handler must invalidate the cached product");
 		(await provider.GetProductAsync(otherId, CancellationToken)).Should().BeEquivalentTo(otherCached);
 		var reloaded = await provider.GetProductOrSetAsync(id, CancellationToken);
 		reloaded.RowVersion.Should().NotBe(before.RowVersion);
@@ -241,8 +270,10 @@ public class EditProductTests : IntegrationTest
 
 	private int GetFirstId() => TestContext.Products[0].Id;
 
-	private async Task<Product?> GetProduct(int productId) =>
-		await Context.Products.AsNoTracking().FirstOrDefaultAsync(x => x.Id == productId, CancellationToken);
+	private async Task<Product?> GetProduct(int productId)
+		=> await Context.Set<Product>()
+			.AsNoTracking()
+			.FirstOrDefaultAsync(x => x.Id == productId, CancellationToken);
 }
 
 public class PatchProductValidationTests : ValidationTest<PatchProductValidation, PatchProductCommand>
@@ -250,24 +281,28 @@ public class PatchProductValidationTests : ValidationTest<PatchProductValidation
 	[Fact]
 	public async Task EditArticle_WithEmptyArticleNumber_FailsValidation()
 	{
-		var result = await ValidateAsync(new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From("") }));
+		var result = await ValidateAsync(
+			new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From("") }));
 		result.ShouldHaveValidationErrorFor("PatchProduct.Sku.Value").Only();
 	}
 
 	[Fact]
 	public async Task EditArticle_WhenArticleNumberNull_FailsValidation()
 	{
-		var result = await ValidateAsync(new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From(null!) }));
+		var result = await ValidateAsync(
+			new PatchProductCommand(1, new PatchProductDto { Sku = PatchField<string>.From(null!) }));
 		result.ShouldHaveValidationErrorFor("PatchProduct.Sku.Value").Only();
 	}
 	[Fact]
 	public async Task InvalidName_FailsValidation()
 	{
-		var result = await ValidateAsync(new PatchProductCommand(1,
-			new PatchProductDto { Name = PatchField<string>.From("ab") }));
+		var result = await ValidateAsync(
+			new PatchProductCommand(
+				1,
+				new PatchProductDto { Name = PatchField<string>.From("ab") }));
 		result.ShouldHaveValidationErrorFor("PatchProduct.Name.Value")
 			.WithErrorCode(ArticleNameMinLength3Message.Instance.MessageKey)
-			.WithCustomState(ArticleNameMinLength3Message.Instance).Only();
+			.WithCustomState(ArticleNameMinLength3Message.Instance)
+			.Only();
 	}
-
 }

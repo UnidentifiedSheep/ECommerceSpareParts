@@ -1,5 +1,5 @@
-using Application.Common.Interfaces.Lrt;
-using Application.Common.LRT;
+using Application.Common;
+using Application.Common.Interfaces;
 using Locan.Core.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,9 +21,14 @@ public sealed class RemoveDeletedProductsLrt(
 	public Type InputType => typeof(NoneInputState);
 	public Type StateType => typeof(NoneInputState);
 	public ILocalizableMessage NameLocalizationMessage => LrtDeletedProductsRemovalNameMessage.Instance;
-	public ILocalizableMessage DescriptionLocalizationMessage => LrtDeletedProductsRemovalDescriptionMessage.Instance;
 
-	public async Task ExecuteAsync(Guid jobId, Guid leaseHolderId, CancellationToken cancellationToken = default)
+	public ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtDeletedProductsRemovalDescriptionMessage.Instance;
+
+	public async Task ExecuteAsync(
+		Guid jobId,
+		Guid leaseHolderId,
+		CancellationToken cancellationToken = default)
 	{
 		var settings = options.CurrentValue;
 		var deletedBefore = timeProvider.GetUtcNow().UtcDateTime.AddDays(-settings.RetentionDays);
@@ -31,7 +36,10 @@ public sealed class RemoveDeletedProductsLrt(
 		while (true)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			var deleted = await repository.DeleteDeletedBefore(deletedBefore, settings.BatchSize, cancellationToken);
+			var deleted = await repository.DeleteDeletedBefore(
+				deletedBefore,
+				settings.BatchSize,
+				cancellationToken);
 			totalDeleted += deleted;
 			if (deleted == 0) break;
 		}

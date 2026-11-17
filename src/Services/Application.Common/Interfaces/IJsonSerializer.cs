@@ -9,5 +9,8 @@ public interface IJsonSerializer
 	T? Deserialize<T>(string json);
 	object? Deserialize(string json, Type type);
 	bool TryDeserialize<T>(string json, [NotNullWhen(true)] out T? result);
-	bool TryDeserialize(string json, Type type, [NotNullWhen(true)] out object? result);
+	bool TryDeserialize(
+		string json,
+		Type type,
+		[NotNullWhen(true)] out object? result);
 }

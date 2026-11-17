@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Enums;
-using Main.Entities.Producer;
+using Main.Entities.Product.Producer;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -46,10 +46,8 @@ public class ProducerSupplierMappingBuilder(Faker faker) : BuilderBase<ProducerS
 	}
 
 	public override ProducerSupplierMapping Build()
-	{
-		return ProducerSupplierMapping.Create(
+		=> ProducerSupplierMapping.Create(
 			Faker.PickRandom<int>(_producerIds),
 			SupplierProducerName ?? Faker.Lorem.Letter(20),
 			Supplier ?? Faker.PickRandom<Supplier>());
-	}
 }

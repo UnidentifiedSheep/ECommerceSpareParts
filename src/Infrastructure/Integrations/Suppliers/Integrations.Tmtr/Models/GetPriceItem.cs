@@ -16,8 +16,8 @@ public sealed record GetPriceItem
 	public DateTimeOffset? AvailabilityDeadline => ParseDate(AvailabilityDeadlineRaw);
 
 	[JsonIgnore]
-	public int? AvailabilityPeriodDays =>
-		int.TryParse(
+	public int? AvailabilityPeriodDays
+		=> int.TryParse(
 			AvailabilityDeadlineRaw,
 			NumberStyles.Integer,
 			CultureInfo.InvariantCulture,

@@ -1,0 +1,85 @@
+using System.Linq.Expressions;
+using Application.Common.Interfaces.Projections;
+using Attributes;
+using LinqKit;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Microsoft.Extensions.Options;
+using S3.Core.Options;
+
+namespace Main.Modules.Product.Application.Products;
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class
+	ProductDtoProjectionProvider : ProjectionProviderBase<Entities.Product.Product.Product, ProductDto>
+{
+	public ProductDtoProjectionProvider(IOptions<S3BucketsOptions> bucketsOptions)
+	{
+		var imagesBaseUrl = bucketsOptions.Value.Images.PublicBaseUrl.TrimEnd('/') + "/";
+
+		Projection = x => new ProductDto
+		{
+			Id = x.Id,
+			Name = x.Name,
+			Sku = x.Sku,
+			Description = x.Description,
+			ProducerId = x.ProducerId,
+			ProducerName = x.Producer.Name,
+			GroupId = x.ProductGroupId,
+			Indicator = x.Indicator,
+			Images = x.Images.Select(z => imagesBaseUrl + z.StorageKey).ToList(),
+			RowVersion = x.RowVersion
+		};
+	}
+
+	public override Expression<Func<Entities.Product.Product.Product, ProductDto>> Projection { get; }
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class
+	ProductWeightDtoProjectionProvider : ProjectionProviderBase<ProductWeight, ProductWeightDto>
+{
+	public override Expression<Func<ProductWeight, ProductWeightDto>> Projection { get; } = x =>
+		new ProductWeightDto
+		{
+			ProductId = x.ProductId,
+			Weight = x.Weight,
+			Unit = x.Unit
+		};
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class ProductSizeDtoProjectionProvider : ProjectionProviderBase<ProductSize, ProductSizeDto>
+{
+	public override Expression<Func<ProductSize, ProductSizeDto>> Projection { get; } = x =>
+		new ProductSizeDto
+		{
+			ProductId = x.ProductId,
+			Unit = x.Unit,
+			Length = x.Length,
+			Height = x.Height,
+			Width = x.Width,
+			VolumeM3 = x.VolumeM3
+		};
+}
+
+[Lifetime(Lifetime.Singleton)]
+public sealed class
+	ProductCharacteristicDtoProjectionProvider : ProjectionProviderBase<ProductCharacteristic,
+	ProductCharacteristicDto>
+{
+	public ProductCharacteristicDtoProjectionProvider(
+		IProjectionProvider<Characteristic, CharacteristicDto> characteristicProjection)
+	{
+		var characteristicToDto = characteristicProjection.Projection;
+
+		Projection = x => new ProductCharacteristicDto
+		{
+			ProductId = x.ProductId,
+			Characteristic = characteristicToDto.Invoke(x.Characteristic),
+			Value = x.Value
+		};
+	}
+
+	public override Expression<Func<ProductCharacteristic, ProductCharacteristicDto>> Projection { get; }
+}

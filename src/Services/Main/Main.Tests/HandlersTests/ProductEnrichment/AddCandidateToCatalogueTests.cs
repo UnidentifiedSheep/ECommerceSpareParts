@@ -1,7 +1,8 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
-using Main.Entities.Exceptions;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -13,9 +14,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class AddCandidateToCatalogueTests : IntegrationTest
 {
 	public AddCandidateToCatalogueTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -34,7 +33,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products.Single(x => x.Sku.Value == "BATCH-SELECTED").Name.Value.Should().Be("Selected name");
@@ -46,12 +45,12 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 	{
 		var existingProduct = await new ProductBuilder(Faker)
 			.WithProducerId(TestContext.Producers[0].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var mappedCandidate = await new CatalogueCandidateBuilder(Faker)
 			.WithSku("BATCH-MAPPED")
 			.WithProducerId(TestContext.Producers[0].Id)
 			.WithProductId(existingProduct.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		var newCandidate = await CreateCandidate("BATCH-NEW", "New product");
 
 		await Mediator.Send(
@@ -63,7 +62,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 			CancellationToken);
 
 		Context.ChangeTracker.Clear();
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 
 		products.Should().HaveCount(2);
 		products.Should().ContainSingle(x => x.Id == existingProduct.Id);
@@ -84,7 +83,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateNotFoundException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Product>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	[Fact]
@@ -101,7 +100,7 @@ public sealed class AddCandidateToCatalogueTests : IntegrationTest
 
 		await action.Should().ThrowAsync<CatalogueCandidateDuplicateIdsException>();
 		Context.ChangeTracker.Clear();
-		(await Context.Products.AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Product>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(0);
 	}
 
 	private async Task<CatalogueCandidate> CreateCandidate(string sku, params string[] names)

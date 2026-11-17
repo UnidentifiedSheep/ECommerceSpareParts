@@ -192,8 +192,7 @@ public class JobScheduleRunTests
 	}
 
 	private static JobScheduleRun Create()
-	{
-		return JobScheduleRun.Create(
+		=> JobScheduleRun.Create(
 			Guid.NewGuid(),
 			Guid.NewGuid(),
 			new DateTime(
@@ -212,8 +211,7 @@ public class JobScheduleRunTests
 				1,
 				0,
 				DateTimeKind.Utc));
-	}
 
-	private static void SetId(JobScheduleRun run, Guid id) =>
-		typeof(JobScheduleRun).GetProperty(nameof(JobScheduleRun.Id))!.SetValue(run, id);
+	private static void SetId(JobScheduleRun run, Guid id)
+		=> typeof(JobScheduleRun).GetProperty(nameof(JobScheduleRun.Id))!.SetValue(run, id);
 }

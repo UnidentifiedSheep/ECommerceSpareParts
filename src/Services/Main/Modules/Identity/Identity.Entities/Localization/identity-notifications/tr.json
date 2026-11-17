@@ -1,0 +1,28 @@
+{
+  "culture": "tr",
+  "messages": {
+    "notifications.password.reset.subject": "Şifre sıfırlama",
+    "notifications.password.reset.title": "Şifrenizi sıfırlayın",
+    "notifications.password.reset.intro": "Hesabınızın şifresini sıfırlamak için bir istek aldık.",
+    "notifications.password.reset.description": "Yeni bir şifre belirlemek için aşağıdaki düğmeyi kullanın. Bu bağlantı sınırlı bir süre için geçerlidir.",
+    "notifications.password.reset.button": "Şifreyi sıfırla",
+    "notifications.password.reset.fallback": "Düğme çalışmazsa bu bağlantıyı kopyalayıp tarayıcınıza yapıştırın:",
+    "notifications.password.reset.ignore": "Şifre sıfırlama isteğinde bulunmadıysanız bu e-postayı güvenle yok sayabilirsiniz.",
+    "notifications.email.verification.subject": "E-posta adresinizi doğrulayın",
+    "notifications.email.verification.title": "E-posta adresinizi doğrulayın",
+    "notifications.email.verification.intro": "Bu e-posta adresi hesabınıza eklendi.",
+    "notifications.email.verification.description": "Bu e-posta adresinin size ait olduğunu doğrulamak için aşağıdaki düğmeyi kullanın. Bu bağlantı sınırlı bir süre için geçerlidir.",
+    "notifications.email.verification.button": "E-postayı doğrula",
+    "notifications.email.verification.fallback": "Düğme çalışmazsa bu bağlantıyı kopyalayıp tarayıcınıza yapıştırın:",
+    "notifications.email.verification.ignore": "Bu e-posta adresini siz eklemediyseniz bu iletiyi güvenle yok sayabilirsiniz.",
+    "notifications.login.notification.subject": "Hesabınızda oturum açıldı",
+    "notifications.login.notification.title": "Yeni hesap girişi",
+    "notifications.login.notification.intro": "Hesabınızda bir oturum açma işlemi tespit ettik.",
+    "notifications.login.notification.date.time.label": "Tarih ve saat",
+    "notifications.login.notification.ip.address.label": "IP adresi",
+    "notifications.login.notification.device.label": "Cihaz",
+    "notifications.login.notification.was.you": "Bu sizseniz herhangi bir işlem yapmanız gerekmez.",
+    "notifications.login.notification.not.you": "Bu girişi tanımıyorsanız şifrenizi hemen değiştirin ve etkin oturumları sonlandırın.",
+    "notifications.login.notification.unknown": "Bilinmiyor"
+  }
+}

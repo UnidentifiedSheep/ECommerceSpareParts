@@ -1,9 +1,9 @@
 using Contracts.Products;
 using Contracts.Storage;
 using FluentAssertions;
-using Main.Application.Products.Interfaces;
-using Main.Entities.Product;
-using Main.Enums;
+using Main.Entities.Product.Enums;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Products.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -15,19 +15,24 @@ namespace Tests.HandlersTests.Characteristics;
 public class ProductEventSelectionTests : IntegrationTest
 {
 	public ProductEventSelectionTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	[Fact]
 	public async Task SelectedPart_ProducesEventEvenWhenItsListIsEmpty()
 	{
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([int.MaxValue], ProductEventParts.Characteristics, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[int.MaxValue],
+			ProductEventParts.Characteristics,
+			CancellationToken);
 
-		var notification = events.Should().ContainSingle().Which.Should()
-			.BeOfType<ProductCharacteristicsUpdatedEvent>().Which;
+		var notification = events.Should()
+			.ContainSingle()
+			.Which
+			.Should()
+			.BeOfType<ProductCharacteristicsUpdatedEvent>()
+			.Which;
 		notification.Products.Should().BeEmpty();
 		notification.UpdatedAt.Kind.Should().Be(DateTimeKind.Utc);
 	}
@@ -36,12 +41,22 @@ public class ProductEventSelectionTests : IntegrationTest
 	public async Task UnselectedPart_DoesNotProduceEventEvenWhenItsListIsPopulated()
 	{
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
-		var characteristic = await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context);
-		await Context.ProductCharacteristics.AddAsync(ProductCharacteristic.Create(productId, characteristic.Id, "100"), CancellationToken);
+		var characteristic =
+			await new CharacteristicBuilder(Faker).WithName("Temperature").BuildAndAddToDb(Context, CancellationToken);
+		await Context.Set<ProductCharacteristic>()
+			.AddAsync(
+				ProductCharacteristic.Create(
+					productId,
+					characteristic.Id,
+					"100"),
+				CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([productId], ProductEventParts.Core, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[productId],
+			ProductEventParts.Core,
+			CancellationToken);
 
 		events.Should().ContainSingle().Which.Should().BeOfType<ProductsUpdatedEvent>();
 	}
@@ -52,8 +67,10 @@ public class ProductEventSelectionTests : IntegrationTest
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([productId],
-			ProductEventParts.Characteristics | ProductEventParts.Weight, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[productId],
+			ProductEventParts.Characteristics | ProductEventParts.Weight,
+			CancellationToken);
 
 		events.Should().HaveCount(2);
 		events.OfType<ProductCharacteristicsUpdatedEvent>().Should().ContainSingle();
@@ -66,7 +83,10 @@ public class ProductEventSelectionTests : IntegrationTest
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([productId], (ProductEventParts)0, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[productId],
+			0,
+			CancellationToken);
 
 		events.Should().BeEmpty();
 	}
@@ -76,7 +96,10 @@ public class ProductEventSelectionTests : IntegrationTest
 	{
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([], ProductEventParts.All, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[],
+			ProductEventParts.All,
+			CancellationToken);
 
 		events.Should().BeEmpty();
 	}
@@ -87,20 +110,59 @@ public class ProductEventSelectionTests : IntegrationTest
 		var productId = GetContext<ProductTestContext>().Products[0].Id;
 		var provider = Scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
-		var events = await provider.GetEventsAsync([productId, int.MaxValue], ProductEventParts.All, CancellationToken);
+		var events = await provider.GetEventsAsync(
+			[productId, int.MaxValue],
+			ProductEventParts.All,
+			CancellationToken);
 
 		events.Should().HaveCount(5);
 		var products = events.OfType<ProductsUpdatedEvent>().Should().ContainSingle().Which.Products;
 		products.Should().HaveCount(2);
 		products.Should().ContainSingle(product => product.Id == productId && !product.IsDeleted);
 		products.Should().ContainSingle(product => product.Id == int.MaxValue && product.IsDeleted);
-		events.OfType<ProductCharacteristicsUpdatedEvent>().Should().ContainSingle().Which.Products.Should()
-			.ContainSingle().Which.ProductId.Should().Be(productId);
-		events.OfType<ProductDimensionsUpdatedEvent>().Should().ContainSingle().Which.Products.Should()
-			.ContainSingle().Which.ProductId.Should().Be(productId);
-		events.OfType<ProductWeightUpdatedEvent>().Should().ContainSingle().Which.Products.Should()
-			.ContainSingle().Which.ProductId.Should().Be(productId);
-		events.OfType<ProductStocksSnapshotEvent>().Should().ContainSingle().Which.Products.Should()
-			.ContainSingle().Which.ProductId.Should().Be(productId);
+		events.OfType<ProductCharacteristicsUpdatedEvent>()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.ProductId
+			.Should()
+			.Be(productId);
+		events.OfType<ProductDimensionsUpdatedEvent>()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.ProductId
+			.Should()
+			.Be(productId);
+		events.OfType<ProductWeightUpdatedEvent>()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.ProductId
+			.Should()
+			.Be(productId);
+		events.OfType<ProductStocksSnapshotEvent>()
+			.Should()
+			.ContainSingle()
+			.Which
+			.Products
+			.Should()
+			.ContainSingle()
+			.Which
+			.ProductId
+			.Should()
+			.Be(productId);
 	}
 }

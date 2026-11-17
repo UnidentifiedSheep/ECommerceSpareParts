@@ -1,0 +1,42 @@
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
+using Attributes;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
+
+namespace Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.CreateProducerSupplierMapping;
+
+[AutoSave]
+[Transactional(retryDelayMs: 20, retryCount: 2)]
+public record CreateProducerSupplierMappingCommand(NewProducerSupplierMapping ProducerSupplierMapping)
+	: ICommand<CreateProducerSupplierMappingResult>;
+
+public record CreateProducerSupplierMappingResult(ProducerSupplierMappingDto ProducerSupplierMapping);
+
+public class CreateProducerSupplierMappingHandler(
+	IUnitOfWork unitOfWork)
+	: ICommandHandler<CreateProducerSupplierMappingCommand, CreateProducerSupplierMappingResult>
+{
+	public async Task<CreateProducerSupplierMappingResult> Handle(
+		CreateProducerSupplierMappingCommand request,
+		CancellationToken cancellationToken)
+	{
+		var supplierProducerName = request.ProducerSupplierMapping.SupplierProducerName.Trim();
+		var model = ProducerSupplierMapping.Create(
+			request.ProducerSupplierMapping.ProducerId,
+			supplierProducerName,
+			request.ProducerSupplierMapping.Supplier);
+
+		await unitOfWork.AddAsync(model, cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
+
+		return new CreateProducerSupplierMappingResult(
+			new ProducerSupplierMappingDto
+			{
+				Id = model.Id,
+				ProducerId = model.ProducerId,
+				Supplier = model.Supplier,
+				SupplierProducerName = model.Name
+			});
+	}
+}

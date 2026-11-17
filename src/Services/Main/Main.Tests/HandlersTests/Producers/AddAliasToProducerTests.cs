@@ -1,11 +1,9 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Main.Entities.Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.ProducerAliases.AddAlias;
-using Main.Application.Static;
-using Main.Entities.Producer;
+using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Handlers.ProducerAliases.AddAlias;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -16,9 +14,7 @@ namespace Tests.HandlersTests.Producers;
 public class AddAliasToProducerTests : IntegrationTest
 {
 	public AddAliasToProducerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -43,7 +39,7 @@ public class AddAliasToProducerTests : IntegrationTest
 
 		await act.Should().NotThrowAsync();
 
-		var alias = await Context.ProducersAliases.AsNoTracking().FirstOrDefaultAsync(CancellationToken);
+		var alias = await Context.Set<ProducerAlias>().AsNoTracking().FirstOrDefaultAsync(CancellationToken);
 
 		alias.Should().NotBeNull();
 
@@ -57,7 +53,7 @@ public class AddAliasToProducerTests : IntegrationTest
 		var producer = TestContext.Producers[0];
 		var existing = await new ProducerAliasBuilder(Faker)
 			.WithProducerId(producer.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new AddAliasCommand(producer.Id, existing.Alias);
 		var exception =
@@ -71,7 +67,7 @@ public class AddAliasToProducerTests : IntegrationTest
 	{
 		var existing = await new ProducerAliasBuilder(Faker)
 			.WithProducerId(TestContext.Producers[0].Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var command = new AddAliasCommand(TestContext.Producers[1].Id, existing.Alias);
 

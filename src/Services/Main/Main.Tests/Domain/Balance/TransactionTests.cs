@@ -1,8 +1,8 @@
-﻿using Exceptions;
+﻿using Enums;
+using Exceptions;
 using FluentAssertions;
-using Main.Entities.Balance;
-using Main.Entities.Organization;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
 
 namespace Tests.Domain.Balance;
 
@@ -482,8 +482,7 @@ public class TransactionTests
 		Guid? senderId = null,
 		Guid? receiverId = null,
 		TransactionSourceType sourceType = TransactionSourceType.Manual)
-	{
-		return Transaction.Create(
+		=> Transaction.Create(
 			senderId ?? Guid.NewGuid(),
 			receiverId ?? Guid.NewGuid(),
 			1,
@@ -491,7 +490,6 @@ public class TransactionTests
 			100m,
 			DateTime.UtcNow,
 			sourceType);
-	}
 
 	private static void ApplyProfile(
 		Transaction transaction,
@@ -501,8 +499,7 @@ public class TransactionTests
 		decimal receiverBalanceInBaseCurrency,
 		decimal amountInBaseCurrency,
 		bool forceDebit = false)
-	{
-		FinancialProfileService.Apply(
+		=> FinancialProfileService.Apply(
 			transaction,
 			senderProfile,
 			receiverProfile,
@@ -510,5 +507,4 @@ public class TransactionTests
 			receiverBalanceInBaseCurrency,
 			amountInBaseCurrency,
 			forceDebit);
-	}
 }

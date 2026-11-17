@@ -1,9 +1,9 @@
 using GreenDonut;
-using Main.Application.Dtos.Producer;
-using Main.Application.Dtos.Producer.SupplierMappings;
-using Main.Application.Handlers.ProducerAliases;
-using Main.Application.Handlers.Producers;
-using Main.Application.Handlers.ProducerSupplierMappings;
+using Main.Modules.Product.Application.Dtos.Producer;
+using Main.Modules.Product.Application.Dtos.Producer.SupplierMappings;
+using Main.Modules.Product.Application.Handlers.ProducerAliases;
+using Main.Modules.Product.Application.Handlers.Producers;
+using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -15,24 +15,23 @@ public static class ProducerDataLoaders
 		IReadOnlyList<int> keys,
 		ISender sender,
 		CancellationToken cancellationToken)
-	{
-		return (await sender.Send(new GetProducersByIdsQuery(keys), cancellationToken)).Producers
+		=> (await sender.Send(new GetProducersByIdsQuery(keys), cancellationToken)).Producers
 			.ToDictionary(x => x.Key, x => x.Value);
-	}
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<string>>> GetProducerAliasesByIdAsync(
 		IReadOnlyList<int> keys,
 		ISender sender,
-		CancellationToken cancellationToken) =>
-		(await sender.Send(new GetProducersAliasesQuery(keys), cancellationToken)).ProducersAliases;
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetProducersAliasesQuery(keys), cancellationToken)).ProducersAliases;
 
 	[DataLoader]
 	public static async Task<Dictionary<int, List<ProducerSupplierMappingDto>>>
 		GetProducerSupplierMappingsByIdAsync(
 			IReadOnlyList<int> keys,
 			ISender sender,
-			CancellationToken cancellationToken) => (await sender.Send(
-		new GetProducersSupplierMappingsQuery(keys),
-		cancellationToken)).Mappings;
+			CancellationToken cancellationToken)
+		=> (await sender.Send(
+			new GetProducersSupplierMappingsQuery(keys),
+			cancellationToken)).Mappings;
 }

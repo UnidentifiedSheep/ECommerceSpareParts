@@ -1,14 +1,18 @@
 using Bogus;
-using Main.Entities.Order;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Order;
 using Tests.Abstractions;
-using DomainOrder = Main.Entities.Order.Order;
+using DomainOrder = Main.Entities.Order.Order.Order;
 
 namespace Tests.DataBuilders.Order;
 
 public sealed class OrderItemBuilder(Faker faker) : BuilderBase<OrderItem>(faker)
 {
-	public DomainOrder Order { get; private set; } = DomainOrder.CreateManual(Guid.NewGuid(), null, 1);
+	public DomainOrder Order { get; private set; } = DomainOrder.CreateManual(
+		Guid.NewGuid(),
+		null,
+		1);
+
 	public int ProductId { get; private set; } = faker.Random.Int(1, 10_000);
 	public int Count { get; private set; } = 1;
 	public decimal? UnitPrice { get; private set; }
@@ -41,9 +45,15 @@ public sealed class OrderItemBuilder(Faker faker) : BuilderBase<OrderItem>(faker
 
 	public override OrderItem Build()
 	{
-		var item = OrderItem.Create(Order.Id, ProductId, Count);
+		var item = OrderItem.Create(
+			Order.Id,
+			ProductId,
+			Count);
 		if (UnitPrice.HasValue)
-			item.AssignPrice(null, UnitPrice.Value, PriceOrigin);
+			item.AssignPrice(
+				null,
+				UnitPrice.Value,
+				PriceOrigin);
 		return item;
 	}
 }

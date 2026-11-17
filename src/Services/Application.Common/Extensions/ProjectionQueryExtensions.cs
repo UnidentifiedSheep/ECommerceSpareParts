@@ -7,5 +7,6 @@ public static class ProjectionQueryExtensions
 {
 	public static IQueryable<TOut> Project<TIn, TOut>(
 		this IQueryable<TIn> query,
-		IProjectionProvider<TIn, TOut> provider) => query.AsExpandable().Select(provider.Projection);
+		IProjectionProvider<TIn, TOut> provider)
+		=> query.AsExpandable().Select(provider.Projection);
 }

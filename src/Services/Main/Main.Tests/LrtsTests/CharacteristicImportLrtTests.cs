@@ -1,6 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.CharacteristicImport;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.CharacteristicImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -29,7 +30,9 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 
 		for (var attempt = 0; attempt < 2; attempt++)
 		{
-			var execution = await ExecuteCsv("Name", rows,
+			var execution = await ExecuteCsv(
+				"Name",
+				rows,
 				fileName => new CharacteristicImportInputState { FileName = fileName });
 
 			execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
@@ -38,12 +41,21 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 			state.Errors.Should().BeEmpty();
 		}
 
-		var characteristics = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var characteristics =
+			await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		characteristics.Should().HaveCount(3);
-		characteristics.Select(characteristic => characteristic.Name).Should()
-			.BeEquivalentTo(["Brake Color", "Размер детали", "Material"]);
-		characteristics.Select(characteristic => characteristic.NormalizedName).Should()
-			.BeEquivalentTo(["brake-color", "razmer-detali", "material"]);
+		characteristics.Select(characteristic => characteristic.Name)
+			.Should()
+			.BeEquivalentTo(
+				"Brake Color",
+				"Размер детали",
+				"Material");
+		characteristics.Select(characteristic => characteristic.NormalizedName)
+			.Should()
+			.BeEquivalentTo(
+				"brake-color",
+				"razmer-detali",
+				"material");
 	}
 
 	[Fact]
@@ -65,13 +77,24 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<CharacteristicImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(6);
-		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2, 3);
+		state.Errors
+			.Select(error => error.RowIdx)
+			.Should()
+			.Equal(
+				1,
+				2,
+				3);
 		state.Errors.Should().OnlyContain(error => !string.IsNullOrWhiteSpace(error.Message));
 
-		var characteristics = await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken);
+		var characteristics =
+			await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken);
 		characteristics.Should().HaveCount(3);
-		characteristics.Select(characteristic => characteristic.Name).Should()
-			.BeEquivalentTo([longestValidName, "A", "Material, Grade"]);
+		characteristics.Select(characteristic => characteristic.Name)
+			.Should()
+			.BeEquivalentTo(
+				longestValidName,
+				"A",
+				"Material, Grade");
 	}
 
 	[Fact]
@@ -87,8 +110,9 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		var state = execution.GetState<CharacteristicImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(1001);
 		state.Errors.Should().BeEmpty();
-		(await Context.Characteristics.AsNoTracking().ToListAsync(CancellationToken))
-			.Should().ContainSingle(characteristic => characteristic.Name == "Brake Color");
+		(await Context.Set<Characteristic>().AsNoTracking().ToListAsync(CancellationToken))
+			.Should()
+			.ContainSingle(characteristic => characteristic.Name == "Brake Color");
 	}
 
 	[Fact]
@@ -103,6 +127,6 @@ public sealed class CharacteristicImportLrtTests(CombinedContainerFixture fixtur
 		var state = execution.GetState<CharacteristicImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(2);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
-		(await Context.Characteristics.CountAsync(CancellationToken)).Should().Be(0);
+		(await Context.Set<Characteristic>().CountAsync(CancellationToken)).Should().Be(0);
 	}
 }

@@ -1,7 +1,7 @@
 using GraphQL.Common.Types;
 using HotChocolate;
-using Search.Enums;
 using Search.Api.GraphQl.Types.Inputs.CatalogueSearch.Criteria;
+using Search.Enums;
 
 namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
 

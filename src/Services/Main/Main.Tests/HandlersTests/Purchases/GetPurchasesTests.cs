@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Application.Handlers.Purchases.GetPurchases;
+using Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchases;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Purchase;
 
@@ -9,9 +9,7 @@ namespace Tests.HandlersTests.Purchases;
 public sealed class GetPurchasesTests : IntegrationTest
 {
 	public GetPurchasesTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<PurchaseTestContext>();
-	}
+		=> RegisterBasicContext<PurchaseTestContext>();
 
 	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
 
@@ -43,6 +41,7 @@ public sealed class GetPurchasesTests : IntegrationTest
 				term = "Regression-Marker";
 				break;
 		}
+
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Search($" {term.ToLowerInvariant()} ");
@@ -95,9 +94,7 @@ public sealed class GetPurchasesTests : IntegrationTest
 
 	[Fact]
 	public async Task Search_UnknownTerm_ReturnsNoDocuments()
-	{
-		(await Search("NoSuchSearchMarker")).Purchases.Should().BeEmpty();
-	}
+		=> (await Search("NoSuchSearchMarker")).Purchases.Should().BeEmpty();
 
 	[Fact]
 	public async Task Search_StillAppliesOrganizationFilter()
@@ -113,6 +110,13 @@ public sealed class GetPurchasesTests : IntegrationTest
 
 	private Task<GetPurchasesResult> Search(string? term) => Mediator.Send(Query(term), CancellationToken);
 
-	private static GetPurchasesQuery Query(string? term) =>
-		new(new RangeModel<DateTime>(), new Pagination(0, 25), [], [], [], [], term);
+	private static GetPurchasesQuery Query(string? term)
+		=> new(
+			new RangeModel<DateTime>(),
+			new Pagination(0, 25),
+			[],
+			[],
+			[],
+			[],
+			term);
 }

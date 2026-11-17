@@ -1,4 +1,3 @@
-using Abstractions.Models;
 using Application.Common.Models;
 
 namespace GraphQL.Common.Types;

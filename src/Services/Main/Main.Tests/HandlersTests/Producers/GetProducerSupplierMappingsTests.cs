@@ -1,10 +1,8 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -15,9 +13,7 @@ namespace Tests.HandlersTests.Producers;
 public class GetProducerSupplierMappingsTests : IntegrationTest
 {
 	public GetProducerSupplierMappingsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -30,11 +26,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
 			.WithSupplierProducerName("Armtek producer")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(anotherProducer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
@@ -57,11 +53,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		var expected = await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
@@ -82,11 +78,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		await new ProducerSupplierMappingBuilder(Faker)
 			.WithProducerId(producer.Id)
 			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
@@ -97,11 +93,10 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 
 		result.Mappings.Should().ContainSingle();
 	}
-
-
 }
 
-public class GetProducerSupplierMappingsValidationTests : ValidationTest<GetProducerSupplierMappingsValidation, GetProducerSupplierMappingsQuery>
+public class GetProducerSupplierMappingsValidationTests : ValidationTest<GetProducerSupplierMappingsValidation
+	, GetProducerSupplierMappingsQuery>
 {
 	[Fact]
 	public async Task GetProducerSupplierMappings_InvalidPagination_FailsValidation()

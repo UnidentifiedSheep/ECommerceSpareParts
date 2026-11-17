@@ -1,20 +1,38 @@
 ﻿using Exceptions;
 using FluentAssertions;
-using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
 namespace Tests.Domain.Product;
 
 public class ProductCharacteristicTests
 {
 	[Theory]
-	[InlineData(1, 10, "Red")]
-	[InlineData(2, 20, "  Large  ")]
-	[InlineData(1, 10, " a ")]
-	[InlineData(2, 20, " ab ")]
-	public void Create_UsesProductAndCharacteristicIds(int productId, int characteristicId, string value)
+	[InlineData(
+		1,
+		10,
+		"Red")]
+	[InlineData(
+		2,
+		20,
+		"  Large  ")]
+	[InlineData(
+		1,
+		10,
+		" a ")]
+	[InlineData(
+		2,
+		20,
+		" ab ")]
+	public void Create_UsesProductAndCharacteristicIds(
+		int productId,
+		int characteristicId,
+		string value)
 	{
-		var model = ProductCharacteristic.Create(productId, characteristicId, value);
+		var model = ProductCharacteristic.Create(
+			productId,
+			characteristicId,
+			value);
 
 		model.ProductId.Should().Be(productId);
 		model.CharacteristicId.Should().Be(characteristicId);
@@ -23,8 +41,20 @@ public class ProductCharacteristicTests
 		ProductCharacteristic.GetKeySelector().Compile()(model).Should().Be(model.GetId());
 		var matches = ProductCharacteristic.GetEqualityExpression(model.GetId()).Compile();
 		matches(model).Should().BeTrue();
-		matches(ProductCharacteristic.Create(productId + 1, characteristicId, value)).Should().BeFalse();
-		matches(ProductCharacteristic.Create(productId, characteristicId + 1, value)).Should().BeFalse();
+		matches(
+				ProductCharacteristic.Create(
+					productId + 1,
+					characteristicId,
+					value))
+			.Should()
+			.BeFalse();
+		matches(
+				ProductCharacteristic.Create(
+					productId,
+					characteristicId + 1,
+					value))
+			.Should()
+			.BeFalse();
 	}
 
 	[Theory]
@@ -33,21 +63,43 @@ public class ProductCharacteristicTests
 	[InlineData("\t\r\n")]
 	public void Create_EmptyOrWhitespaceValue_Throws(string value)
 	{
-		var act = () => ProductCharacteristic.Create(1, 10, value);
+		var act = () => ProductCharacteristic.Create(
+			1,
+			10,
+			value);
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(ArticleCharacteristicValueMustNotBeEmptyMessage.Key);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(ArticleCharacteristicValueMustNotBeEmptyMessage.Key);
 	}
 
 	[Fact]
 	public void Create_ValueLengthBoundary()
 	{
 		var value = new string('x', 128);
-		ProductCharacteristic.Create(1, 10, $"  {value}  ").Value.Should().Be(value);
-		var act = () => ProductCharacteristic.Create(1, 10, new string('x', 129));
+		ProductCharacteristic.Create(
+				1,
+				10,
+				$"  {value}  ")
+			.Value
+			.Should()
+			.Be(value);
+		var act = () => ProductCharacteristic.Create(
+			1,
+			10,
+			new string('x', 129));
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be(ArticleCharacteristicValueMaxLengthMessage.Key);
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be(ArticleCharacteristicValueMaxLengthMessage.Key);
 	}
 
 	[Theory]
@@ -56,7 +108,10 @@ public class ProductCharacteristicTests
 	[InlineData(" ab ", "ab")]
 	public void SetValue_UpdatesValueAndPreservesKey(string input, string expected)
 	{
-		var model = ProductCharacteristic.Create(1, 10, "Value");
+		var model = ProductCharacteristic.Create(
+			1,
+			10,
+			"Value");
 
 		model.SetValue(input);
 
@@ -69,7 +124,10 @@ public class ProductCharacteristicTests
 	[InlineData("   ")]
 	public void SetValue_InvalidValue_PreservesExistingValue(string value)
 	{
-		var model = ProductCharacteristic.Create(1, 10, "Value");
+		var model = ProductCharacteristic.Create(
+			1,
+			10,
+			"Value");
 		var act = () => model.SetValue(value);
 
 		act.Should().Throw<InvalidInputException>();

@@ -1,9 +1,7 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Abstractions.Models;
 using Application.Common.Models;
-using Main.Application.Handlers.StorageContents.GetProductStorageContents;
-using Main.Entities.Storage;
+using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -176,17 +174,16 @@ public class GetProductStorageContentsTests : IntegrationTest
 		string storageCode,
 		int currencyId,
 		int count)
-	{
-		return await new StorageContentBuilder(Faker)
+		=> await new StorageContentBuilder(Faker)
 			.WithProductIds(productId)
 			.WithStorageCode(storageCode)
 			.WithCurrencyId(currencyId)
 			.WithCount(count)
 			.BuildAndAddToDb(Context);
-	}
 }
 
-public class GetProductStorageContentsValidationTests : ValidationTest<GetProductStorageContentsValidation, GetProductStorageContentsQuery>
+public class GetProductStorageContentsValidationTests : ValidationTest<GetProductStorageContentsValidation,
+	GetProductStorageContentsQuery>
 {
 	[Theory]
 	[InlineData(-1, 10)]
@@ -205,6 +202,7 @@ public class GetProductStorageContentsValidationTests : ValidationTest<GetProduc
 
 		var result = await ValidateAsync(
 			new GetProductStorageContentsQuery([item]));
-		result.ShouldHaveValidationErrorFor(page < 0 ? "Items[0].Pagination.Page" : "Items[0].Pagination.Size");
+		result.ShouldHaveValidationErrorFor(
+			page < 0 ? "Items[0].Pagination.Page" : "Items[0].Pagination.Size");
 	}
 }

@@ -1,16 +1,15 @@
 using FluentAssertions;
-using Main.Application.Dtos.Sale;
-using Main.Application.Models.Storage;
-using Main.Application.Services;
-using Main.Application.Interfaces.Services;
-using MediatR;
+using Main.Modules.Sale.Application.Dtos.Sale;
+using Main.Modules.Sale.Application.Services;
+using Main.Modules.Storage.Abstractions.Interfaces;
+using Main.Modules.Storage.Abstractions.Models;
 using Moq;
 
 namespace Tests.ServicesTests;
 
 public class SaleServiceTests
 {
-	private readonly SaleService _service = new(Mock.Of<ISender>(), Mock.Of<IStorageContentService>());
+	private readonly SaleService _service = new(Mock.Of<IStorageContentService>());
 
 	[Fact]
 	public void DistributeDetails_WithNewSaleContent_DistributesFromLargestLotsFirst()
@@ -332,8 +331,7 @@ public class SaleServiceTests
 		int count,
 		decimal buyPrice = 100m,
 		DateTime? purchaseDate = null)
-	{
-		return new StorageLot(
+		=> new(
 			id,
 			productId,
 			1,
@@ -343,20 +341,17 @@ public class SaleServiceTests
 				2026,
 				1,
 				1));
-	}
 
 	private static NewSaleContentDto NewSaleContent(
 		int productId,
 		int count,
 		decimal price = 200m,
 		decimal priceWithDiscount = 180m)
-	{
-		return new NewSaleContentDto
+		=> new()
 		{
 			ProductId = productId,
 			Count = count,
 			OriginalPrice = price,
 			DiscountedPrice = priceWithDiscount
 		};
-	}
 }

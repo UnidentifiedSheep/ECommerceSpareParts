@@ -1,0 +1,7 @@
+{
+  "culture": "en",
+  "messages": {
+    "job.not.found": "Requested job not found.",
+    "job.schedule.not.found": "Requested job schedule not found."
+  }
+}

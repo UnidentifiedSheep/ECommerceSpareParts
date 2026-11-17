@@ -8,6 +8,6 @@ public readonly record struct EventAudience(Guid? UserId)
 	public static EventAudience ForUser(Guid userId)
 	{
 		ArgumentOutOfRangeException.ThrowIfEqual(userId, Guid.Empty);
-		return new(userId);
+		return new EventAudience(userId);
 	}
 }

@@ -22,9 +22,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "ci"))
 from release import DIGEST, Registries, ReleaseError, require, save, validate
 
 RUNTIME = {"main-api": (10, "api_main-api"), "search-api": (20, "api_search-api"),
-           "pricing-api": (30, "api_pricing-api"),
            "main-worker": (40, "workers_main-worker"),
-           "pricing-worker": (40, "workers_pricing-worker"), "gateway": (50, "gateway_gateway")}
+           "gateway": (50, "gateway_gateway")}
 STACKS = {"api", "workers", "gateway", "migrators"}
 LABEL = "io.ecommerce.cd"
 

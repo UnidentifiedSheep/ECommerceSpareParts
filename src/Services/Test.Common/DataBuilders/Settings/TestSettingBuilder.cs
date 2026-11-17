@@ -15,11 +15,9 @@ internal sealed class TestSettingBuilder(Faker faker) : BuilderBase<TestSetting>
 	}
 
 	public override TestSetting Build()
-	{
-		return new TestSetting(
+		=> new(
 			new TestSettingData
 			{
 				Value = Value ?? Faker.Random.Int(1, 10_000)
 			});
-	}
 }

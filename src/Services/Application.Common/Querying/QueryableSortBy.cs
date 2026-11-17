@@ -15,7 +15,8 @@ public class QueryableSortBy
 
 	private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
 
-	private readonly ConcurrentDictionary<(Type Entity, string Field), Func<string, LambdaExpression>> _parameterizedMappings = new();
+	private readonly ConcurrentDictionary<(Type Entity, string Field), Func<string, LambdaExpression>>
+		_parameterizedMappings = new();
 
 	public char Delimiter { get; private set; } = '_';
 
@@ -45,10 +46,12 @@ public class QueryableSortBy
 		_parameterizedMappings[(typeof(TEntity), field.ToLowerInvariant())] = argument =>
 		{
 			var value = ConvertArgument<TArgument>(argument);
-			var body = new ParameterSubstitution(selector.Parameters[1],
+			var body = new ParameterSubstitution(
+				selector.Parameters[1],
 				Expression.Constant(value, typeof(TArgument))).Visit(selector.Body)!;
 			return Expression.Lambda<Func<TEntity, object?>>(
-				Expression.Convert(body, typeof(object)), selector.Parameters[0]);
+				Expression.Convert(body, typeof(object)),
+				selector.Parameters[0]);
 		};
 		return this;
 	}
@@ -58,21 +61,22 @@ public class QueryableSortBy
 		try
 		{
 			var type = typeof(TArgument);
-			var value = TypeDescriptor.GetConverter(type).ConvertFrom(null, CultureInfo.InvariantCulture, argument);
+			var value = TypeDescriptor.GetConverter(type)
+				.ConvertFrom(
+					null,
+					CultureInfo.InvariantCulture,
+					argument);
 			if (type.IsEnum && (value is null || !Enum.IsDefined(type, value)))
 				throw new ArgumentException($"Unknown {type.Name} value '{argument}'.");
 			return (TArgument)value!;
 		}
-		catch (Exception exception) when (exception is ArgumentException or FormatException or OverflowException or NotSupportedException)
+		catch (Exception exception) when (exception is ArgumentException or FormatException or
+											OverflowException or NotSupportedException)
 		{
-			throw new ArgumentException($"Invalid sort argument '{argument}' for {typeof(TArgument).Name}.", exception);
+			throw new ArgumentException(
+				$"Invalid sort argument '{argument}' for {typeof(TArgument).Name}.",
+				exception);
 		}
-	}
-
-	private sealed class ParameterSubstitution(ParameterExpression parameter, Expression replacement) : ExpressionVisitor
-	{
-		protected override Expression VisitParameter(ParameterExpression node) =>
-			node == parameter ? replacement : base.VisitParameter(node);
 	}
 
 	public QueryableSortBy MapDefault<TSource, TKey>(
@@ -100,7 +104,8 @@ public class QueryableSortBy
 		if (argument is not null)
 		{
 			if (!_parameterizedMappings.TryGetValue((type, source), out var mapping))
-				throw new ArgumentException($"Sort mapping '{source}' for {type} does not accept an argument.");
+				throw new ArgumentException(
+					$"Sort mapping '{source}' for {type} does not accept an argument.");
 			return (Expression<Func<TEntity, object?>>)mapping(argument);
 		}
 
@@ -116,8 +121,8 @@ public class QueryableSortBy
 		throw new ArgumentException($"Sort mapping '{source}' for {type} does not exist.");
 	}
 
-	public bool GetDefaultDesc<TEntity>() =>
-		_defaultDirectionMap.TryGetValue(typeof(TEntity), out var desc) && desc;
+	public bool GetDefaultDesc<TEntity>()
+		=> _defaultDirectionMap.TryGetValue(typeof(TEntity), out var desc) && desc;
 
 	public static KeySelectorSortDefinition<TEntity> ParseToKeySelector<TEntity>(SortExpression? sort)
 	{
@@ -135,4 +140,10 @@ public class QueryableSortBy
 		return sortParams.Select(ParseToKeySelector<TEntity>).ToArray();
 	}
 
+	private sealed class ParameterSubstitution(ParameterExpression parameter, Expression replacement)
+		: ExpressionVisitor
+	{
+		protected override Expression VisitParameter(ParameterExpression node)
+			=> node == parameter ? replacement : base.VisitParameter(node);
+	}
 }

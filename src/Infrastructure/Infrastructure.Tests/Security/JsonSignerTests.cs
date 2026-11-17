@@ -48,15 +48,13 @@ public class JsonSignerTests
 	}
 
 	private static JsonSigner CreateSigner()
-	{
-		return new JsonSigner(
+		=> new(
 			Options.Create(
 				new SecretEncryptionOptions
 				{
 					Secret = "json-signer-test-secret"
 				}),
 			new ProjectJsonOptions());
-	}
 
 	private sealed record TestPayload(Guid Id, string Value);
 }

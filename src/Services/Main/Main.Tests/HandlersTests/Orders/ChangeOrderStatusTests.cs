@@ -1,9 +1,10 @@
 using Exceptions;
 using FluentAssertions;
 using FluentValidation.TestHelper;
-using Main.Application.Orders.Commands.ChangeOrderStatus;
-using Main.Entities.Exceptions;
-using Main.Enums.Orders;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Exceptions;
+using Main.Entities.Order.Order;
+using Main.Modules.Order.Application.Orders.Commands.ChangeOrderStatus;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
@@ -13,7 +14,8 @@ namespace Tests.HandlersTests.Orders;
 
 public class ChangeOrderStatusTests : IntegrationTest
 {
-	public ChangeOrderStatusTests(CombinedContainerFixture fixture) : base(fixture) => RegisterBasicContext<OrderTestContext>();
+	public ChangeOrderStatusTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<OrderTestContext>();
 	private OrderTestContext Orders => GetContext<OrderTestContext>();
 
 	[Theory]
@@ -25,11 +27,22 @@ public class ChangeOrderStatusTests : IntegrationTest
 	{
 		var actorId = Orders.OtherUser.Id;
 		var order = status == OrderStatus.Completed ? Orders.ConfirmedOrder : Orders.ManualOrder;
-		await Mediator.Send(new ChangeOrderStatusCommand(order.Id, actorId, status, order.RowVersion), CancellationToken);
-		var saved = await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken);
+		await Mediator.Send(
+			new ChangeOrderStatusCommand(
+				order.Id,
+				actorId,
+				status,
+				order.RowVersion),
+			CancellationToken);
+		var saved = await Context.Set<Order>()
+			.AsNoTracking()
+			.SingleAsync(x => x.Id == order.Id, CancellationToken);
 		saved.Status.Should().Be(status);
 		if (status == OrderStatus.Deleted)
-			(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(order.Items.Count);
+			(await Context.Set<OrderItem>()
+					.AsNoTracking()
+					.CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should()
+				.Be(order.Items.Count);
 		if (status == OrderStatus.Confirmed)
 		{
 			saved.ConfirmedByUserId.Should().Be(actorId);
@@ -42,8 +55,16 @@ public class ChangeOrderStatusTests : IntegrationTest
 	{
 		var order = Orders.ManualOrder;
 		await Assert.ThrowsAsync<InvalidRowVersionException>(() => Mediator.Send(
-			new ChangeOrderStatusCommand(order.Id, Orders.OtherUser.Id, OrderStatus.Confirmed, order.RowVersion + 1), CancellationToken));
-		(await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken)).Status.Should().Be(OrderStatus.Pending);
+			new ChangeOrderStatusCommand(
+				order.Id,
+				Orders.OtherUser.Id,
+				OrderStatus.Confirmed,
+				order.RowVersion + 1),
+			CancellationToken));
+		(await Context.Set<Order>().AsNoTracking().SingleAsync(x => x.Id == order.Id, CancellationToken))
+			.Status
+			.Should()
+			.Be(OrderStatus.Pending);
 	}
 
 	[Fact]
@@ -51,33 +72,51 @@ public class ChangeOrderStatusTests : IntegrationTest
 	{
 		var order = Orders.ManualOrder;
 		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(
-			new ChangeOrderStatusCommand(order.Id, Orders.OtherUser.Id, OrderStatus.Completed, order.RowVersion), CancellationToken));
+			new ChangeOrderStatusCommand(
+				order.Id,
+				Orders.OtherUser.Id,
+				OrderStatus.Completed,
+				order.RowVersion),
+			CancellationToken));
 	}
 
 	[Fact]
 	public async Task MissingOrder_IsRejected()
-	{
-		await Assert.ThrowsAsync<OrderNotFoundException>(() => Mediator.Send(
-			new ChangeOrderStatusCommand(Guid.NewGuid(), Orders.OtherUser.Id, OrderStatus.Confirmed, 1), CancellationToken));
-	}
-
+		=> await Assert.ThrowsAsync<OrderNotFoundException>(() => Mediator.Send(
+			new ChangeOrderStatusCommand(
+				Guid.NewGuid(),
+				Orders.OtherUser.Id,
+				OrderStatus.Confirmed,
+				1),
+			CancellationToken));
 }
 
-public class ChangeOrderStatusValidationTests : ValidationTest<ChangeOrderStatusValidation, ChangeOrderStatusCommand>
+public class
+	ChangeOrderStatusValidationTests : ValidationTest<ChangeOrderStatusValidation, ChangeOrderStatusCommand>
 {
 	[Theory]
 	[InlineData(OrderStatus.Pending)]
 	[InlineData((OrderStatus)999)]
 	public async Task UnsupportedStatus_IsRejected(OrderStatus status)
 	{
-		var result = await ValidateAsync(new ChangeOrderStatusCommand(Guid.NewGuid(), Guid.NewGuid(), status, 1));
+		var result = await ValidateAsync(
+			new ChangeOrderStatusCommand(
+				Guid.NewGuid(),
+				Guid.NewGuid(),
+				status,
+				1));
 		result.ShouldHaveValidationErrorFor(x => x.DesiredStatus).Only();
 	}
 
 	[Fact]
 	public async Task EmptyOrderId_IsRejected()
 	{
-		var result = await ValidateAsync(new ChangeOrderStatusCommand(Guid.Empty, Guid.NewGuid(), OrderStatus.Confirmed, 1));
+		var result = await ValidateAsync(
+			new ChangeOrderStatusCommand(
+				Guid.Empty,
+				Guid.NewGuid(),
+				OrderStatus.Confirmed,
+				1));
 		result.ShouldHaveValidationErrorFor(x => x.OrderId).Only();
 	}
 }

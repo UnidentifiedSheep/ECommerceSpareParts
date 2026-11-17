@@ -5,8 +5,7 @@ namespace Extensions;
 public static class WeightExtensions
 {
 	public static decimal ToKg(this decimal value, WeightUnit unit)
-	{
-		return unit switch
+		=> unit switch
 		{
 			WeightUnit.Gram => value / 1000,
 			WeightUnit.Kilogram => value,
@@ -16,5 +15,4 @@ public static class WeightExtensions
 				unit,
 				null)
 		};
-	}
 }

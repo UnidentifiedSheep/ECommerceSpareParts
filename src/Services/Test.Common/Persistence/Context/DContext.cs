@@ -1,5 +1,4 @@
 using Domain.CommonEntities;
-using Domain.CommonEntities.Job;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Common;
 using Persistence.Common.BaseTableConfigurations;
@@ -14,14 +13,6 @@ namespace Tests.Persistence.Context;
 /// </summary>
 internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(options)
 {
-	public DbSet<Setting> Settings => Set<Setting>();
-
-	public DbSet<Job> Jobs => Set<Job>();
-
-	public DbSet<JobSchedule> JobSchedules => Set<JobSchedule>();
-
-	public DbSet<JobScheduleRun> JobScheduleRuns => Set<JobScheduleRun>();
-
 	protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 	{
 		base.OnConfiguring(optionsBuilder);
@@ -30,7 +21,7 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.ApplyConfiguration(new SettingConfiguration()).ApplyJobConfigurations();
+		modelBuilder.ApplyConfiguration(new SettingConfiguration());
 
 		modelBuilder
 			.Entity<Setting>()
@@ -39,10 +30,14 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 			.HasValue<TestSetting>(TestSetting.SettingName);
 
 		modelBuilder.Entity<TestMetadataEntity>().ToTable("metadata_entities").HasKey(entity => entity.Id);
-		modelBuilder.Entity<TestAuditableMetadataEntity>().ToTable("auditable_metadata_entities").HasKey(entity => entity.Id);
+		modelBuilder.Entity<TestAuditableMetadataEntity>()
+			.ToTable("auditable_metadata_entities")
+			.HasKey(entity => entity.Id);
 
 		modelBuilder.ApplyConfiguration(new EntityHistoryConfiguration());
-		modelBuilder.Entity<BeforeSaveTestEntity>().ToTable("before_save_entities").HasKey(entity => entity.Id);
+		modelBuilder.Entity<BeforeSaveTestEntity>()
+			.ToTable("before_save_entities")
+			.HasKey(entity => entity.Id);
 		modelBuilder.Entity<BeforeSaveTestEntity>().Ignore(entity => entity.CreatedCalls);
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();

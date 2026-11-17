@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Organization;
+using Main.Entities.Balance.Balance;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
@@ -23,7 +23,8 @@ public class OrganizationFinancialProfileBuilder(Faker faker)
 		return this;
 	}
 
-	public override OrganizationFinancialProfile Build() => OrganizationFinancialProfile.Create(
-		OrganizationId ?? Guid.NewGuid(),
-		MinAllowedBalance ?? 0m);
+	public override OrganizationFinancialProfile Build()
+		=> OrganizationFinancialProfile.Create(
+			OrganizationId ?? Guid.NewGuid(),
+			MinAllowedBalance ?? 0m);
 }

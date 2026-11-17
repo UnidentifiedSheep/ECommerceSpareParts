@@ -1,25 +1,44 @@
-using Main.Persistence.Context;
-using Security.Core.Interfaces;
 using System.Globalization;
-using Abstractions.Interfaces;
 using Api.Common;
-using Application.Common.Models.Options.S3;
+using Application.Common.Extensions;
+using Application.Common.Host;
+using Application.Common.Interfaces;
 using Cache;
+using Cache.OneTimeTokens;
 using Locan.Hosting;
-using Main.Api;
-using Main.Application.Models;
-using Main.Cache;
-using Main.Persistence;
+using Main.Modules.Analytics;
+using Main.Modules.Balance;
+using Main.Modules.Cart;
+using Main.Modules.Currency;
+using Main.Modules.Documents;
+using Main.Modules.Identity;
+using Main.Modules.Identity.Application.Models;
+using Main.Modules.Jobs;
+using Main.Modules.Notifications;
+using Main.Modules.Order;
+using Main.Modules.Organization;
+using Main.Modules.Platform;
+using Main.Modules.Product;
+using Main.Modules.Purchase;
+using Main.Modules.Sale;
+using Main.Modules.Storage;
+using Main.Modules.Suppliers;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Notification.Extensions;
 using Npgsql;
 using Persistence;
+using Persistence.Common;
+using Persistence.Context;
+using Persistence.Relations;
+using Pricing.Module;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 using Security;
+using Security.Core.Interfaces;
 using Security.Extensions;
 using Security.Models;
 using Serilog;
@@ -29,7 +48,6 @@ using Tests.Interfaces.ServiceProvider;
 using Tests.Stubs;
 using Tests.TestContexts;
 using ZiggyCreatures.Caching.Fusion.Backplane;
-using ApplicationServiceProvider = Main.Application.ServiceProvider;
 
 namespace Tests;
 
@@ -47,9 +65,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		var services = new ServiceCollection();
 
 		services.RegisterTestContexts();
-		services.AddNotifications()
-			.AddNotificationServices();
-
 
 		services.AddLogging();
 		Log.Logger = new LoggerConfiguration()
@@ -61,7 +76,28 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			.Console(formatProvider: CultureInfo.InvariantCulture)
 			.CreateLogger();
 
-		ApplicationServiceProvider.AddApplicationLayer(services, null).AddLocan().AddPersistenceLayer();
+		services.AddLocan();
+		services.AddModule<CurrencyModule>(new ConfigurationBuilder().Build());
+		services.AddModule<ProductModule>(new ConfigurationBuilder().Build());
+		services.AddModule<IdentityModule>(new ConfigurationBuilder().Build());
+		services.AddModule<PurchaseModule>(new ConfigurationBuilder().Build());
+		services.AddModule<SaleModule>(new ConfigurationBuilder().Build());
+		services.AddModule<AnalyticsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<BalanceModule>(new ConfigurationBuilder().Build());
+		services.AddModule<CartModule>(new ConfigurationBuilder().Build());
+		services.AddModule<DocumentsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<JobsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<PlatformModule>(new ConfigurationBuilder().Build());
+		services.AddModule<SuppliersModule>(new ConfigurationBuilder().Build());
+		services.AddModule<NotificationsModule>(new ConfigurationBuilder().Build());
+		services.AddModule<OrderModule>(new ConfigurationBuilder().Build());
+		services.AddModule<OrganizationModule>(new ConfigurationBuilder().Build());
+		services.AddModule<StorageModule>(new ConfigurationBuilder().Build());
+		services.AddModule<PricingModule>(new ConfigurationBuilder().Build());
+		services.AddPersistenceCore().AddRelationsPersistence();
+		services.AddSingleton<ILrtNamedObject, JobScheduleTestLrt>();
+		services.AddSingleton<ILrtNamedObject, QuotaTestLrt>();
+		services.AddLrtQuota(QuotaTestLrt.QuotaName, 1);
 		services.AddSingleton<TestTimeProvider>();
 		services.AddSingleton<TimeProvider>(sp => sp.GetRequiredService<TestTimeProvider>());
 		var passwordRules = new PasswordRules
@@ -94,7 +130,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 					}
 				}));
 
-		services.ConfigureDbContext<DContext>(options =>
+		services.ConfigureDbContext<UnifiedDbContext>(options =>
 			options.UseNpgsql(pgsql => pgsql.MigrationsAssembly("Main.Migrator")));
 
 		var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
@@ -132,7 +168,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services
 			.AddJsonSigner()
 			.AddCacheLayer("test")
-			.AddApplicationCache()
+			.AddOneTimeTokens()
 			.AddFullSecurityLayer(passwordRules)
 			.AddCommonLayer();
 
@@ -141,7 +177,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 		services.AddSystemOptionsForTests();
 
 		services.AddSingleton<PublishEndpointAccessor>();
-		services.AddScoped<IPublishEndpoint>(sp => sp.GetRequiredService<PublishEndpointAccessor>().Publisher);
+		services.AddScoped<IPublishEndpoint>(sp
+			=> sp.GetRequiredService<PublishEndpointAccessor>().Publisher);
 		services.RemoveAll<IFusionCacheBackplane>();
 		services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 

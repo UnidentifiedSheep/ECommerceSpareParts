@@ -1,15 +1,16 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
+using Application.Common.Services;
 using Enums;
 using Extensions;
 using FluentAssertions;
-using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Application.Static;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
-using Main.Enums.Balances;
+using FluentValidation.TestHelper;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Entities.Balance.Exceptions;
+using Main.Entities.Currency;
+using Main.Entities.Organization.Exceptions;
+using Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -52,7 +53,7 @@ public class CreateTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -65,11 +66,11 @@ public class CreateTransactionTests : IntegrationTest
 		transaction.IsCompletionApplied.Should().BeTrue();
 
 		var senderBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == sender.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var receiverBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == receiver.Id && x.CurrencyId == currency.Id,
@@ -184,7 +185,7 @@ public class CreateTransactionTests : IntegrationTest
 		var result = await Mediator.Send(command, CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -216,13 +217,20 @@ public class CreateTransactionTests : IntegrationTest
 	}
 }
 
-public class CreateTransactionValidationTests : ValidationTest<CreateTransactionValidation, CreateTransactionCommand>
+public class
+	CreateTransactionValidationTests : ValidationTest<CreateTransactionValidation, CreateTransactionCommand>
 {
-	protected override CreateTransactionValidation CreateValidator() =>
-		new(new Application.Common.Services.OperationDatePolicy(TimeProvider.System, new global::Tests.Stubs.UserContextMock()));
+	protected override CreateTransactionValidation CreateValidator()
+		=> new(new OperationDatePolicy(TimeProvider.System, new UserContextMock()));
 
-	private static CreateTransactionCommand ValidCommand() => new(
-		Guid.NewGuid(), Guid.NewGuid(), 100m, 1, DateTime.UtcNow, TransactionSourceType.Manual);
+	private static CreateTransactionCommand ValidCommand()
+		=> new(
+			Guid.NewGuid(),
+			Guid.NewGuid(),
+			100m,
+			1,
+			DateTime.UtcNow,
+			TransactionSourceType.Manual);
 
 	[Theory]
 	[InlineData(0)]
@@ -236,14 +244,20 @@ public class CreateTransactionValidationTests : ValidationTest<CreateTransaction
 	[Fact]
 	public async Task CreateTransaction_TooOldDate_FailsValidation()
 	{
-		var result = await ValidateAsync(ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddDays(-31) });
-		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime).WithErrorCode("operation.date.too.old").Only();
+		var result = await ValidateAsync(
+			ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddDays(-31) });
+		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime)
+			.WithErrorCode("operation.date.too.old")
+			.Only();
 	}
 
 	[Fact]
 	public async Task CreateTransaction_FutureDate_FailsValidation()
 	{
-		var result = await ValidateAsync(ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddMinutes(6) });
-		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime).WithErrorCode("operation.date.cannot.be.in.future").Only();
+		var result = await ValidateAsync(
+			ValidCommand() with { TransactionDateTime = DateTime.UtcNow.AddMinutes(6) });
+		result.ShouldHaveValidationErrorFor(x => x.TransactionDateTime)
+			.WithErrorCode("operation.date.cannot.be.in.future")
+			.Only();
 	}
 }

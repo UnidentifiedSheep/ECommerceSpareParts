@@ -1,14 +1,15 @@
+using System.Text;
+using System.Text.Json;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
-using Application.Common.Models.Options.S3;
 using Contracts.Products;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces.Localizers;
-using Main.Application.Lrts.ProductImport;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.ProductImport;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,34 +17,37 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using S3.Core.Interfaces;
-using System.Text.Json;
-using System.Text;
+using S3.Core.Options;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.LrtsTests;
 
 public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportLrtTests.TestProductImportLrt>
 {
 	public ProductImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-	private MessageBrokerStub Broker => (MessageBrokerStub)Scope.ServiceProvider
-		.GetRequiredService<PublishEndpointAccessor>().Publisher;
+
+	private MessageBrokerStub Broker
+		=> (MessageBrokerStub)Scope.ServiceProvider
+			.GetRequiredService<PublishEndpointAccessor>()
+			.Publisher;
 
 	[Fact]
 	public void CreateJob_CreatesSingleRunImport()
 	{
 		var dispatcher = Scope.ServiceProvider.GetRequiredService<IJobCreationDispatcher>();
 
-		var job = dispatcher.Create(nameof(ProductImportLrt),
-			JsonSerializer.Serialize(new ProductImportInputState { FileName = "products.csv" }), 3);
+		var job = dispatcher.Create(
+			nameof(ProductImportLrt),
+			JsonSerializer.Serialize(new ProductImportInputState { FileName = "products.csv" }),
+			3);
 
 		job.Should().BeOfType<SingleRunJob>();
 		job.SystemName.Should().Be(nameof(ProductImportLrt));
@@ -91,22 +95,32 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Errors.Should().BeEmpty();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
-		products.Should().ContainSingle(x => x.Id == existingProduct.Id)
-			.Which.Name.Value.Should().Be(existingName);
+		products.Should()
+			.ContainSingle(x => x.Id == existingProduct.Id)
+			.Which
+			.Name
+			.Value
+			.Should()
+			.Be(existingName);
 		products
 			.Should()
 			.ContainSingle(x =>
 				x.Sku.NormalizedValue == new Sku("XYZ123").NormalizedValue &&
 				x.ProducerId == firstProducer.Id)
-			.Which.Name.Value.Should().Be("New");
+			.Which
+			.Name
+			.Value
+			.Should()
+			.Be("New");
 		products
 			.Should()
 			.ContainSingle(x =>
 				x.Sku.NormalizedValue == new Sku("ABC123").NormalizedValue &&
 				x.ProducerId == secondProducer.Id);
-		AssertPublishedProducts(products.Where(product => product.Id != existingProduct.Id).Select(product => product.Id));
+		AssertPublishedProducts(
+			products.Where(product => product.Id != existingProduct.Id).Select(product => product.Id));
 	}
 
 	[Fact]
@@ -116,10 +130,22 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		var execution = await ExecuteCsv(
 			"Sku,Name,Producer",
 			[
-				CsvRow("SKU-001", "First product", producer.Name),
-				CsvRow("SKU-002", "Second product", producer.Name),
-				CsvRow("SKU 001", "Duplicate from next batch", producer.Name),
-				CsvRow("SKU-003", "New in next batch", producer.Name)
+				CsvRow(
+					"SKU-001",
+					"First product",
+					producer.Name),
+				CsvRow(
+					"SKU-002",
+					"Second product",
+					producer.Name),
+				CsvRow(
+					"SKU 001",
+					"Duplicate from next batch",
+					producer.Name),
+				CsvRow(
+					"SKU-003",
+					"New in next batch",
+					producer.Name)
 			],
 			fileName => new ProductImportInputState { FileName = fileName });
 
@@ -128,10 +154,13 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Errors.Should().BeEmpty();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 
-		var products = await Context.Products.AsNoTracking().ToListAsync(CancellationToken);
+		var products = await Context.Set<Product>().AsNoTracking().ToListAsync(CancellationToken);
 		products.Should().HaveCount(3);
-		products.Single(product => product.Sku.NormalizedValue == "SKU001").Name.Value
-			.Should().Be("First product");
+		products.Single(product => product.Sku.NormalizedValue == "SKU001")
+			.Name
+			.Value
+			.Should()
+			.Be("First product");
 		AssertPublishedProducts(products.Select(product => product.Id));
 	}
 
@@ -146,9 +175,27 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		var execution = await ExecuteCsv(
 			"Sku,Name,Producer,Description,Indicator,GroupId",
 			[
-				CsvRow("AB", "Too short", producer.Name, "", "", ""),
-				CsvRow("VALID-123", "Valid product", "Unknown producer", "", "", ""),
-				CsvRow("VALID-123", "Valid product", producer.Name, "  Description  ", "  New  ", group.Id)
+				CsvRow(
+					"AB",
+					"Too short",
+					producer.Name,
+					"",
+					"",
+					""),
+				CsvRow(
+					"VALID-123",
+					"Valid product",
+					"Unknown producer",
+					"",
+					"",
+					""),
+				CsvRow(
+					"VALID-123",
+					"Valid product",
+					producer.Name,
+					"  Description  ",
+					"  New  ",
+					group.Id)
 			],
 			fileName => new ProductImportInputState { FileName = fileName });
 
@@ -157,7 +204,7 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		state.Checkpoint!.CurrentLine.Should().Be(3);
 		state.Errors.Select(error => error.RowIdx).Should().Equal(1, 2);
 
-		var product = await Context.Products.AsNoTracking().SingleAsync(CancellationToken);
+		var product = await Context.Set<Product>().AsNoTracking().SingleAsync(CancellationToken);
 		product.Sku.Value.Should().Be("VALID-123");
 		product.ProducerId.Should().Be(producer.Id);
 		product.Description.Should().Be("  Description  ");
@@ -173,12 +220,21 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 	{
 		var producer = TestContext.Producers[0];
 		if (duplicate)
-			await new ProductBuilder(Faker).WithProducerId(producer.Id).WithSku(new Sku("EXISTING-123"))
+			await new ProductBuilder(Faker).WithProducerId(producer.Id)
+				.WithSku(new Sku("EXISTING-123"))
 				.BuildAndAddToDb(Context, CancellationToken);
 
 		var execution = await ExecuteCsv(
 			"Sku,Name,Producer",
-			duplicate ? [CsvRow("EXISTING123", "Existing product", producer.Name)] : [],
+			duplicate
+				?
+				[
+					CsvRow(
+						"EXISTING123",
+						"Existing product",
+						producer.Name)
+				]
+				: [],
 			fileName => new ProductImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
@@ -195,14 +251,20 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 
 		var execution = await ExecuteCsv(
 			"Sku,Name,Producer",
-			[CsvRow("FAILED-123", "Failed batch", producer.Name)],
+			[
+				CsvRow(
+					"FAILED-123",
+					"Failed batch",
+					producer.Name)
+			],
 			fileName => new ProductImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Failed);
 		execution.Job.ErrorMessage.Should().Contain("Product publication failed");
-		(await Context.Products.AnyAsync(CancellationToken)).Should().BeFalse();
+		(await Context.Set<Product>().AnyAsync(CancellationToken)).Should().BeFalse();
 		(LrtStateSerializer.DeserializeState<ProductImportState>(execution.Job.State)?.Checkpoint)
-			.Should().BeNull();
+			.Should()
+			.BeNull();
 		AssertPublishedProducts([], broker);
 	}
 
@@ -212,22 +274,39 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		var producer = TestContext.Producers[0];
 		var broker = Broker;
 		var failed = false;
-		SetPublisher(broker, message =>
-		{
-			if (failed || message.Products.All(product => product.Sku != "RETRY-003"))
-				return false;
-			failed = true;
-			return true;
-		});
+		SetPublisher(
+			broker,
+			message =>
+			{
+				if (failed || message.Products.All(product => product.Sku != "RETRY-003"))
+					return false;
+				failed = true;
+				return true;
+			});
 		var fileName = $"{Guid.NewGuid():N}.csv";
 		var committedPrefix = "Sku,Name,Producer\n" +
-			CsvRow("FIRST-001", "First product", producer.Name) + "\n" +
-			CsvRow("FIRST-002", "Second product", producer.Name) + "\n";
+			CsvRow(
+				"FIRST-001",
+				"First product",
+				producer.Name) + "\n" +
+			CsvRow(
+				"FIRST-002",
+				"Second product",
+				producer.Name) + "\n";
 		var content = committedPrefix +
-			CsvRow("RETRY-003", "Retried product", producer.Name) + "\n" +
-			CsvRow("RETRY-004", "Another retried product", producer.Name);
+			CsvRow(
+				"RETRY-003",
+				"Retried product",
+				producer.Name) + "\n" +
+			CsvRow(
+				"RETRY-004",
+				"Another retried product",
+				producer.Name);
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
-		storage.SetFile("uploads", fileName, content);
+		storage.SetFile(
+			"uploads",
+			fileName,
+			content);
 
 		var execution = await ExecuteLrt(
 			JsonSerializer.Serialize(new ProductImportInputState { FileName = fileName }),
@@ -238,8 +317,13 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		var checkpoint = execution.GetState<ProductImportState>().Checkpoint!;
 		checkpoint.CurrentLine.Should().Be(4);
 		checkpoint.Offset.Should().Be(Encoding.UTF8.GetByteCount(content));
-		storage.GetDownloadOffsets("uploads", fileName).Should().Equal(0, Encoding.UTF8.GetByteCount(committedPrefix));
-		var ids = await Context.Products.AsNoTracking().Select(product => product.Id).ToListAsync(CancellationToken);
+		storage.GetDownloadOffsets("uploads", fileName)
+			.Should()
+			.Equal(0, Encoding.UTF8.GetByteCount(committedPrefix));
+		var ids = await Context.Set<Product>()
+			.AsNoTracking()
+			.Select(product => product.Id)
+			.ToListAsync(CancellationToken);
 		ids.Should().HaveCount(4);
 		AssertPublishedProducts(ids, broker);
 	}
@@ -261,14 +345,26 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 	{
 		broker ??= Broker;
 		var expected = ids.ToArray();
-		broker.PublishedMessagesOfType<ProductsUpdatedEvent>().SelectMany(message => message.Products)
-			.Select(product => product.Id).Should().BeEquivalentTo(expected);
-		broker.PublishedMessagesOfType<ProductCharacteristicsUpdatedEvent>().SelectMany(message => message.Products)
-			.Select(product => product.ProductId).Should().BeEquivalentTo(expected);
-		broker.PublishedMessagesOfType<ProductDimensionsUpdatedEvent>().SelectMany(message => message.Products)
-			.Select(product => product.ProductId).Should().BeEquivalentTo(expected);
-		broker.PublishedMessagesOfType<ProductWeightUpdatedEvent>().SelectMany(message => message.Products)
-			.Select(product => product.ProductId).Should().BeEquivalentTo(expected);
+		broker.PublishedMessagesOfType<ProductsUpdatedEvent>()
+			.SelectMany(message => message.Products)
+			.Select(product => product.Id)
+			.Should()
+			.BeEquivalentTo(expected);
+		broker.PublishedMessagesOfType<ProductCharacteristicsUpdatedEvent>()
+			.SelectMany(message => message.Products)
+			.Select(product => product.ProductId)
+			.Should()
+			.BeEquivalentTo(expected);
+		broker.PublishedMessagesOfType<ProductDimensionsUpdatedEvent>()
+			.SelectMany(message => message.Products)
+			.Select(product => product.ProductId)
+			.Should()
+			.BeEquivalentTo(expected);
+		broker.PublishedMessagesOfType<ProductWeightUpdatedEvent>()
+			.SelectMany(message => message.Products)
+			.Select(product => product.ProductId)
+			.Should()
+			.BeEquivalentTo(expected);
 	}
 
 	public sealed class TestProductImportLrt(
@@ -276,7 +372,12 @@ public sealed class ProductImportLrtTests : CsvLrtIntegrationTest<ProductImportL
 		IApplicationTransactionFactory transactions,
 		IOptions<S3BucketsOptions> buckets,
 		ILogger<ProductImportLrt> logger,
-		IContextualLocalizer localizer) : ProductImportLrt(storage, transactions, buckets, logger, localizer)
+		IContextualLocalizer localizer) : ProductImportLrt(
+		storage,
+		transactions,
+		buckets,
+		logger,
+		localizer)
 	{
 		protected override int BatchSize => 2;
 	}

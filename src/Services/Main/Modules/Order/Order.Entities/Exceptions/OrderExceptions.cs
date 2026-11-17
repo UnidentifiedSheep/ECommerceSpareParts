@@ -1,0 +1,13 @@
+using Exceptions.Base.Localized;
+
+namespace Main.Entities.Order.Exceptions;
+
+public sealed class OrderNotFoundException(Guid id) : LocalizedNotFoundException(
+	OrderNotFoundMessage.Instance,
+	new { Id = id });
+
+public sealed class OrderReadAccessDeniedException()
+	: LocalizedForbiddenException(OrderReadAccessDeniedMessage.Instance);
+
+public sealed class OrderWriteAccessDeniedException()
+	: LocalizedForbiddenException(OrderWriteAccessDeniedMessage.Instance);

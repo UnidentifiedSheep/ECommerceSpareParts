@@ -1,9 +1,9 @@
-using Application.Common.Querying;
-using Abstractions.Models;
 using Application.Common.Models;
+using Application.Common.Querying;
+using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Sales.GetProductSaleHistory;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
 using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -14,9 +14,7 @@ namespace Tests.HandlersTests.Sales;
 public class GetProductSaleHistoryTests : IntegrationTest
 {
 	public GetProductSaleHistoryTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<SaleTestContext>();
-	}
+		=> RegisterBasicContext<SaleTestContext>();
 
 	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
 
@@ -101,7 +99,10 @@ public class GetProductSaleHistoryTests : IntegrationTest
 	{
 		var sale = SaleContext.Sale;
 		var first = sale.Contents.Single();
-		first.SetPriceAndDetails(100m, 90m, first.Details.ToArray());
+		first.SetPriceAndDetails(
+			100m,
+			90m,
+			first.Details.ToArray());
 		var second = new SaleContentBuilder(Faker)
 			.WithProductId(first.ProductId)
 			.WithPrices(200m, 80m)
@@ -116,7 +117,9 @@ public class GetProductSaleHistoryTests : IntegrationTest
 
 		var result = await Mediator.Send(CreateQuery(sortBy: [sortBy]), CancellationToken);
 
-		result.History.Select(content => content.SaleContentId).Should()
+		result.History
+			.Select(content => content.SaleContentId)
+			.Should()
 			.Equal(firstContentFirst ? [first.Id, second.Id] : [second.Id, first.Id]);
 	}
 
@@ -157,7 +160,15 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
-			CreateQuery(sortBy: [new SortExpression("organizationMatch", true, preferredSale.OrganizationId.ToString()), "saleDate_desc"]),
+			CreateQuery(
+				sortBy:
+				[
+					new SortExpression(
+						"organizationMatch",
+						true,
+						preferredSale.OrganizationId.ToString()),
+					"saleDate_desc"
+				]),
 			CancellationToken);
 
 		result
@@ -176,9 +187,10 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		var crossProduct = products.First(x => x.Id != SaleContext.Product.Id);
 		var unrelatedProduct = products.First(x => x.Id != SaleContext.Product.Id && x.Id != crossProduct.Id);
 
-		await Context.ProductCrosses.AddAsync(
-			ProductCross.Create(SaleContext.Product.Id, crossProduct.Id),
-			CancellationToken);
+		await Context.Set<ProductCross>()
+			.AddAsync(
+				ProductCross.Create(SaleContext.Product.Id, crossProduct.Id),
+				CancellationToken);
 
 		var crossContent = new SaleContentBuilder(Faker)
 			.WithProductId(crossProduct.Id)
@@ -210,10 +222,16 @@ public class GetProductSaleHistoryTests : IntegrationTest
 
 		var withoutCrosses = await Mediator.Send(CreateQuery(sortBy: ["saleDate_desc"]), CancellationToken);
 		var firstPage = await Mediator.Send(
-			CreateQuery(sortBy: ["saleDate_desc"], showCrosses: true, pagination: new Pagination(0, 1)),
+			CreateQuery(
+				sortBy: ["saleDate_desc"],
+				showCrosses: true,
+				pagination: new Pagination(0, 1)),
 			CancellationToken);
 		var secondPage = await Mediator.Send(
-			CreateQuery(sortBy: ["saleDate_desc"], showCrosses: true, pagination: new Pagination(1, 1)),
+			CreateQuery(
+				sortBy: ["saleDate_desc"],
+				showCrosses: true,
+				pagination: new Pagination(1, 1)),
 			CancellationToken);
 
 		withoutCrosses.History.Should().ContainSingle().Which.SaleContentId.Should().Be(originalContent.Id);
@@ -224,9 +242,16 @@ public class GetProductSaleHistoryTests : IntegrationTest
 	[Fact]
 	public async Task OrganizationMatch_InvalidGuid_ThrowsInvalidInputException()
 	{
-		var query = CreateQuery(sortBy: [new SortExpression("organizationMatch", true, "not-a-guid")]);
+		var query = CreateQuery(
+			sortBy:
+			[
+				new SortExpression(
+					"organizationMatch",
+					true,
+					"not-a-guid")
+			]);
 
-		await Assert.ThrowsAsync<Exceptions.InvalidInputException>(() => Mediator.Send(query, CancellationToken));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(query, CancellationToken));
 	}
 
 	private GetProductSaleHistoryQuery CreateQuery(
@@ -236,8 +261,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 		IReadOnlyCollection<SortExpression>? sortBy = null,
 		bool showCrosses = false,
 		Pagination? pagination = null)
-	{
-		return new GetProductSaleHistoryQuery(
+		=> new(
 			SaleContext.Product.Id,
 			pagination ?? new Pagination(0, 20),
 			storageCode,
@@ -245,5 +269,4 @@ public class GetProductSaleHistoryTests : IntegrationTest
 			currencyId,
 			sortBy ?? [],
 			showCrosses);
-	}
 }

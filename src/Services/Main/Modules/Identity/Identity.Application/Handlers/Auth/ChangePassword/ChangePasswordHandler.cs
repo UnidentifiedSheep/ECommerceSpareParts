@@ -1,0 +1,41 @@
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using Attributes;
+using Main.Entities.Exceptions;
+using Main.Entities.User;
+using Main.Modules.Identity.Application.Interfaces.Persistence;
+using MediatR;
+using Security.Core.Interfaces;
+
+namespace Main.Modules.Identity.Application.Handlers.Auth.ChangePassword;
+
+[AutoSave]
+[Transactional]
+public record ChangePasswordCommand(Guid UserId, string PreviousPassword, string NewPassword) : ICommand;
+
+public class ChangePasswordHandler(IUserRepository userRepository, IPasswordManager passwordManager)
+	: ICommandHandler<ChangePasswordCommand>
+{
+	public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
+	{
+		var user = await userRepository.FirstOrDefaultAsync(
+				Criteria<User>.New()
+					.Where(user => user.Id == request.UserId)
+					.Track()
+					.ForUpdate()
+					.Build(),
+				cancellationToken) ??
+			throw new UserNotFoundException(request.UserId);
+
+		if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
+			throw new WrongCredentialsException(null, request.PreviousPassword);
+
+		user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
+
+		await userRepository.RevokeRefreshTokensAsync(
+			user.Id,
+			"Password changed",
+			cancellationToken);
+		return Unit.Value;
+	}
+}

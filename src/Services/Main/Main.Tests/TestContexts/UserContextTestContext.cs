@@ -1,13 +1,12 @@
-﻿using Security.Core.Interfaces;
-using Abstractions.Interfaces;
-using Application.Common.Interfaces.Settings;
-using Main.Persistence.Context;
+﻿using Application.Common.Interfaces.Settings;
+using Persistence.Context;
+using Security.Core.Interfaces;
 using Tests.Stubs;
 
 namespace Tests.TestContexts;
 
 public class UserContextTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	ISettingsService settingsService,
 	TestSystemOptionsAccessor systemOptionsAccessor,
 	IUserContext userContext) : GlobalApplicationSettingTestContext(

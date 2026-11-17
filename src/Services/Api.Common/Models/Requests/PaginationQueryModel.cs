@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Application.Common.Models;
+﻿using Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.Models.Requests;
@@ -12,6 +11,6 @@ public record PaginationQueryModel
 	[FromQuery(Name = "size")]
 	public int? Size { get; init; }
 
-	public static implicit operator Pagination(PaginationQueryModel queryModel) =>
-		new(queryModel.Page ?? 0, queryModel.Size ?? 20);
+	public static implicit operator Pagination(PaginationQueryModel queryModel)
+		=> new(queryModel.Page ?? 0, queryModel.Size ?? 20);
 }

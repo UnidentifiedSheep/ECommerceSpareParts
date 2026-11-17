@@ -1,6 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -13,9 +14,7 @@ public sealed class
 	MapCatalogueCandidatesToProductsLrtTests : LrtIntegrationTest<MapCatalogueCandidatesToProductsLrt>
 {
 	public MapCatalogueCandidatesToProductsLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -39,7 +38,7 @@ public sealed class
 
 		Context.ChangeTracker.Clear();
 		var persistedCandidate = await Context
-			.CatalogueCandidates
+			.Set<CatalogueCandidate>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().Be(product.Id);
@@ -64,7 +63,7 @@ public sealed class
 
 		Context.ChangeTracker.Clear();
 		var persistedCandidate = await Context
-			.CatalogueCandidates
+			.Set<CatalogueCandidate>()
 			.AsNoTracking()
 			.SingleAsync(x => x.Id == candidate.Id, CancellationToken);
 		persistedCandidate.ProductId.Should().BeNull();

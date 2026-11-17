@@ -5,8 +5,8 @@ namespace Application.Common.Services.Events;
 
 public class DomainEventScope : IDomainEventScope
 {
-	private readonly DomainEventBuffer _beforeSave = new();
 	private readonly DomainEventBuffer _afterSave = new();
+	private readonly DomainEventBuffer _beforeSave = new();
 	private int _collectionDepth;
 
 	public bool IsCollectionEnabled => _collectionDepth > 0;

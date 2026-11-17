@@ -51,14 +51,18 @@ public sealed class SearchInCatalogueHandlerTests
 					],
 					7));
 		var handler = CreateHandler();
-		var productCriteria = new ProductSearchCriteria { Weight = new() { Range = new() { Gt = 0 } } };
+		var productCriteria = new ProductSearchCriteria
+			{ Weight = new WeightSearchCriteria { Range = new RangeCriteria<decimal> { Gt = 0 } } };
 
 		var result = await handler.Handle(
 			CreateQuery(
-				new HashSet<SearchTarget>
+					new HashSet<SearchTarget>
+					{
+						SearchTarget.Products, SearchTarget.CatalogueCandidates
+					}) with
 				{
-					SearchTarget.Products, SearchTarget.CatalogueCandidates
-				}) with { ProductCriteria = productCriteria },
+					ProductCriteria = productCriteria
+				},
 			CancellationToken.None);
 
 		result.Products.Total.Should().Be(11);
@@ -66,7 +70,12 @@ public sealed class SearchInCatalogueHandlerTests
 		result.Products.Items.Single().ProductGroupId.Should().Be(product.ProductGroupId);
 		result.SearchInCatalogueCandidates.Total.Should().Be(7);
 		result.SearchInCatalogueCandidates.Items.Should().ContainSingle().Which.Id.Should().Be(candidate.Id);
-		result.SearchInCatalogueCandidates.Items.Single().MappedProductId.Should().Be(candidate.MappedProductId);
+		result.SearchInCatalogueCandidates
+			.Items
+			.Single()
+			.MappedProductId
+			.Should()
+			.Be(candidate.MappedProductId);
 		receivedCriteria.Should().NotBeNull();
 		receivedCriteria!.Query.Should().Be("bosch 123");
 		receivedCriteria.ProducerIds.Should().Equal(42);
@@ -146,8 +155,7 @@ public sealed class SearchInCatalogueHandlerTests
 		IReadOnlySet<SearchTarget> targets,
 		bool includeHighlights = false,
 		CandidateMappingStatus candidateMappingStatus = CandidateMappingStatus.Unmapped)
-	{
-		return new SearchInCatalogueQuery(
+		=> new(
 			"  bosch 123  ",
 			targets,
 			new HashSet<SearchMatchType>
@@ -165,11 +173,9 @@ public sealed class SearchInCatalogueHandlerTests
 			candidateMappingStatus,
 			includeHighlights,
 			[7, 7, 8]);
-	}
 
 	private static ProductDocument CreateProduct()
-	{
-		return new ProductDocument
+		=> new()
 		{
 			Id = 123,
 			Sku = "BOSCH-123",
@@ -179,11 +185,9 @@ public sealed class SearchInCatalogueHandlerTests
 			ProductGroupId = 7,
 			Indicator = null
 		};
-	}
 
 	private static CatalogueCandidateDocument CreateCandidate()
-	{
-		return new CatalogueCandidateDocument
+		=> new()
 		{
 			Id = Guid.NewGuid(),
 			Sku = "BOSCH-123",
@@ -192,5 +196,4 @@ public sealed class SearchInCatalogueHandlerTests
 			MappedProductId = null,
 			Names = ["Candidate name"]
 		};
-	}
 }

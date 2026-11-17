@@ -5,8 +5,8 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.User;
 using Main.Api.GraphQl.Types.User;
-using Main.Application.Handlers.Users.GetUsers;
-using Main.Application.Handlers.Users.SearchUsers;
+using Main.Modules.Identity.Application.Handlers.Users.GetUsers;
+using Main.Modules.Identity.Application.Handlers.Users.SearchUsers;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

@@ -1,13 +1,14 @@
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Analytics.Lrts.SaleAnalyticsSynchronization;
-using Main.Application.Lrts.Base.Synchronization;
-using Main.Application.Interfaces.Services.Currency;
-using Main.Entities.Sale;
+using Main.Entities.Analytics;
+using Main.Entities.Sale.Sale;
+using Main.Modules.Analytics.Application.Lrts.SaleAnalyticsSynchronization;
+using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -21,7 +22,8 @@ namespace Tests.LrtsTests;
 
 public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 {
-	public SaleAnalyticsSynchronizationLrtTests(CombinedContainerFixture fixture) : base(fixture) => RegisterBasicContext<SaleTestContext>();
+	public SaleAnalyticsSynchronizationLrtTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<SaleTestContext>();
 
 	[Fact]
 	public async Task Synchronize_RebuildsMissingAndExistingFactsWithoutDuplicates()
@@ -30,74 +32,123 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 		var context = GetContext<SaleTestContext>();
 		for (var index = 0; index < 2; index++)
 		{
-			var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithPurchasePrice(40m)
-				.WithCurrencyId(context.Sale.CurrencyId).WithStorageContentIds([context.StorageContent.Id]).Build();
-			context.Sale.AddContent(new SaleContentBuilder(Faker).WithProductId(context.Product.Id)
-				.WithPrices(120m, 90m).WithDetails([detail]).Build());
+			var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
+				.WithPurchasePrice(40m)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithStorageContentIds([context.StorageContent.Id])
+				.Build();
+			context.Sale.AddContent(
+				new SaleContentBuilder(Faker).WithProductId(context.Product.Id)
+					.WithPrices(120m, 90m)
+					.WithDetails([detail])
+					.Build());
 		}
+
 		await Context.SaveChangesAsync(CancellationToken);
-		await Context.SaleContentAnalytics.ExecuteDeleteAsync(CancellationToken);
+		await Context.Set<SaleContentAnalytics>().ExecuteDeleteAsync(CancellationToken);
 		var first = await Execute();
 		first.Status.Should().Be(JobStatus.Succeeded, first.ErrorMessage);
-		var (_, checkpoint) = LrtStateSerializer.Deserialize<NoneInputState, SynchronizationState<Guid>>(first.State);
+		var (_, checkpoint) =
+			LrtStateSerializer.Deserialize<NoneInputState, SynchronizationState<Guid>>(first.State);
 		checkpoint!.ProcessedCount.Should().Be(4);
-		var before = await Context.SaleContentAnalytics.AsNoTracking().OrderBy(item => item.SaleContentId).ToListAsync(CancellationToken);
+		var before = await Context.Set<SaleContentAnalytics>()
+			.AsNoTracking()
+			.OrderBy(item => item.SaleContentId)
+			.ToListAsync(CancellationToken);
 		before.Should().HaveCount(6);
 		var second = await Execute();
 		second.Status.Should().Be(JobStatus.Succeeded, second.ErrorMessage);
-		(await Context.SaleContentAnalytics.AsNoTracking().OrderBy(item => item.SaleContentId).ToListAsync(CancellationToken))
-			.Should().BeEquivalentTo(before);
+		(await Context.Set<SaleContentAnalytics>()
+				.AsNoTracking()
+				.OrderBy(item => item.SaleContentId)
+				.ToListAsync(CancellationToken))
+			.Should()
+			.BeEquivalentTo(before);
 	}
 
 	[Fact]
 	public async Task Failure_PreservesCompletedBatchAndResumeSkipsItsRows()
 	{
-		var bad = await AddSales(invalidLast: true);
-		await Context.SaleContentAnalytics.ExecuteDeleteAsync(CancellationToken);
+		var bad = await AddSales(true);
+		await Context.Set<SaleContentAnalytics>().ExecuteDeleteAsync(CancellationToken);
 		var failed = await Execute();
 		failed.Status.Should().NotBe(JobStatus.Succeeded);
-		var (_, checkpoint) = LrtStateSerializer.Deserialize<NoneInputState, SynchronizationState<Guid>>(failed.State);
+		var (_, checkpoint) =
+			LrtStateSerializer.Deserialize<NoneInputState, SynchronizationState<Guid>>(failed.State);
 		checkpoint!.ProcessedCount.Should().Be(2);
-		(await Context.SaleContentAnalytics.CountAsync(CancellationToken)).Should().Be(2);
+		(await Context.Set<SaleContentAnalytics>().CountAsync(CancellationToken)).Should().Be(2);
 
-		var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithCurrencyId(GetContext<SaleTestContext>().Sale.CurrencyId)
-			.WithStorageContentIds([GetContext<SaleTestContext>().StorageContent.Id]).WithPurchasePrice(40m).Build();
-		bad.SetPriceAndDetails(120m, 90m, [detail]);
+		var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
+			.WithCurrencyId(GetContext<SaleTestContext>().Sale.CurrencyId)
+			.WithStorageContentIds([GetContext<SaleTestContext>().StorageContent.Id])
+			.WithPurchasePrice(40m)
+			.Build();
+		bad.SetPriceAndDetails(
+			120m,
+			90m,
+			[detail]);
 		await Context.SaveChangesAsync(CancellationToken);
-		var retained = await Context.SaleContentAnalytics.OrderBy(item => item.SaleContentId).FirstAsync(CancellationToken);
-		retained.Update(1m, 1m, 1m);
+		var retained = await Context.Set<SaleContentAnalytics>()
+			.OrderBy(item => item.SaleContentId)
+			.FirstAsync(CancellationToken);
+		retained.Update(
+			retained.SaleId,
+			retained.OrganizationId,
+			retained.BuyerId,
+			retained.SaleDatetime,
+			retained.Count,
+			1m,
+			1m,
+			1m);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var resumed = await Execute(checkpoint);
 		resumed.Status.Should().Be(JobStatus.Succeeded, resumed.ErrorMessage);
-		(await Context.SaleContentAnalytics.CountAsync(CancellationToken)).Should().Be(4);
-		(await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(item => item.SaleContentId == retained.SaleContentId, CancellationToken))
-			.RevenueInBaseCurrency.Should().Be(1m);
+		(await Context.Set<SaleContentAnalytics>().CountAsync(CancellationToken)).Should().Be(4);
+		(await Context.Set<SaleContentAnalytics>()
+				.AsNoTracking()
+				.SingleAsync(item => item.SaleContentId == retained.SaleContentId, CancellationToken))
+			.RevenueInBaseCurrency
+			.Should()
+			.Be(1m);
 	}
 
 	[Fact]
-	public async Task Synchronize_SoftDeletedSale_PreservesItsFacts()
+	public async Task Synchronize_SoftDeletedSale_KeepsAmountsAndDeactivatesFacts()
 	{
-		var before = await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken);
+		var before = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(CancellationToken);
 		GetContext<SaleTestContext>().Sale.Delete();
 		await Context.SaveChangesAsync(CancellationToken);
 		var job = await Execute();
 		job.Status.Should().Be(JobStatus.Succeeded, job.ErrorMessage);
-		(await Context.SaleContentAnalytics.AsNoTracking().SingleAsync(CancellationToken)).Should().BeEquivalentTo(before);
+		var after = await Context.Set<SaleContentAnalytics>().AsNoTracking().SingleAsync(CancellationToken);
+		after.IsCompleted.Should().BeFalse();
+		after.Should().BeEquivalentTo(before, options => options.Excluding(item => item.IsCompleted));
 	}
 
 	private async Task<SaleContent> AddSales(bool invalidLast = false)
 	{
 		var context = GetContext<SaleTestContext>();
-		var sales = new List<Main.Entities.Sale.Sale> { context.Sale };
+		var sales = new List<Sale> { context.Sale };
 		for (var index = 0; index < 3; index++)
 		{
-			var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithPurchasePrice(40m)
-				.WithStorageContentIds([context.StorageContent.Id]).WithCurrencyId(context.Sale.CurrencyId).Build();
-			var content = new SaleContentBuilder(Faker).WithProductId(context.Product.Id).WithPrices(120m, 90m).WithDetails([detail]).Build();
-			var sale = new SaleBuilder(Faker).WithUserId(context.Buyer.Id).WithOrganizationId(context.Buyer.Id)
-				.WithCurrencyId(context.Sale.CurrencyId).WithStorageCode(context.Sale.StorageCode)
-				.WithTransactionId(context.Transaction.Id).WithContents([content]).Completed().Build();
+			var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
+				.WithPurchasePrice(40m)
+				.WithStorageContentIds([context.StorageContent.Id])
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.Build();
+			var content = new SaleContentBuilder(Faker).WithProductId(context.Product.Id)
+				.WithPrices(120m, 90m)
+				.WithDetails([detail])
+				.Build();
+			var sale = new SaleBuilder(Faker).WithUserId(context.Buyer.Id)
+				.WithOrganizationId(context.Buyer.Id)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithStorageCode(context.Sale.StorageCode)
+				.WithTransactionId(context.Transaction.Id)
+				.WithContents([content])
+				.Completed()
+				.Build();
 			sales.Add(sale);
 			await Context.AddAsync(sale, CancellationToken);
 		}
@@ -107,34 +158,60 @@ public class SaleAnalyticsSynchronizationLrtTests : IntegrationTest
 		{
 			var rates = GetContext<CurrencyRatesTestContext>();
 			var rate = rates.Rates.First();
-			await rates.SetHistoryAsync(rate, [], CancellationToken);
-			await Scope.ServiceProvider.GetRequiredService<ICurrencyRateSnapshotProvider>().Reload(CancellationToken);
-			var detail = new SaleContentDetailBuilder(Faker).WithCount(1).WithPurchasePrice(40m)
+			await rates.SetHistoryAsync(
+				rate,
+				[],
+				CancellationToken);
+			await Scope.ServiceProvider
+				.GetRequiredService<ICurrencyRateSnapshotProvider>()
+				.Reload(CancellationToken);
+			var detail = new SaleContentDetailBuilder(Faker).WithCount(1)
+				.WithPurchasePrice(40m)
 				.WithStorageContentIds([context.StorageContent.Id])
 				.WithCurrencyId(rate.FromCurrencyId)
-				.WithPurchaseDate(new DateTime(1990, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Build();
-			last.SetPriceAndDetails(120m, 90m, [detail]);
+				.WithPurchaseDate(
+					new DateTime(
+						1990,
+						1,
+						1,
+						0,
+						0,
+						0,
+						DateTimeKind.Utc))
+				.Build();
+			last.SetPriceAndDetails(
+				120m,
+				90m,
+				[detail]);
 		}
+
 		await Context.SaveChangesAsync(CancellationToken);
 		return last;
 	}
 
 	private async Task<SingleRunJob> Execute(SynchronizationState<Guid>? checkpoint = null)
 	{
-		Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher = new MessageBrokerStub();
+		Scope.ServiceProvider.GetRequiredService<PublishEndpointAccessor>().Publisher =
+			new MessageBrokerStub();
 		var lrt = ActivatorUtilities.CreateInstance<SmallBatchLrt>(Scope.ServiceProvider);
-		var state = checkpoint is null ? lrt.ValidateState("{}") : LrtStateSerializer.Serialize(new NoneInputState(), checkpoint);
-		var job = SingleRunJob.Create(lrt.SystemName, state, 3);
+		var state = checkpoint is null
+			? lrt.ValidateState("{}")
+			: LrtStateSerializer.Serialize(new NoneInputState(), checkpoint);
+		var job = SingleRunJob.Create(lrt.SystemName, state);
 		var holder = Guid.NewGuid();
 		job.AcquireLease(holder, TimeSpan.FromMinutes(5));
 		await Context.AddAsync(job, CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
-		await lrt.ExecuteAsync(job.Id, holder, CancellationToken);
+		await lrt.ExecuteAsync(
+			job.Id,
+			holder,
+			CancellationToken);
 		await Context.Entry(job).ReloadAsync(CancellationToken);
 		return job;
 	}
 
-	private sealed class SmallBatchLrt(IApplicationTransactionFactory transactions, ILogger<SaleAnalyticsSynchronizationLrt> logger)
+	private sealed class SmallBatchLrt(IApplicationTransactionFactory transactions,
+		ILogger<SaleAnalyticsSynchronizationLrt> logger)
 		: SaleAnalyticsSynchronizationLrt(transactions, logger)
 	{
 		protected override int BatchSize => 2;

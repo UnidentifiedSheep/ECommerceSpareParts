@@ -1,7 +1,8 @@
+using Enums;
 using FluentAssertions;
-using Main.Application.Handlers.Balance;
-using Main.Entities.Organization;
-using Main.Enums.Balances;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Balance.Enums.Balances;
+using Main.Modules.Balance.Application.Handlers.Balance;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -42,7 +43,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -53,11 +54,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,
@@ -86,7 +87,7 @@ public class CreateSystemTransactionTests : IntegrationTest
 			CancellationToken);
 
 		var transaction = await Context
-			.Transactions
+			.Set<Transaction>()
 			.AsNoTracking()
 			.FirstAsync(x => x.Id == result.Transaction.Id, CancellationToken);
 
@@ -97,11 +98,11 @@ public class CreateSystemTransactionTests : IntegrationTest
 		transaction.IsCompleted.Should().BeTrue();
 
 		var userBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(x => x.OrganizationId == user.Id && x.CurrencyId == currency.Id, CancellationToken);
 		var systemBalance = await Context
-			.UserBalances
+			.Set<OrganizationBalance>()
 			.AsNoTracking()
 			.FirstAsync(
 				x => x.OrganizationId == systemUser.Id && x.CurrencyId == currency.Id,

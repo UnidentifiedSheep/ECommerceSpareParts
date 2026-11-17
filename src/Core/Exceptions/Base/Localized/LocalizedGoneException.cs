@@ -6,15 +6,11 @@ namespace Exceptions.Base.Localized;
 public abstract class LocalizedGoneException : GoneException, ILocalizableException
 {
 	protected LocalizedGoneException(ILocalizableMessage message) : base(null)
-	{
-		LocalizableMessage = message;
-	}
+		=> LocalizableMessage = message;
 
 	protected LocalizedGoneException(ILocalizableMessage message, object relatedData)
 		: base(null, relatedData)
-	{
-		LocalizableMessage = message;
-	}
+		=> LocalizableMessage = message;
 
 	public ILocalizableMessage LocalizableMessage { get; }
 }

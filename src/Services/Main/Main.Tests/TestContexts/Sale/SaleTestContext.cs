@@ -1,12 +1,12 @@
-using Microsoft.EntityFrameworkCore;
-using Main.Entities.Balance;
-using Main.Entities.Organization;
-using Main.Entities.Product;
-using Main.Entities.Storage;
+using Enums;
+using Main.Entities.Analytics;
+using Main.Entities.Balance.Balance;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Stock;
+using Main.Entities.Storage.Storage;
 using Main.Entities.User;
-using Main.Enums;
-using Main.Enums.Balances;
-using Main.Persistence.Context;
+using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
@@ -15,16 +15,16 @@ using Tests.Extensions;
 using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
-using DomainSale = Main.Entities.Sale.Sale;
+using DomainSale = Main.Entities.Sale.Sale.Sale;
 
 namespace Tests.TestContexts.Sale;
 
 public class SaleTestContext(
-	DContext context,
+	UnifiedDbContext context,
 	UserContextTestContext userContext,
 	ProductTestContext productContext,
 	StorageContentTestContext storageContentContext,
-	CurrencyTestContext currencyContext) : TestContextBase<DContext>(context), IDependentTestContext
+	CurrencyTestContext currencyContext) : TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public User Buyer { get; private set; } = null!;
 
@@ -105,16 +105,27 @@ public class SaleTestContext(
 			.Build();
 
 		StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
-		var stock = await DbContext.ProductStocks.SingleAsync(
-			item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id, cancellationToken);
+		var stock = await DbContext.Set<ProductStock>()
+			.SingleAsync(
+				item => item.StorageCode == StorageContent.StorageCode && item.ProductId == Product.Id,
+				cancellationToken);
 		stock.SetQuantity(stock.Quantity - SoldCount);
 
 		await DbContext.AddAsync(Sale, cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 		foreach (var content in Sale.Contents)
-			await DbContext.AddAsync(Main.Entities.Sale.SaleContentAnalytics.Create(content.Id,
-				content.OriginalPrice * content.Count, content.TotalSum,
-				content.Details.Sum(detail => detail.BuyPrice * detail.Count)), cancellationToken);
+			await DbContext.AddAsync(
+				SaleContentAnalytics.Create(
+					content.Id,
+					Sale.Id,
+					Sale.OrganizationId,
+					Sale.UserId,
+					Sale.SaleDatetime,
+					content.Count,
+					content.OriginalPrice * content.Count,
+					content.TotalSum,
+					content.Details.Sum(detail => detail.BuyPrice * detail.Count)),
+				cancellationToken);
 		await DbContext.SaveChangesAsync(cancellationToken);
 	}
 }

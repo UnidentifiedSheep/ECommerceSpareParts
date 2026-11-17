@@ -1,0 +1,7 @@
+{
+  "culture": "tr",
+  "messages": {
+    "job.not.found": "İstenen görev bulunamadı.",
+    "job.schedule.not.found": "İstenen görev zamanlaması bulunamadı."
+  }
+}

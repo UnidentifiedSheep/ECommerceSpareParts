@@ -7,10 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
-      <ProjectReference Include="..\Integrations.ExchangeRate.Cbr\Integrations.ExchangeRate.Cbr.csproj" />
-      <ProjectReference Include="..\Integrations.ExchangeRate.MoneyConvert\Integrations.ExchangeRate.MoneyConvert.csproj" />
-      <ProjectReference Include="..\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj" />
+        <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj"/>
+        <ProjectReference Include="..\Integrations.ExchangeRate.Cbr\Integrations.ExchangeRate.Cbr.csproj"/>
+        <ProjectReference Include="..\Integrations.ExchangeRate.MoneyConvert\Integrations.ExchangeRate.MoneyConvert.csproj"/>
+        <ProjectReference Include="..\Integrations.ExchangeRate\Integrations.ExchangeRate.csproj"/>
     </ItemGroup>
 
 </Project>

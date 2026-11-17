@@ -8,10 +8,7 @@ public class ConflictException : BaseValuedException
 	{
 	}
 
-	public ConflictException(string? message, string details) : base(message)
-	{
-		Details = details;
-	}
+	public ConflictException(string? message, string details) : base(message) => Details = details;
 
 	public ConflictException(string? message, object relatedData) : base(message, relatedData)
 	{

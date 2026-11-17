@@ -1,0 +1,8 @@
+using NamedObject.Core.Interfaces;
+
+namespace Application.Common.Interfaces;
+
+public interface ILrtNamedObject : ILrt, ILrtDescriptor, ILocalizableNamedObject;
+
+public interface ILrtNamedObject<in TInputState> : ILrtNamedObject, ILrt<TInputState>
+	where TInputState : IInputState;

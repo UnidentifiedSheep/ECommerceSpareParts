@@ -1,15 +1,15 @@
 ﻿using Main.Entities.Currency;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Context;
 using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
 
-public class CurrencySeed : ISeed<DContext>
+public class CurrencySeed : ISeed<UnifiedDbContext>
 {
-	public async Task SeedAsync(DContext context)
+	public async Task SeedAsync(UnifiedDbContext context)
 	{
-		if (await context.Currencies.AnyAsync(x => x.Code == "USD"))
+		if (await context.Set<Currency>().AnyAsync(x => x.Code == "USD"))
 			return;
 
 		var usd = Currency.Create(
@@ -18,7 +18,7 @@ public class CurrencySeed : ISeed<DContext>
 			"$",
 			"USD");
 
-		await context.Currencies.AddAsync(usd);
+		await context.Set<Currency>().AddAsync(usd);
 		await context.SaveChangesAsync();
 	}
 

@@ -1,33 +1,43 @@
 using Enums;
-using Microsoft.Extensions.DependencyInjection;
 using Exceptions;
-using Main.Enums.Orders;
 using FluentAssertions;
+using FluentValidation.TestHelper;
+using Main.Entities;
+using Main.Entities.Auth;
+using Main.Entities.Order.Enums.Orders;
+using Main.Entities.Order.Order;
+using Main.Modules.Order.Application.Orders.Commands.UpsertOrder;
+using Main.Modules.Order.Application.Orders.Dtos;
+using Main.Modules.Order.Application.Orders.Queries;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Security.Core.Interfaces;
+using Tests.Abstractions.Test;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Order;
-
-using FluentValidation.TestHelper;
-using Tests.Abstractions.Test;
-using Main.Entities;
-using Main.Application.Orders.Commands.UpsertOrder;
-using Main.Application.Orders.Dtos;
 
 namespace Tests.HandlersTests.Orders;
 
 public class UpsertOrderTests : IntegrationTest
 {
-	public UpsertOrderTests(CombinedContainerFixture fixture) : base(fixture) => RegisterBasicContext<OrderTestContext>();
+	public UpsertOrderTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<OrderTestContext>();
 	private OrderTestContext Orders => GetContext<OrderTestContext>();
 	private UpsertOrderDto UpdateDto()
 	{
 		var order = Orders.ManualOrder;
-		return new()
+		return new UpsertOrderDto
 		{
 			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
 			UserId = order.UserId, CurrencyId = order.CurrencyId,
-			Items = order.Items.Select(item => new UpsertOrderItemDto
-			{ Id = item.Id, ProductId = item.ProductId, Count = item.Count + 1, UnitPrice = item.UnitPrice }).ToArray()
+			Items = order.Items
+				.Select(item => new UpsertOrderItemDto
+				{
+					Id = item.Id, ProductId = item.ProductId, Count = item.Count + 1,
+					UnitPrice = item.UnitPrice
+				})
+				.ToArray()
 		};
 	}
 
@@ -38,10 +48,13 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = template with
 		{
 			Id = null, RowVersion = null,
-			Items = [new() { ProductId = template.Items.First().ProductId, Count = 2 }]
+			Items = [new UpsertOrderItemDto { ProductId = template.Items.First().ProductId, Count = 2 }]
 		};
 		var result = await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		var created = await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == result.OrderId, CancellationToken);
+		var created = await Context.Set<Order>()
+			.AsNoTracking()
+			.Include(x => x.Items)
+			.SingleAsync(x => x.Id == result.OrderId, CancellationToken);
 		created.Id.Should().NotBe(template.Id!.Value);
 		created.Items.Should().ContainSingle().Which.Count.Should().Be(2);
 	}
@@ -52,9 +65,16 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = UpdateDto();
 		var otherVersion = Orders.OnlineOrder.RowVersion;
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		var updated = await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken);
+		var updated = await Context.Set<Order>()
+			.AsNoTracking()
+			.Include(x => x.Items)
+			.SingleAsync(x => x.Id == dto.Id, CancellationToken);
 		updated.Items.Should().ContainSingle().Which.Count.Should().Be(dto.Items.Single().Count);
-		(await Context.Orders.AsNoTracking().SingleAsync(x => x.Id == Orders.OnlineOrder.Id, CancellationToken)).RowVersion.Should().Be(otherVersion);
+		(await Context.Set<Order>()
+				.AsNoTracking()
+				.SingleAsync(x => x.Id == Orders.OnlineOrder.Id, CancellationToken)).RowVersion
+			.Should()
+			.Be(otherVersion);
 	}
 
 	[Fact]
@@ -63,8 +83,15 @@ public class UpsertOrderTests : IntegrationTest
 		var dto = UpdateDto();
 		dto = dto with { Items = [dto.Items.Single() with { UnitPrice = 200m }] };
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
-		(await Context.Orders.AsNoTracking().Include(x => x.Items).SingleAsync(x => x.Id == dto.Id, CancellationToken))
-			.Items.Single().UnitPrice.Should().Be(200m);
+		(await Context.Set<Order>()
+				.AsNoTracking()
+				.Include(x => x.Items)
+				.SingleAsync(x => x.Id == dto.Id, CancellationToken))
+			.Items
+			.Single()
+			.UnitPrice
+			.Should()
+			.Be(200m);
 	}
 	[Theory]
 	[InlineData(false)]
@@ -77,28 +104,49 @@ public class UpsertOrderTests : IntegrationTest
 			order.Confirm(order.UserId);
 			await Context.SaveChangesAsync(CancellationToken);
 		}
+
 		var retained = order.Items[0];
 		var removed = order.Items[1];
-		var otherItemIds = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
-			.Select(item => item.Id).ToArrayAsync(CancellationToken);
+		var otherItemIds = await Context.Set<OrderItem>()
+			.AsNoTracking()
+			.Where(item => item.OrderId != order.Id)
+			.Select(item => item.Id)
+			.ToArrayAsync(CancellationToken);
 		var dto = new UpsertOrderDto
 		{
 			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
 			UserId = order.UserId, CurrencyId = order.CurrencyId,
-			Items = [
-				new() { Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count + 1, UnitPrice = retained.UnitPrice },
-				new() { ProductId = removed.ProductId, Count = 7 }]
+			Items =
+			[
+				new UpsertOrderItemDto
+				{
+					Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count + 1,
+					UnitPrice = retained.UnitPrice
+				},
+				new UpsertOrderItemDto { ProductId = removed.ProductId, Count = 7 }
+			]
 		};
 
 		await Mediator.Send(new UpsertOrderCommand(dto), CancellationToken);
 
-		var saved = await Context.OrderItems.AsNoTracking().Where(item => item.OrderId == order.Id && !item.IsDeleted).ToArrayAsync(CancellationToken);
+		var saved = await Context.Set<OrderItem>()
+			.AsNoTracking()
+			.Where(item => item.OrderId == order.Id && !item.IsDeleted)
+			.ToArrayAsync(CancellationToken);
 		saved.Should().HaveCount(2);
 		saved.Single(item => item.Id == retained.Id).Count.Should().Be(dto.Items.First().Count);
 		saved.Single(item => item.Id != retained.Id).Count.Should().Be(7);
-		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken)).IsDeleted.Should().BeTrue();
-		(await Context.OrderItems.AsNoTracking().Where(item => item.OrderId != order.Id)
-			.Select(item => item.Id).ToArrayAsync(CancellationToken)).Should().BeEquivalentTo(otherItemIds);
+		(await Context.Set<OrderItem>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == removed.Id, CancellationToken)).IsDeleted
+			.Should()
+			.BeTrue();
+		(await Context.Set<OrderItem>()
+				.AsNoTracking()
+				.Where(item => item.OrderId != order.Id)
+				.Select(item => item.Id)
+				.ToArrayAsync(CancellationToken)).Should()
+			.BeEquivalentTo(otherItemIds);
 	}
 
 	[Theory]
@@ -115,18 +163,31 @@ public class UpsertOrderTests : IntegrationTest
 		}
 		else if (status == OrderStatus.Deleted) order.Delete();
 		else order.Cancel();
+
 		await Context.SaveChangesAsync(CancellationToken);
 		var retained = order.Items[0];
 		var dto = new UpsertOrderDto
 		{
 			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
 			UserId = order.UserId, CurrencyId = order.CurrencyId,
-			Items = [new() { Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count, UnitPrice = retained.UnitPrice }]
+			Items =
+			[
+				new UpsertOrderItemDto
+				{
+					Id = retained.Id, ProductId = retained.ProductId, Count = retained.Count,
+					UnitPrice = retained.UnitPrice
+				}
+			]
 		};
 
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(
+			new UpsertOrderCommand(dto),
+			CancellationToken));
 
-		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should().Be(2);
+		(await Context.Set<OrderItem>()
+				.AsNoTracking()
+				.CountAsync(item => item.OrderId == order.Id, CancellationToken)).Should()
+			.Be(2);
 	}
 
 	[Fact]
@@ -134,8 +195,13 @@ public class UpsertOrderTests : IntegrationTest
 	{
 		var dto = UpdateDto();
 		dto = dto with { Items = [dto.Items.Single() with { Id = Orders.OnlineOrder.Items[0].Id }] };
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
-		(await Context.OrderItems.AsNoTracking().CountAsync(item => item.OrderId == dto.Id, CancellationToken)).Should().Be(1);
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(
+			new UpsertOrderCommand(dto),
+			CancellationToken));
+		(await Context.Set<OrderItem>()
+				.AsNoTracking()
+				.CountAsync(item => item.OrderId == dto.Id, CancellationToken)).Should()
+			.Be(1);
 	}
 
 	[Fact]
@@ -145,49 +211,73 @@ public class UpsertOrderTests : IntegrationTest
 		var removed = order.Items[1];
 		order.RemoveItem(removed);
 		await Context.SaveChangesAsync(CancellationToken);
-		var userContext = (Stubs.UserContextMock)Scope.ServiceProvider
-			.GetRequiredService<Security.Core.Interfaces.IUserContext>();
-		userContext.SetIsAuthenticated(true).SetUserId(order.UserId!.Value)
-			.SetPermissions([Main.Entities.Auth.Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET)]);
+		var userContext = (UserContextMock)Scope.ServiceProvider
+			.GetRequiredService<IUserContext>();
+		userContext.SetIsAuthenticated(true)
+			.SetUserId(order.UserId!.Value)
+			.SetPermissions([Permission.ToNormalizedPermission(PermissionCodes.ORDERS_GET)]);
 
-		var result = await Mediator.Send(new Main.Application.Orders.Queries.GetOrderItemsByOrderIdsQuery(order.Id), CancellationToken);
+		var result = await Mediator.Send(new GetOrderItemsByOrderIdsQuery(order.Id), CancellationToken);
 		result.Items[order.Id].Should().ContainSingle().Which.Id.Should().NotBe(removed.Id);
 
 		var dto = new UpsertOrderDto
 		{
 			Id = order.Id, RowVersion = order.RowVersion, OrganizationId = order.OrganizationId,
 			UserId = order.UserId, CurrencyId = order.CurrencyId,
-			Items = [new() { Id = removed.Id, ProductId = removed.ProductId, Count = removed.Count, UnitPrice = removed.UnitPrice }]
+			Items =
+			[
+				new UpsertOrderItemDto
+				{
+					Id = removed.Id, ProductId = removed.ProductId, Count = removed.Count,
+					UnitPrice = removed.UnitPrice
+				}
+			]
 		};
-		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(new UpsertOrderCommand(dto), CancellationToken));
-		(await Context.OrderItems.AsNoTracking().SingleAsync(item => item.Id == removed.Id, CancellationToken))
-			.IsDeleted.Should().BeTrue();
+		await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(
+			new UpsertOrderCommand(dto),
+			CancellationToken));
+		(await Context.Set<OrderItem>()
+				.AsNoTracking()
+				.SingleAsync(item => item.Id == removed.Id, CancellationToken))
+			.IsDeleted
+			.Should()
+			.BeTrue();
 	}
-
 }
 
 public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, UpsertOrderCommand>
 {
-	private static UpsertOrderDto Valid => new()
-	{
-		OrganizationId = Guid.NewGuid(), CurrencyId = 1, RowVersion = null,
-		Items = [new() { ProductId = 1, Count = 1 }]
-	};
+	private static UpsertOrderDto Valid
+		=> new()
+		{
+			OrganizationId = Guid.NewGuid(), CurrencyId = 1, RowVersion = null,
+			Items = [new UpsertOrderItemDto { ProductId = 1, Count = 1 }]
+		};
 
 	[Fact]
 	public async Task Create_WithExistingItemId_IsRejected()
 	{
-		var result = await ValidateAsync(new UpsertOrderCommand(Valid with
-		{ Items = [new() { Id = 1, ProductId = 1, Count = 1 }] }));
+		var result = await ValidateAsync(
+			new UpsertOrderCommand(
+				Valid with
+				{
+					Items = [new UpsertOrderItemDto { Id = 1, ProductId = 1, Count = 1 }]
+				}));
 		result.ShouldHaveValidationErrorFor(x => x.Order.Items)
-			.WithErrorCode(OrderItemInvalidMessage.Instance.MessageKey).Only();
+			.WithErrorCode(OrderItemInvalidMessage.Instance.MessageKey)
+			.Only();
 	}
 
 	[Fact]
 	public async Task Update_WithItemIdAndVersion_IsAccepted()
 	{
-		var result = await ValidateAsync(new UpsertOrderCommand(Valid with
-		{ Id = Guid.NewGuid(), RowVersion = 1, Items = [new() { Id = 1, ProductId = 1, Count = 1 }] }));
+		var result = await ValidateAsync(
+			new UpsertOrderCommand(
+				Valid with
+				{
+					Id = Guid.NewGuid(), RowVersion = 1,
+					Items = [new UpsertOrderItemDto { Id = 1, ProductId = 1, Count = 1 }]
+				}));
 		result.ShouldNotHaveAnyValidationErrors();
 	}
 
@@ -197,17 +287,24 @@ public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, 
 		var result = await ValidateAsync(new UpsertOrderCommand(Valid with { Id = Guid.NewGuid() }));
 		result.ShouldHaveValidationErrorFor(x => x.Order.RowVersion)
 			.WithErrorCode(OrderRowVersionRequiredMessage.Instance.MessageKey)
-			.WithCustomState(OrderRowVersionRequiredMessage.Instance).Only();
+			.WithCustomState(OrderRowVersionRequiredMessage.Instance)
+			.Only();
 	}
 
 	[Fact]
 	public async Task Update_WithDuplicateItemIds_IsRejected()
 	{
 		var item = new UpsertOrderItemDto { Id = 1, ProductId = 1, Count = 1 };
-		var result = await ValidateAsync(new UpsertOrderCommand(Valid with
-		{ Id = Guid.NewGuid(), RowVersion = 1, Items = [item, item with { ProductId = 2, Count = 3 }] }));
+		var result = await ValidateAsync(
+			new UpsertOrderCommand(
+				Valid with
+				{
+					Id = Guid.NewGuid(), RowVersion = 1,
+					Items = [item, item with { ProductId = 2, Count = 3 }]
+				}));
 		result.ShouldHaveValidationErrorFor(x => x.Order.Items)
-			.WithErrorCode(OrderItemsInvalidMessage.Instance.MessageKey).Only();
+			.WithErrorCode(OrderItemsInvalidMessage.Instance.MessageKey)
+			.Only();
 	}
 	[Theory]
 	[InlineData(false)]
@@ -217,7 +314,11 @@ public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, 
 		var dto = Valid with
 		{
 			Id = updating ? Guid.NewGuid() : null, RowVersion = updating ? 1u : null,
-			Items = [new() { ProductId = 1, Count = 1 }, new() { ProductId = 2, Count = 2 }]
+			Items =
+			[
+				new UpsertOrderItemDto { ProductId = 1, Count = 1 },
+				new UpsertOrderItemDto { ProductId = 2, Count = 2 }
+			]
 		};
 		var result = await ValidateAsync(new UpsertOrderCommand(dto));
 		result.ShouldNotHaveAnyValidationErrors();
@@ -229,10 +330,14 @@ public class UpsertOrderValidationTests : ValidationTest<UpsertOrderValidation, 
 		var dto = Valid with
 		{
 			Id = Guid.NewGuid(), RowVersion = 1,
-			Items = [new() { Id = 1, ProductId = 1, Count = 1 }, new() { Id = 2, ProductId = 2, Count = 2 }, new() { ProductId = 3, Count = 1 }]
+			Items =
+			[
+				new UpsertOrderItemDto { Id = 1, ProductId = 1, Count = 1 },
+				new UpsertOrderItemDto { Id = 2, ProductId = 2, Count = 2 },
+				new UpsertOrderItemDto { ProductId = 3, Count = 1 }
+			]
 		};
 		var result = await ValidateAsync(new UpsertOrderCommand(dto));
 		result.ShouldNotHaveAnyValidationErrors();
 	}
-
 }

@@ -1,0 +1,103 @@
+using System.Linq.Expressions;
+using Domain;
+using Domain.CommonEntities.Job;
+using Domain.Interfaces;
+using Domain.Validation;
+
+namespace Main.Entities.Documents.Documents;
+
+public sealed class DocumentGenerationRequest
+	: Entity<DocumentGenerationRequest, Guid>, ILinqEntity<DocumentGenerationRequest, Guid>
+{
+
+	private DocumentGenerationRequest()
+	{
+	}
+
+	private DocumentGenerationRequest(
+		Guid jobId,
+		string documentSystemName,
+		Guid? requesterId)
+	{
+		RequestId = Guid.NewGuid();
+		JobId = jobId.EnsureNotEqual(
+			Guid.Empty,
+			() => new InvalidOperationException("Job ID cannot be empty."));
+		DocumentSystemName = documentSystemName
+			.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Document system name is required."))
+			.EnsureMaxLength(
+				128,
+				() =>
+					new InvalidOperationException("Document system name is too long."));
+
+		RequesterId = requesterId?.EnsureNotEqual(
+			Guid.Empty,
+			() => new InvalidOperationException("Requester ID cannot be empty."));
+		CreatedAt = DateTime.UtcNow;
+	}
+	public Guid RequestId { get; }
+	public Guid JobId { get; private set; }
+	public string DocumentSystemName { get; private set; } = null!;
+	public Guid? RequesterId { get; private set; }
+	public DateTime CreatedAt { get; private set; }
+	public string? BucketName { get; private set; }
+	public string? StorageKey { get; private set; }
+	public DateTime? GeneratedAt { get; private set; }
+	public DateTime? ExpiresAt { get; private set; }
+
+	public Job Job { get; private set; } = null!;
+
+	public static Expression<Func<DocumentGenerationRequest, Guid>> GetKeySelector()
+		=> request => request.RequestId;
+
+	public static Expression<Func<DocumentGenerationRequest, bool>> GetEqualityExpression(Guid key)
+		=> request => request.RequestId == key;
+
+	public static DocumentGenerationRequest Create(
+		Guid jobId,
+		string documentSystemName,
+		Guid? requesterId = null)
+		=> new(
+			jobId,
+			documentSystemName,
+			requesterId);
+
+	public void Complete(
+		string bucketName,
+		string storageKey,
+		DateTime generatedAt,
+		DateTime expiresAt)
+	{
+		if (StorageKey is not null)
+			throw new InvalidOperationException("Document generation is already completed.");
+
+		var validatedBucketName = bucketName
+			.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Bucket name is required."))
+			.EnsureMaxLength(
+				255,
+				() =>
+					new InvalidOperationException("Bucket name is too long."));
+		var validatedStorageKey = storageKey
+			.EnsureNotNullOrWhiteSpace(() =>
+				new InvalidOperationException("Storage key is required."))
+			.EnsureMaxLength(
+				1024,
+				() =>
+					new InvalidOperationException("Storage key is too long."));
+		generatedAt.Ensure(
+			value => value.Kind == DateTimeKind.Utc,
+			() => new InvalidOperationException("Generation time must be UTC."));
+		expiresAt.Ensure(
+			value => value.Kind == DateTimeKind.Utc && value > generatedAt,
+			() => new InvalidOperationException("Expiration time must be UTC and after generation."));
+
+		BucketName = validatedBucketName;
+		StorageKey = validatedStorageKey;
+		GeneratedAt = generatedAt;
+		ExpiresAt = expiresAt;
+	}
+
+	public override Guid GetId() => RequestId;
+}

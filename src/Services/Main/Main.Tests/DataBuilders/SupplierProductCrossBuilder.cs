@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Product.Enrichment;
+using Main.Entities.Product.Product.Enrichment;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -23,9 +23,7 @@ public sealed class SupplierProductCrossBuilder(Faker faker) : BuilderBase<Suppl
 	}
 
 	public SupplierProductCrossBuilder WithSupplierProducts(SupplierProduct left, SupplierProduct right)
-	{
-		return WithLeftSupplierProductId(left.Id).WithRightSupplierProductId(right.Id);
-	}
+		=> WithLeftSupplierProductId(left.Id).WithRightSupplierProductId(right.Id);
 
 	public override SupplierProductCross Build()
 	{

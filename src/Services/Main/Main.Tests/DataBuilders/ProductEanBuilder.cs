@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
@@ -24,7 +24,8 @@ public class ProductEanBuilder(Faker faker) : BuilderBase<ProductEan>(faker)
 		return this;
 	}
 
-	public override ProductEan Build() => ProductEan.Create(
-		ProductId ?? Faker.Random.Int(1),
-		Ean ?? Interlocked.Increment(ref _nextEan).ToString("D13"));
+	public override ProductEan Build()
+		=> ProductEan.Create(
+			ProductId ?? Faker.Random.Int(1),
+			Ean ?? Interlocked.Increment(ref _nextEan).ToString("D13"));
 }

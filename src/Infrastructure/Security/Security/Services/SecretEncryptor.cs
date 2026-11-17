@@ -50,11 +50,9 @@ public sealed class SecretEncryptor : ISecretEncryptor, IDisposable
 	}
 
 	public string Decrypt(string encrypted)
-	{
-		return TryDecrypt(encrypted, out var value)
+		=> TryDecrypt(encrypted, out var value)
 			? value!
 			: throw new CryptographicException("Unable to decrypt secret.");
-	}
 
 	public bool TryDecrypt(string encrypted, out string? value)
 	{
@@ -101,8 +99,8 @@ public sealed class SecretEncryptor : ISecretEncryptor, IDisposable
 		}
 	}
 
-	private static string Base64UrlEncode(byte[] bytes) =>
-		Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+	private static string Base64UrlEncode(byte[] bytes)
+		=> Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 
 	private static byte[] Base64UrlDecode(string value)
 	{

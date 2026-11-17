@@ -1,14 +1,14 @@
-using Main.Entities.Producer;
-using Main.Entities.Product.Enrichment;
-using Main.Persistence.Context;
+using Main.Entities.Product.Producer;
+using Main.Entities.Product.Product.Enrichment;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Interfaces;
 
 namespace Tests.TestContexts.ProductEnrichment;
 
-public class SupplierProductTestContext(DContext context, ProducerTestContext producerTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class SupplierProductTestContext(UnifiedDbContext context, ProducerTestContext producerTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	public IReadOnlyList<SupplierProduct> SupplierProducts { get; private set; } = null!;
 	public IReadOnlyList<SupplierProductCross> Crosses { get; private set; } = null!;

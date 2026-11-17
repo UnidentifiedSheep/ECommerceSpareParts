@@ -8,8 +8,8 @@ namespace Application.Common.Extensions;
 public static class ProjectionServiceCollectionExtensions
 {
 	public static IServiceCollection RegisterProjectionProviders<TAssemblyMarker>(
-		this IServiceCollection services) =>
-		services.RegisterProjectionProviders(typeof(TAssemblyMarker).Assembly);
+		this IServiceCollection services)
+		=> services.RegisterProjectionProviders(typeof(TAssemblyMarker).Assembly);
 
 	public static IServiceCollection RegisterProjectionProviders(
 		this IServiceCollection services,
@@ -61,14 +61,15 @@ public static class ProjectionServiceCollectionExtensions
 		return services;
 	}
 
-	private static ServiceLifetime ToServiceLifetime(Lifetime lifetime) => lifetime switch
-	{
-		Lifetime.Singleton => ServiceLifetime.Singleton,
-		Lifetime.Scoped => ServiceLifetime.Scoped,
-		Lifetime.Transient => ServiceLifetime.Transient,
-		_ => throw new ArgumentOutOfRangeException(
-			nameof(lifetime),
-			lifetime,
-			null)
-	};
+	private static ServiceLifetime ToServiceLifetime(Lifetime lifetime)
+		=> lifetime switch
+		{
+			Lifetime.Singleton => ServiceLifetime.Singleton,
+			Lifetime.Scoped => ServiceLifetime.Scoped,
+			Lifetime.Transient => ServiceLifetime.Transient,
+			_ => throw new ArgumentOutOfRangeException(
+				nameof(lifetime),
+				lifetime,
+				null)
+		};
 }

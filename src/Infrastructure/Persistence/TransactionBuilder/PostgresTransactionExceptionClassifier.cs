@@ -20,13 +20,18 @@ internal sealed class PostgresTransactionExceptionClassifier : ITransactionExcep
 			PostgresErrorCodes.SerializationFailure => TransactionErrorKind.ConcurrencyConflict,
 			PostgresErrorCodes.DeadlockDetected => TransactionErrorKind.Deadlock,
 			PostgresErrorCodes.LockNotAvailable => TransactionErrorKind.LockUnavailable,
-			_ when FindException<DbUpdateConcurrencyException>(exception) is not null => TransactionErrorKind.ConcurrencyConflict,
+			_ when FindException<DbUpdateConcurrencyException>(exception) is not null => TransactionErrorKind
+				.ConcurrencyConflict,
 			_ => TransactionErrorKind.Unknown
 		};
-		return new TransactionError(exception, kind, postgres?.ConstraintName);
+		return new TransactionError(
+			exception,
+			kind,
+			postgres?.ConstraintName);
 	}
 
-	internal static PostgresException? FindPostgresException(Exception exception) => FindException<PostgresException>(exception);
+	internal static PostgresException? FindPostgresException(Exception exception)
+		=> FindException<PostgresException>(exception);
 
 	private static TException? FindException<TException>(Exception exception) where TException : Exception
 	{

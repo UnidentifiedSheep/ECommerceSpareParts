@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Application.Common.Extensions;
 using Application.Common.Querying;
-using Application.Common.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.Models.Requests;
 

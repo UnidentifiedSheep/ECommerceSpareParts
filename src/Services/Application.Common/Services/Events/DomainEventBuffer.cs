@@ -82,5 +82,4 @@ internal sealed class DomainEventBuffer
 
 		return factory();
 	}
-
 }

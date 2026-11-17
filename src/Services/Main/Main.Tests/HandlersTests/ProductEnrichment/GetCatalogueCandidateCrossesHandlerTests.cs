@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -10,9 +10,7 @@ namespace Tests.HandlersTests.ProductEnrichment;
 public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 {
 	public GetCatalogueCandidateCrossesHandlerTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<CatalogueCandidateTestContext>();
-	}
+		=> RegisterBasicContext<CatalogueCandidateTestContext>();
 
 	private CatalogueCandidateTestContext CatalogueTestContext => GetContext<CatalogueCandidateTestContext>();
 	private SupplierProductTestContext SupplierTestContext => GetContext<SupplierProductTestContext>();
@@ -45,12 +43,12 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 		var mappedSupplierProduct = SupplierTestContext.SupplierProducts[1];
 		var additionalSource = await new SupplierProductBuilder(Faker)
 			.WithNamesCount(2)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 		candidate.AddSupplierProduct(additionalSource);
 		await Context.SaveChangesAsync(CancellationToken);
 		await new SupplierProductCrossBuilder(Faker)
 			.WithSupplierProducts(additionalSource, mappedSupplierProduct)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetCatalogueCandidateCrossesQuery([candidate.Id]),
@@ -98,7 +96,7 @@ public sealed class GetCatalogueCandidateCrossesHandlerTests : IntegrationTest
 	{
 		var candidate = await new CatalogueCandidateBuilder(Faker)
 			.WithProducerId(CatalogueTestContext.Candidates[0].ProducerId)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetCatalogueCandidateCrossesQuery([candidate.Id]),

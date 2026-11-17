@@ -7,7 +7,8 @@ namespace Application.Common.Services.History;
 
 public sealed class EntityHistoryContext : IEntityHistoryContext
 {
-	private readonly Dictionary<(Type EntityType, string EntityKey), HashSet<EntityHistoryReason>> _reasons = [];
+	private readonly Dictionary<(Type EntityType, string EntityKey), HashSet<EntityHistoryReason>> _reasons =
+		[];
 
 	public void AddReason<TEntity, TKey>(TKey id, EntityHistoryReason reason)
 		where TEntity : Entity<TEntity, TKey> where TKey : notnull
@@ -38,7 +39,9 @@ public sealed class EntityHistoryContext : IEntityHistoryContext
 		where TEntity : Entity<TEntity, TKey> where TKey : notnull
 	{
 		ArgumentNullException.ThrowIfNull(id);
-		return _reasons.TryGetValue((typeof(TEntity), EntityKey.Format(id)), out var reasons) ? reasons.ToArray() : [];
+		return _reasons.TryGetValue((typeof(TEntity), EntityKey.Format(id)), out var reasons)
+			? reasons.ToArray()
+			: [];
 	}
 
 	public IReadOnlyList<EntityHistoryReason> GetReasons<TEntity, TKey>(Entity<TEntity, TKey> entity)

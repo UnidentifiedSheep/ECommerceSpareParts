@@ -68,8 +68,6 @@ public static class HostBuilderExtensions
 	}
 
 	private static void ConfigureActivityTracking(ILoggingBuilder logging)
-	{
-		logging.Configure(options => options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId |
+		=> logging.Configure(options => options.ActivityTrackingOptions = ActivityTrackingOptions.TraceId |
 			ActivityTrackingOptions.SpanId | ActivityTrackingOptions.ParentId);
-	}
 }

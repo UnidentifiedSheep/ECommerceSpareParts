@@ -1,5 +1,5 @@
 using HotChocolate;
-using Main.Application.Dtos.Product;
+using Main.Modules.Product.Application.Dtos.Product;
 
 namespace Main.Api.GraphQl.Types.Inputs.Product;
 
@@ -24,13 +24,14 @@ public sealed record GqlCreateProductInput
 	[GraphQLName("groupId")]
 	public int? GroupId { get; init; }
 
-	public CreateProductDto ToDto() => new()
-	{
-		Sku = Sku,
-		Name = Name,
-		ProducerId = ProducerId,
-		Description = Description,
-		Indicator = Indicator,
-		GroupId = GroupId
-	};
+	public CreateProductDto ToDto()
+		=> new()
+		{
+			Sku = Sku,
+			Name = Name,
+			ProducerId = ProducerId,
+			Description = Description,
+			Indicator = Indicator,
+			GroupId = GroupId
+		};
 }

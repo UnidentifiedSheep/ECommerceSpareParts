@@ -1,0 +1,7 @@
+{
+  "culture": "ru",
+  "messages": {
+    "notifications.document.generated.title": "Документ готов",
+    "notifications.document.generated.text": "Документ «{DocumentName|string}» готов: {DocumentUrl|string}"
+  }
+}

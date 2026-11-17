@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Suppliers.Persistence</AssemblyName>
+        <RootNamespace>Main.Modules.Suppliers.Persistence</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Suppliers.Entities\Suppliers.Entities.csproj"/>
+    </ItemGroup>
+
+</Project>

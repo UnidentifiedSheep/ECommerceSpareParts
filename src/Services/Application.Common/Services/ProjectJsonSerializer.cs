@@ -7,17 +7,22 @@ namespace Application.Common.Services;
 
 public sealed class ProjectJsonSerializer(ProjectJsonOptions projectOptions) : IJsonSerializer
 {
-	public string Serialize<T>(T value)
-		=> JsonSerializer.Serialize(value, projectOptions.SerializerOptions);
+	public string Serialize<T>(T value) => JsonSerializer.Serialize(value, projectOptions.SerializerOptions);
 
 	public string Serialize(object? value, Type type)
-		=> JsonSerializer.Serialize(value, type, projectOptions.SerializerOptions);
+		=> JsonSerializer.Serialize(
+			value,
+			type,
+			projectOptions.SerializerOptions);
 
 	public T? Deserialize<T>(string json)
 		=> JsonSerializer.Deserialize<T>(json, projectOptions.SerializerOptions);
 
 	public object? Deserialize(string json, Type type)
-		=> JsonSerializer.Deserialize(json, type, projectOptions.SerializerOptions);
+		=> JsonSerializer.Deserialize(
+			json,
+			type,
+			projectOptions.SerializerOptions);
 
 	public bool TryDeserialize<T>(string json, [NotNullWhen(true)] out T? result)
 	{
@@ -33,7 +38,10 @@ public sealed class ProjectJsonSerializer(ProjectJsonOptions projectOptions) : I
 		}
 	}
 
-	public bool TryDeserialize(string json, Type type, [NotNullWhen(true)] out object? result)
+	public bool TryDeserialize(
+		string json,
+		Type type,
+		[NotNullWhen(true)] out object? result)
 	{
 		try
 		{

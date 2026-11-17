@@ -1,4 +1,4 @@
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Locan.Core.Interfaces;
 using Locan.Core.LocalizableMessages;
 
@@ -19,11 +19,11 @@ public sealed class JobScheduleTestLrt : ILrtNamedObject<JobScheduleTestInputSta
 
 	public string SystemName => LrtName;
 
-	public ILocalizableMessage NameLocalizationMessage =>
-		new LocalizableMessage("test-job-schedule-lrt.name");
+	public ILocalizableMessage NameLocalizationMessage
+		=> new LocalizableMessage("test-job-schedule-lrt.name");
 
-	public ILocalizableMessage DescriptionLocalizationMessage =>
-		new LocalizableMessage("test-job-schedule-lrt.description");
+	public ILocalizableMessage DescriptionLocalizationMessage
+		=> new LocalizableMessage("test-job-schedule-lrt.description");
 
 	public Type InputType => typeof(JobScheduleTestInputState);
 
@@ -32,5 +32,6 @@ public sealed class JobScheduleTestLrt : ILrtNamedObject<JobScheduleTestInputSta
 	public Task ExecuteAsync(
 		Guid jobId,
 		Guid leaseHolderId,
-		CancellationToken cancellationToken = default) => Task.CompletedTask;
+		CancellationToken cancellationToken = default)
+		=> Task.CompletedTask;
 }

@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Entities.Balance;
+using Main.Entities.Balance.Balance;
 using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
@@ -22,7 +22,8 @@ public class UserBalanceBuilder(Faker faker) : BuilderBase<OrganizationBalance>(
 		return this;
 	}
 
-	public override OrganizationBalance Build() => OrganizationBalance.Create(
-		UserId ?? Guid.NewGuid(),
-		CurrencyId ?? Faker.Random.Int(1, 100));
+	public override OrganizationBalance Build()
+		=> OrganizationBalance.Create(
+			UserId ?? Guid.NewGuid(),
+			CurrencyId ?? Faker.Random.Int(1, 100));
 }

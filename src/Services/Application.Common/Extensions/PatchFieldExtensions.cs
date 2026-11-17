@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Application.Common.Models;
+﻿using Application.Common.Models;
 
 namespace Application.Common.Extensions;
 

@@ -4,7 +4,7 @@ using GraphQL.Common.Extensions;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Storage;
-using Main.Application.Handlers.StorageContents.GetStorageContents;
+using Main.Modules.Storage.Application.Handlers.StorageContents.GetStorageContents;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

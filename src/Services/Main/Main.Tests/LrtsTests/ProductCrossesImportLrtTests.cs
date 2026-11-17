@@ -1,6 +1,7 @@
 using Domain.CommonEnums;
 using FluentAssertions;
-using Main.Application.Lrts.ProductCrossesImport;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Lrts.ProductCrossesImport;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
@@ -10,9 +11,7 @@ namespace Tests.LrtsTests;
 public sealed class ProductCrossesImportLrtTests : CsvLrtIntegrationTest<ProductCrossesImportLrt>
 {
 	public ProductCrossesImportLrtTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-	}
+		=> RegisterBasicContext<ProductTestContext>();
 
 	private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
@@ -25,7 +24,13 @@ public sealed class ProductCrossesImportLrtTests : CsvLrtIntegrationTest<Product
 
 		var execution = await ExecuteCsv(
 			"Sku,Producer,CrossSku,CrossProducer",
-			[CsvRow(missingSku, producer.Name, existing.Sku.Value, producer.Name)],
+			[
+				CsvRow(
+					missingSku,
+					producer.Name,
+					existing.Sku.Value,
+					producer.Name)
+			],
 			fileName => new ProductCrossesImportInputState { FileName = fileName });
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
@@ -63,6 +68,6 @@ public sealed class ProductCrossesImportLrtTests : CsvLrtIntegrationTest<Product
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<ProductCrossesImportState>();
 		state.Errors.Should().BeEmpty();
-		(await Context.ProductCrosses.AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
+		(await Context.Set<ProductCross>().AsNoTracking().CountAsync(CancellationToken)).Should().Be(1);
 	}
 }

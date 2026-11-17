@@ -17,8 +17,8 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(
 
 	protected readonly IQueryableExtensions QueryableExtensions = queryableExtensions;
 
-	public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default) =>
-		await DbSet.FindAsync(EntityKey.GetValues(id), ct);
+	public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default)
+		=> await DbSet.FindAsync(EntityKey.GetValues(id), ct);
 
 	public async Task<TEntity?> FirstOrDefaultAsync(
 		Criteria<TEntity>? criteria = null,

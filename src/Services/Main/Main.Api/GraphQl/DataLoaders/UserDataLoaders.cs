@@ -1,7 +1,6 @@
 using GreenDonut;
-using Main.Application.Dtos.Users;
-using Main.Application.Dtos.Storage;
-using Main.Application.Handlers.Users;
+using Main.Modules.Identity.Application.Dtos.Users;
+using Main.Modules.Identity.Application.Handlers.Users;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;
@@ -16,10 +15,11 @@ public static class UserDataLoaders
 		=> (await sender.Send(new GetUsersByIdsQuery(keys), cancellationToken)).Users;
 
 	[DataLoader]
-	public static async Task<IReadOnlyDictionary<Guid, UserRolesAndPermissions>> GetUserRolesAndPermissionsByIdAsync(
-		IReadOnlyList<Guid> keys,
-		ISender sender,
-		CancellationToken cancellationToken)
+	public static async Task<IReadOnlyDictionary<Guid, UserRolesAndPermissions>>
+		GetUserRolesAndPermissionsByIdAsync(
+			IReadOnlyList<Guid> keys,
+			ISender sender,
+			CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersRolesAndPermissionsQuery(keys), cancellationToken)).Users;
 
 	[DataLoader]
@@ -36,12 +36,4 @@ public static class UserDataLoaders
 		ISender sender,
 		CancellationToken cancellationToken)
 		=> (await sender.Send(new GetUsersPhonesByIdsQuery(keys), cancellationToken)).Phones;
-
-	[DataLoader]
-	public static async Task<IReadOnlyDictionary<Guid, IReadOnlyList<StorageDto>>> GetUserStoragesByIdAsync(
-		IReadOnlyList<Guid> keys,
-		ISender sender,
-		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetUsersStoragesByIdsQuery(keys), cancellationToken)).Storages;
-
 }

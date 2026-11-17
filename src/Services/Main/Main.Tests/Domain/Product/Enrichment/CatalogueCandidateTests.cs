@@ -1,9 +1,9 @@
 using Domain.Events;
 using Enums;
 using FluentAssertions;
-using Main.Entities.DomainEvents.CatalogueCandidate;
-using Main.Entities.Product.Enrichment;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.DomainEvents.CatalogueCandidate;
+using Main.Entities.Product.Product.Enrichment;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.Domain.Product.Enrichment;
 
@@ -269,10 +269,8 @@ public sealed class CatalogueCandidateTests
 	private static CatalogueCandidate CreateCandidate() => CatalogueCandidate.Create("ABC-123", 42);
 
 	private static SupplierProduct CreateSupplierProduct(string sku = "SUPPLIER-123")
-	{
-		return SupplierProduct.Create(
+		=> SupplierProduct.Create(
 			new Sku(sku),
 			"Supplier producer",
 			Supplier.FavoritParts);
-	}
 }

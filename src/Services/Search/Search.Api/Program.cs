@@ -1,8 +1,8 @@
 using System.Reflection;
 using Abstractions;
-using Application.Common.Consumer;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Consumer;
 using Carter;
 using Contracts.Tasks;
 using Internal.Integration.Di;
@@ -15,7 +15,6 @@ using Search.Application.Consumers.CatalogueCandidate;
 using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
-using Security;
 using Security.Extensions;
 
 const string serviceName = "Search";
@@ -52,14 +51,16 @@ builder.Services.AddMassTransit(x =>
 	{
 		cfg.ConfigureRabbitMq(context);
 
-		cfg.ReceiveEndpoint("search-tasks", ep =>
-		{
-			ep.ConfigureConsumeTopology = false;
-			ep.ConcurrentMessageLimit = 1;
-			ep.PrefetchCount = 1;
-			ep.BindForService<ServiceTaskRequestedEvent>(ServicesDefinitions.Search);
-			ep.ConfigureConsumer<ServiceTaskRequestedConsumer>(context);
-		});
+		cfg.ReceiveEndpoint(
+			"search-tasks",
+			ep =>
+			{
+				ep.ConfigureConsumeTopology = false;
+				ep.ConcurrentMessageLimit = 1;
+				ep.PrefetchCount = 1;
+				ep.BindForService<ServiceTaskRequestedEvent>(ServicesDefinitions.Search);
+				ep.ConfigureConsumer<ServiceTaskRequestedConsumer>(context);
+			});
 
 		cfg.ReceiveEndpoint(
 			"search-queue",

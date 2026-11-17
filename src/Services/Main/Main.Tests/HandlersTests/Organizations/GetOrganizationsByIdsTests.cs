@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.Organizations;
+using Main.Modules.Organization.Application.Handlers.Organizations;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -8,9 +8,7 @@ namespace Tests.HandlersTests.Organizations;
 public class GetOrganizationsByIdsTests : IntegrationTest
 {
 	public GetOrganizationsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UserRelationsTestContext>();
-	}
+		=> RegisterBasicContext<UserRelationsTestContext>();
 
 	private UserRelationsTestContext TestContext => GetContext<UserRelationsTestContext>();
 
@@ -21,7 +19,8 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 		var sharedId = TestContext.SharedOrganization.Id;
 
 		var result = await Mediator.Send(
-			new GetOrganizationsByIdsQuery([firstId, sharedId, firstId, Guid.NewGuid()]), CancellationToken);
+			new GetOrganizationsByIdsQuery([firstId, sharedId, firstId, Guid.NewGuid()]),
+			CancellationToken);
 
 		result.Organizations.Keys.Should().BeEquivalentTo([firstId, sharedId]);
 		result.Organizations[firstId].Id.Should().Be(firstId);
@@ -34,7 +33,9 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 		var hiddenId = TestContext.HiddenOrganization.Id;
 		var systemId = GetContext<UserContextTestContext>().SystemUser.Id;
 
-		var result = await Mediator.Send(new GetOrganizationsByIdsQuery([hiddenId, systemId]), CancellationToken);
+		var result = await Mediator.Send(
+			new GetOrganizationsByIdsQuery([hiddenId, systemId]),
+			CancellationToken);
 
 		result.Organizations.Keys.Should().Equal(hiddenId);
 	}
@@ -60,7 +61,9 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyBatch_ReturnsEmptyDictionary()
 	{
-		var result = await Mediator.Send(new GetOrganizationsByIdsQuery(Array.Empty<Guid>()), CancellationToken);
+		var result = await Mediator.Send(
+			new GetOrganizationsByIdsQuery(Array.Empty<Guid>()),
+			CancellationToken);
 
 		result.Organizations.Should().BeEmpty();
 	}

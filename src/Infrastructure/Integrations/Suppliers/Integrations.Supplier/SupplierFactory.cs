@@ -4,10 +4,10 @@ namespace Integrations.Supplier;
 
 public class SupplierFactory(IEnumerable<ISupplier> suppliers) : ISupplierFactory
 {
-	private readonly Dictionary<global::Enums.Supplier, ISupplier> _suppliers =
+	private readonly Dictionary<Enums.Supplier, ISupplier> _suppliers =
 		suppliers.ToDictionary(s => s.Supplier);
 
-	public ISupplier Create(global::Enums.Supplier supplier) => _suppliers[supplier];
+	public ISupplier Create(Enums.Supplier supplier) => _suppliers[supplier];
 
 	public async Task<IReadOnlyList<ISupplier>> GetAvailableSuppliers(
 		CancellationToken cancellationToken = default)

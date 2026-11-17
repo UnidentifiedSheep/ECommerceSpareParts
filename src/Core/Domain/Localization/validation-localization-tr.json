@@ -1,0 +1,8 @@
+﻿{
+  "culture": "tr",
+  "messages": {
+    "position.count.must.be.greater.than.zero": "Pozisyon adedi 0'dan büyük olmalıdır.",
+    "price.must.be.positive": "Fiyat 0'dan büyük olmalıdır.",
+    "price.max.two.decimal.places": "Fiyat en fazla 2 ondalık basamak içerebilir."
+  }
+}

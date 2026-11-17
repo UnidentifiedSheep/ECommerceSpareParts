@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.Product;
+using Main.Entities.Product.Product;
 
 namespace Tests.Domain.Product;
 
@@ -80,8 +80,13 @@ public class ProductImageTests
 	{
 		var act = () => ProductImage.CreateFromStorageKey(42, storageKey!);
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be("article.image.invalid.storage.key");
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be("article.image.invalid.storage.key");
 	}
 
 	[Fact]
@@ -92,8 +97,13 @@ public class ProductImageTests
 
 		var act = () => ProductImage.CreateFromStorageKey(42, longestKey + "x");
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be("article.image.invalid.storage.key");
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be("article.image.invalid.storage.key");
 	}
 
 	[Theory]
@@ -104,7 +114,12 @@ public class ProductImageTests
 	{
 		var act = () => ProductImage.CreateFromStorageKey(42, storageKey);
 
-		act.Should().Throw<InvalidInputException>()
-			.Which.LocalizableMessage.MessageKey.Should().Be("article.image.invalid.extension");
+		act.Should()
+			.Throw<InvalidInputException>()
+			.Which
+			.LocalizableMessage
+			.MessageKey
+			.Should()
+			.Be("article.image.invalid.extension");
 	}
 }

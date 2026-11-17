@@ -1,12 +1,11 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Auth.AddRolesToUser;
+using FluentValidation.TestHelper;
+using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
+using Main.Modules.Identity.Application.Handlers.Auth.AddRolesToUser;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,9 +14,7 @@ namespace Tests.HandlersTests.Auth;
 public class AddRolesToUserTests : IntegrationTest
 {
 	public AddRolesToUserTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	private UsersTestContext TestContext => GetContext<UsersTestContext>();
 
@@ -35,42 +32,65 @@ public class AddRolesToUserTests : IntegrationTest
 		result.UserId.Should().Be(userId);
 		result.AddedRoles.Should().Equal(editor);
 		repeated.AddedRoles.Should().BeEmpty();
-		(await RoleNamesFor(userId)).Should().BeEquivalentTo(["MEMBER", reader, editor]);
-		(await RoleNamesFor(TestContext.OtherUser.Id)).Should().BeEquivalentTo(["MEMBER", editor]);
+		(await RoleNamesFor(userId)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				reader,
+				editor);
+		(await RoleNamesFor(TestContext.OtherUser.Id)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				editor);
 	}
 
 	[Fact]
 	public async Task AddRoles_UnknownRoleRejectsWholeBatch()
 	{
-		var action = () => Mediator.Send(new AddRolesToUserCommand(
-			TestContext.User.Id, [TestContext.EditorRole.Name, "missing-role"]), CancellationToken);
+		var action = () => Mediator.Send(
+			new AddRolesToUserCommand(
+				TestContext.User.Id,
+				[TestContext.EditorRole.Name, "missing-role"]),
+			CancellationToken);
 
 		var exception = await action.Should().ThrowAsync<DbValidationException>();
 		exception.Which.Failures.Should().ContainSingle(failure => failure.Error is RoleNotFoundException);
 
-		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
+		(await RoleNamesFor(TestContext.User.Id)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				TestContext.ReaderRole.Name);
 	}
 
 	[Fact]
 	public async Task EmptyRoles_ReturnsEmptyResult()
 	{
-		var result = await Mediator.Send(new AddRolesToUserCommand(TestContext.User.Id, []), CancellationToken);
+		var result = await Mediator.Send(
+			new AddRolesToUserCommand(TestContext.User.Id, []),
+			CancellationToken);
 
 		result.AddedRoles.Should().BeEmpty();
-		(await RoleNamesFor(TestContext.User.Id)).Should().BeEquivalentTo(["MEMBER", TestContext.ReaderRole.Name]);
+		(await RoleNamesFor(TestContext.User.Id)).Should()
+			.BeEquivalentTo(
+				"MEMBER",
+				TestContext.ReaderRole.Name);
 	}
 
 	[Fact]
 	public async Task MissingUser_IsRejected()
 	{
 		var action = () => Mediator.Send(
-			new AddRolesToUserCommand(Guid.NewGuid(), [TestContext.EditorRole.Name]), CancellationToken);
+			new AddRolesToUserCommand(Guid.NewGuid(), [TestContext.EditorRole.Name]),
+			CancellationToken);
 
 		await action.Should().ThrowAsync<DbValidationException>();
 	}
 
-	private Task<string[]> RoleNamesFor(Guid userId) => Context.Set<UserRole>().AsNoTracking()
-		.Where(x => x.UserId == userId).Select(x => x.RoleName).ToArrayAsync(CancellationToken);
+	private Task<string[]> RoleNamesFor(Guid userId)
+		=> Context.Set<UserRole>()
+			.AsNoTracking()
+			.Where(x => x.UserId == userId)
+			.Select(x => x.RoleName)
+			.ToArrayAsync(CancellationToken);
 }
 
 public class AddRolesToUserValidationTests : ValidationTest<AddRolesToUserValidation, AddRolesToUserCommand>
@@ -81,6 +101,7 @@ public class AddRolesToUserValidationTests : ValidationTest<AddRolesToUserValida
 		var result = await ValidateAsync(new AddRolesToUserCommand(Guid.NewGuid(), ["reader", " system "]));
 		result.ShouldHaveValidationErrorFor("RoleNames[1]")
 			.WithErrorCode(CantAddSystemRoleToUserMessage.Instance.MessageKey)
-			.WithCustomState(CantAddSystemRoleToUserMessage.Instance).Only();
+			.WithCustomState(CantAddSystemRoleToUserMessage.Instance)
+			.Only();
 	}
 }

@@ -1,18 +1,18 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Events;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
 using Attributes;
-using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.Abstractions.Test;
+using Persistence.Context;
+using Tests.Jobs;
 using Tests.TestContainers.Combined;
 
 namespace Tests;
 
 [Collection("Combined collection")]
 public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
-	: LrtIntegrationTestBase<TLrt, ServiceProviderBuilder, ServiceProviderArguments, DContext>
+	: LrtIntegrationTestBase<TLrt, ServiceProviderBuilder, ServiceProviderArguments, UnifiedDbContext>
 	where TLrt : class, ILrtNamedObject
 {
 	private TestEnvironmentLease _environmentLease = null!;
@@ -51,5 +51,4 @@ public abstract class LrtIntegrationTest<TLrt>(CombinedContainerFixture fixture)
 		using var scope = Scope;
 		await ResetDataStoresAsync();
 	}
-
 }

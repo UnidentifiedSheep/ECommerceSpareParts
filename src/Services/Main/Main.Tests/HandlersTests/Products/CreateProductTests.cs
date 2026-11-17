@@ -1,12 +1,12 @@
-using Main.Entities;
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Dtos.Product;
-using Main.Application.Products.Commands.CreateProducts;
+using FluentValidation.TestHelper;
 using Main.Entities.Product;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Products.Commands.CreateProducts;
 using Microsoft.EntityFrameworkCore;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,9 +15,7 @@ namespace Tests.HandlersTests.Products;
 public class CreateProductTests : IntegrationTest
 {
 	public CreateProductTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProducerTestContext>();
-	}
+		=> RegisterBasicContext<ProducerTestContext>();
 
 	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
@@ -88,11 +86,11 @@ public class CreateProductTests : IntegrationTest
 		dbProduct.ProducerId.Should().Be(product.ProducerId);
 	}
 
-	private async Task<List<Product>> GetProducts() => await TestContext.DbContext.Products.ToListAsync();
+	private async Task<List<Product>> GetProducts()
+		=> await TestContext.DbContext.Set<Product>().ToListAsync();
 
 	private List<CreateProductDto> CreateDtos(int count)
-	{
-		return Enumerable
+		=> Enumerable
 			.Range(1, count)
 			.Select(_ => new CreateProductDto
 			{
@@ -101,34 +99,42 @@ public class CreateProductTests : IntegrationTest
 				ProducerId = TestContext.Faker.PickRandom(TestContext.Producers.Select(p => p.Id).ToArray())
 			})
 			.ToList();
-	}
 }
 
 public class CreateProductsValidationTests : ValidationTest<CreateProductsValidation, CreateProductsCommand>
 {
-	private static CreateProductDto ValidProduct() => new() { Sku = "ABC-123", Name = "Product", ProducerId = 1 };
+	private static CreateProductDto ValidProduct()
+		=> new() { Sku = "ABC-123", Name = "Product", ProducerId = 1 };
 
 	[Fact]
 	public async Task CreateArticle_WithEmptyList_FailsValidation()
 	{
 		var result = await ValidateAsync(new CreateProductsCommand([]));
 		result.ShouldHaveValidationErrorFor(x => x.NewProducts)
-			.WithErrorCode(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance.MessageKey).WithCustomState(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance).Only();
+			.WithErrorCode(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance.MessageKey)
+			.WithCustomState(ArticleCreateArticlesMustHaveAtLeastOneMessage.Instance)
+			.Only();
 	}
 
 	[Fact]
 	public async Task CreateArticle_WithLongName_FailsValidation()
 	{
-		var result = await ValidateAsync(new CreateProductsCommand([ValidProduct() with { Name = new string('x', 256) }]));
+		var result = await ValidateAsync(
+			new CreateProductsCommand([ValidProduct() with { Name = new string('x', 256) }]));
 		result.ShouldHaveValidationErrorFor("NewProducts[0].Name")
-			.WithErrorCode(ArticleNameMaxLength255Message.Instance.MessageKey).WithCustomState(ArticleNameMaxLength255Message.Instance).Only();
+			.WithErrorCode(ArticleNameMaxLength255Message.Instance.MessageKey)
+			.WithCustomState(ArticleNameMaxLength255Message.Instance)
+			.Only();
 	}
 
 	[Fact]
 	public async Task CreateArticle_WithManyItems_FailsValidation()
 	{
-		var result = await ValidateAsync(new CreateProductsCommand(Enumerable.Range(0, 200).Select(_ => ValidProduct()).ToList()));
+		var result = await ValidateAsync(
+			new CreateProductsCommand(Enumerable.Range(0, 200).Select(_ => ValidProduct()).ToList()));
 		result.ShouldHaveValidationErrorFor(x => x.NewProducts)
-			.WithErrorCode(ArticleCreateArticlesMax100AtOnceMessage.Instance.MessageKey).WithCustomState(ArticleCreateArticlesMax100AtOnceMessage.Instance).Only();
+			.WithErrorCode(ArticleCreateArticlesMax100AtOnceMessage.Instance.MessageKey)
+			.WithCustomState(ArticleCreateArticlesMax100AtOnceMessage.Instance)
+			.Only();
 	}
 }

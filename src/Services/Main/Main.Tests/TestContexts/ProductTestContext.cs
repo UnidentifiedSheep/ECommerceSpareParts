@@ -1,5 +1,5 @@
-﻿using Main.Entities.Product;
-using Main.Persistence.Context;
+﻿using Main.Entities.Product.Product;
+using Persistence.Context;
 using Tests.Abstractions;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -7,8 +7,8 @@ using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
-public class ProductTestContext(DContext context, ProducerTestContext producerTestContext)
-	: TestContextBase<DContext>(context), IDependentTestContext
+public class ProductTestContext(UnifiedDbContext context, ProducerTestContext producerTestContext)
+	: TestContextBase<UnifiedDbContext>(context), IDependentTestContext
 {
 	private readonly List<Product> _products = [];
 
@@ -19,10 +19,8 @@ public class ProductTestContext(DContext context, ProducerTestContext producerTe
 	public static Type[] DependsOn { get; } = [typeof(ProducerTestContext)];
 
 	public override async Task InitializeAsync(CancellationToken cancellationToken = default)
-	{
-		_products.AddRange(
+		=> _products.AddRange(
 			await new ProductBuilder(Faker)
 				.WithProducers(producerTestContext.Producers)
 				.BuildManyAndAddToDb(DbContext, 10));
-	}
 }

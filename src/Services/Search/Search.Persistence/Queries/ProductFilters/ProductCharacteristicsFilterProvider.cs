@@ -17,10 +17,13 @@ public sealed class ProductCharacteristicsFilterProvider : IProductSearchFilterP
 
 			if (characteristic.Values is { } values)
 				condition &= new QueryContainerDescriptor<Product>().Terms(terms => terms
-					.Field(product => product.Characteristics.First().Value).Terms(values));
+					.Field(product => product.Characteristics.First().Value)
+					.Terms(values));
 
 			if (characteristic.NumericRange is { } range)
-				condition &= ProductRangeQueryBuilder.Build(Infer.Field<Product>(product => product.Characteristics.First().NumericValue), range);
+				condition &= ProductRangeQueryBuilder.Build(
+					Infer.Field<Product>(product => product.Characteristics.First().NumericValue),
+					range);
 
 			var nested = new QueryContainerDescriptor<Product>().Nested(query => query
 				.Path(product => product.Characteristics)

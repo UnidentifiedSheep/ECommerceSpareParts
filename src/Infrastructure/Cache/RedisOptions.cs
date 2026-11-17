@@ -13,8 +13,8 @@ public class RedisOptions
 
 	public bool AbortConnect { get; init; }
 
-	public string ConnectionString =>
-		string.IsNullOrWhiteSpace(Password)
+	public string ConnectionString
+		=> string.IsNullOrWhiteSpace(Password)
 			? Url
 			: $"{Url},password={Password},abortConnect={AbortConnect.ToString().ToLowerInvariant()}";
 }

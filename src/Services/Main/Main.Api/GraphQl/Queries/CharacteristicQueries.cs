@@ -5,8 +5,8 @@ using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
-using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Characteristics.GetCharacteristics;
+using Main.Modules.Product.Application.Dtos.Product;
+using Main.Modules.Product.Application.Handlers.Characteristics.GetCharacteristics;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;
@@ -38,6 +38,8 @@ public sealed class CharacteristicQueries
 				input.Pagination),
 			cancellationToken);
 
-		return result.Characteristics.Select(characteristic => new GqlCharacteristic(characteristic)).ToArray();
+		return result.Characteristics
+			.Select(characteristic => new GqlCharacteristic(characteristic))
+			.ToArray();
 	}
 }

@@ -1,7 +1,7 @@
 using Bogus;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
 using Tests.Abstractions;
-using OrganizationEntity = Main.Entities.Organization.Organization;
+using OrganizationEntity = Main.Entities.Organization.Organization.Organization;
 
 namespace Tests.DataBuilders.Organization;
 

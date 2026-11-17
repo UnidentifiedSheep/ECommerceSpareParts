@@ -1,16 +1,23 @@
-using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models;
+using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models.ProductUpdates;
 
 namespace Search.Application.Interfaces.Product;
 
 public interface IProductRepository : ISearchRepository<Entities.Product, int>
 {
-	Task ApplyUpdates(IReadOnlyCollection<ProductFieldUpdate> updates, CancellationToken cancellationToken = default);
+	Task ApplyUpdates(
+		IReadOnlyCollection<ProductFieldUpdate> updates,
+		CancellationToken cancellationToken = default);
 
-	Task ApplyStockUpdates(IReadOnlyCollection<ProductStockUpdate> updates, CancellationToken cancellationToken = default);
+	Task ApplyStockUpdates(
+		IReadOnlyCollection<ProductStockUpdate> updates,
+		CancellationToken cancellationToken = default);
 
-	Task<long> DeleteDeletedBefore(DateTime deletedBefore, int batchSize, CancellationToken cancellationToken = default);
+	Task<long> DeleteDeletedBefore(
+		DateTime deletedBefore,
+		int batchSize,
+		CancellationToken cancellationToken = default);
 
 	Task<SearchResult<Entities.Product>> Search(
 		CatalogueSearchCriteria criteria,

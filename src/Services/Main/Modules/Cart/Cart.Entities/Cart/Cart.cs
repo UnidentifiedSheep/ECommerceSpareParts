@@ -1,0 +1,57 @@
+using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
+using Domain;
+using Domain.Interfaces;
+using Domain.Validation;
+
+namespace Main.Entities.Cart.Cart;
+
+public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid, int)>
+{
+	private Cart()
+	{
+	}
+
+	private Cart(
+		Guid userId,
+		int productId,
+		int count)
+	{
+		UserId = userId;
+		ProductId = productId;
+		SetCount(count);
+	}
+
+	[ValidateTuple("PK")]
+	public Guid UserId { get; }
+
+	[ValidateTuple("PK")]
+	public int ProductId { get; }
+
+	public int Count { get; private set; }
+
+	public static Expression<Func<Cart, (Guid, int)>> GetKeySelector()
+		=> x =>
+			ValueTuple.Create(x.UserId, x.ProductId);
+
+	public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
+		=> x =>
+			x.UserId == key.Item1 && x.ProductId == key.Item2;
+
+	public static Cart Create(
+		Guid userId,
+		int productId,
+		int count)
+		=> new(
+			userId,
+			productId,
+			count);
+
+	public void SetCount(int count)
+	{
+		count.EnsureGreaterThan(0, PositionCountMustBeGreaterThanZeroMessage.Instance);
+		Count = count;
+	}
+
+	public override (Guid, int) GetId() => (UserId, ProductId);
+}

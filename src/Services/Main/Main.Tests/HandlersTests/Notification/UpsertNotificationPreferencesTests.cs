@@ -1,12 +1,12 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
 using FluentAssertions;
-using FluentValidation;
-using Main.Application.Dtos.NotificationPreference;
-using Main.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
+using FluentValidation.TestHelper;
 using Main.Entities;
+using Main.Entities.User;
+using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
+using Main.Modules.Notifications.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
 using Microsoft.EntityFrameworkCore;
 using Notification.Core.Recipients;
+using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
@@ -15,12 +15,10 @@ namespace Tests.HandlersTests.Notification;
 public class UpsertNotificationPreferencesTests : IntegrationTest
 {
 	public UpsertNotificationPreferencesTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<NotificationPreferencesTestContext>();
-	}
+		=> RegisterBasicContext<NotificationPreferencesTestContext>();
 
-	private NotificationPreferencesTestContext PreferencesContext =>
-		GetContext<NotificationPreferencesTestContext>();
+	private NotificationPreferencesTestContext PreferencesContext
+		=> GetContext<NotificationPreferencesTestContext>();
 
 	[Fact]
 	public async Task UpsertPreferences_ChangesOnlyRequestedUsersPreference()
@@ -28,14 +26,19 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 		var user = PreferencesContext.Users[0];
 		var otherUser = PreferencesContext.Users[1];
 
-		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
-			[new UpsertUserNotificationPreferenceDto
-			{
-				ChannelName = EmailRecipient.ChannelName,
-				IsEnabled = true
-			}]), CancellationToken);
+		await Mediator.Send(
+			new UpsertNotificationPreferencesCommand(
+				user.Id,
+				[
+					new UpsertUserNotificationPreferenceDto
+					{
+						ChannelName = EmailRecipient.ChannelName,
+						IsEnabled = true
+					}
+				]),
+			CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.Where(x => x.ChannelName == EmailRecipient.ChannelName)
 			.ToArrayAsync(CancellationToken);
@@ -50,16 +53,22 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 	{
 		var user = PreferencesContext.Users[2];
 
-		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
-			[new UpsertUserNotificationPreferenceDto
-			{
-				ChannelName = EmailRecipient.ChannelName,
-				IsEnabled = false
-			}]), CancellationToken);
+		await Mediator.Send(
+			new UpsertNotificationPreferencesCommand(
+				user.Id,
+				[
+					new UpsertUserNotificationPreferenceDto
+					{
+						ChannelName = EmailRecipient.ChannelName,
+						IsEnabled = false
+					}
+				]),
+			CancellationToken);
 
-		var preference = await Context.UserNotificationPreferences
+		var preference = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
-			.SingleAsync(x => x.UserId == user.Id && x.ChannelName == EmailRecipient.ChannelName,
+			.SingleAsync(
+				x => x.UserId == user.Id && x.ChannelName == EmailRecipient.ChannelName,
 				CancellationToken);
 
 		preference.Enabled.Should().BeFalse();
@@ -71,14 +80,19 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 		var user = PreferencesContext.Users[1];
 		var otherUser = PreferencesContext.Users[0];
 
-		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
-			[new UpsertUserNotificationPreferenceDto
-			{
-				ChannelName = EmailRecipient.ChannelName,
-				IsEnabled = false
-			}]), CancellationToken);
+		await Mediator.Send(
+			new UpsertNotificationPreferencesCommand(
+				user.Id,
+				[
+					new UpsertUserNotificationPreferenceDto
+					{
+						ChannelName = EmailRecipient.ChannelName,
+						IsEnabled = false
+					}
+				]),
+			CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.ToArrayAsync(CancellationToken);
 
@@ -92,16 +106,22 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 	{
 		var user = PreferencesContext.Users[2];
 
-		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
-			[new UpsertUserNotificationPreferenceDto
-			{
-				ChannelName = InAppRecipient.ChannelName,
-				IsEnabled = false
-			}]), CancellationToken);
+		await Mediator.Send(
+			new UpsertNotificationPreferencesCommand(
+				user.Id,
+				[
+					new UpsertUserNotificationPreferenceDto
+					{
+						ChannelName = InAppRecipient.ChannelName,
+						IsEnabled = false
+					}
+				]),
+			CancellationToken);
 
-		var preference = await Context.UserNotificationPreferences
+		var preference = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
-			.SingleAsync(x => x.UserId == user.Id && x.ChannelName == InAppRecipient.ChannelName,
+			.SingleAsync(
+				x => x.UserId == user.Id && x.ChannelName == InAppRecipient.ChannelName,
 				CancellationToken);
 
 		preference.Enabled.Should().BeTrue();
@@ -112,33 +132,39 @@ public class UpsertNotificationPreferencesTests : IntegrationTest
 	{
 		var user = PreferencesContext.Users[0];
 
-		await Mediator.Send(new UpsertNotificationPreferencesCommand(user.Id,
-			[]), CancellationToken);
+		await Mediator.Send(
+			new UpsertNotificationPreferencesCommand(
+				user.Id,
+				[]),
+			CancellationToken);
 
-		var preferences = await Context.UserNotificationPreferences
+		var preferences = await Context.Set<UserNotificationPreference>()
 			.AsNoTracking()
 			.ToArrayAsync(CancellationToken);
 
 		preferences.Should().HaveCount(PreferencesContext.Preferences.Count);
 		preferences.Single(x => x.UserId == user.Id).Enabled.Should().BeFalse();
 	}
-
-
 }
 
-public class UpsertNotificationPreferencesValidationTests : ValidationTest<UpsertNotificationPreferencesValidation, UpsertNotificationPreferencesCommand>
+public class UpsertNotificationPreferencesValidationTests : ValidationTest<
+	UpsertNotificationPreferencesValidation, UpsertNotificationPreferencesCommand>
 {
 	[Fact]
 	public async Task UpsertPreferences_WithDuplicateChannels_ReturnsLocalizedValidationError()
 	{
-		var command = new UpsertNotificationPreferencesCommand(Guid.NewGuid(),
+		var command = new UpsertNotificationPreferencesCommand(
+			Guid.NewGuid(),
 			[
-				new UpsertUserNotificationPreferenceDto { ChannelName = EmailRecipient.ChannelName, IsEnabled = true },
-				new UpsertUserNotificationPreferenceDto { ChannelName = EmailRecipient.ChannelName, IsEnabled = false }
+				new UpsertUserNotificationPreferenceDto
+					{ ChannelName = EmailRecipient.ChannelName, IsEnabled = true },
+				new UpsertUserNotificationPreferenceDto
+					{ ChannelName = EmailRecipient.ChannelName, IsEnabled = false }
 			]);
 		var result = await ValidateAsync(command);
 		result.ShouldHaveValidationErrorFor(x => x.Preferences)
 			.WithErrorCode(NotificationsChannelDuplicateMessage.Key)
-			.WithCustomState(NotificationsChannelDuplicateMessage.Instance).Only();
+			.WithCustomState(NotificationsChannelDuplicateMessage.Instance)
+			.Only();
 	}
 }

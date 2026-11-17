@@ -1,0 +1,119 @@
+using Application.Common;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.LRT;
+using Attributes;
+using Locan.Core.Interfaces;
+using Main.Entities.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Interfaces.Persistence;
+using Microsoft.Extensions.Logging;
+
+namespace Main.Modules.Product.Application.Lrts.EnrichCatalogue.MapCatalogueCandidatesToProducts;
+
+public class MapCatalogueCandidatesToProductsLrt(
+	IApplicationTransactionFactory transactionService,
+	ILogger<MapCatalogueCandidatesToProductsLrt> logger)
+	: LrtBase<NoneInputState, MapCatalogueCandidatesToProductsState>(
+		transactionService,
+		logger)
+{
+	public const string LrtSystemName = nameof(MapCatalogueCandidatesToProductsLrt);
+
+	public override string SystemName => LrtSystemName;
+
+	public override ILocalizableMessage NameLocalizationMessage
+		=> LrtCatalogueCandidatesMapToProductsNameMessage.Instance;
+
+	public override ILocalizableMessage DescriptionLocalizationMessage
+		=> LrtCatalogueCandidatesMapToProductsDescriptionMessage.Instance;
+
+	protected override async Task DoWork(NoneInputState inputState)
+	{
+		const int batchSize = 1000;
+
+		while (true)
+		{
+			var result = await ProcessBatchAsync(State.LastProcessedId, batchSize);
+
+			if (result.ReadRows == 0)
+				return;
+
+			await SaveStateAsync(
+				new MapCatalogueCandidatesToProductsState
+				{
+					LastProcessedId = result.LastProcessedId,
+					ProcessedRows = State.ProcessedRows + result.ReadRows,
+					MappedRows = State.MappedRows + result.MappedRows,
+					SkippedRows = State.SkippedRows + result.SkippedRows
+				});
+
+			if (!result.HasMore)
+				break;
+		}
+	}
+
+	private Task<BatchResult> ProcessBatchAsync(Guid lastProcessedId, int batchSize)
+	{
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(batchSize);
+
+		return ExecuteInTransactionAsync(
+			TransactionalAttribute.ReadCommitted(30, 3),
+			async (context, cancellationToken) =>
+			{
+				var candidates = await context.GetRequiredService<IRepository<CatalogueCandidate, Guid>>()
+					.ListAsync(
+						Criteria<CatalogueCandidate>
+							.New()
+							.Where(x => x.ProductId == null)
+							.Where(x => x.Id > lastProcessedId)
+							.OrderByAsc(x => x.Id)
+							.Track()
+							.Size(batchSize)
+							.Build(),
+						cancellationToken);
+
+				if (candidates.Count == 0)
+					return new BatchResult(
+						lastProcessedId,
+						0,
+						0,
+						0,
+						false);
+
+				var productIds = await context.GetRequiredService<IProductRepository>()
+					.GetProductIdsByKeys(
+						candidates.Select(x => (NormalizedSku: x.Sku.NormalizedValue, x.ProducerId)),
+						cancellationToken);
+
+				var mappedRows = 0;
+				foreach (var candidate in candidates)
+				{
+					if (!productIds.TryGetValue(
+							(candidate.Sku.NormalizedValue, candidate.ProducerId),
+							out var productId))
+						continue;
+
+					candidate.MapToProduct(productId);
+					mappedRows++;
+				}
+
+				await context.UnitOfWork.SaveChangesAsync(cancellationToken);
+
+				return new BatchResult(
+					candidates[^1].Id,
+					candidates.Count,
+					mappedRows,
+					candidates.Count - mappedRows,
+					candidates.Count == batchSize);
+			},
+			CancellationToken);
+	}
+
+	private sealed record BatchResult(
+		Guid LastProcessedId,
+		int ReadRows,
+		int MappedRows,
+		int SkippedRows,
+		bool HasMore);
+}

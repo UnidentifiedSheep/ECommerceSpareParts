@@ -1,5 +1,5 @@
-﻿using Main.Application.Handlers.Cart.DeleteFromCart;
-using Main.Entities.Exceptions;
+﻿using Main.Entities.Cart.Exceptions;
+using Main.Modules.Cart.Application.Handlers.Cart.DeleteFromCart;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;
@@ -10,7 +10,7 @@ namespace Tests.HandlersTests.Cart;
 
 public class DeleteFromCartTests : IntegrationTest
 {
-	private Main.Entities.Cart.Cart _cartItem = null!;
+	private Main.Entities.Cart.Cart.Cart _cartItem = null!;
 
 	public DeleteFromCartTests(CombinedContainerFixture fixture) : base(fixture)
 	{
@@ -36,7 +36,7 @@ public class DeleteFromCartTests : IntegrationTest
 		await Mediator.Send(command, CancellationToken);
 
 		var cartItem = await Context
-			.Carts
+			.Set<Main.Entities.Cart.Cart.Cart>()
 			.AsNoTracking()
 			.FirstOrDefaultAsync(
 				x => x.UserId == command.UserId && x.ProductId == command.ProductId,

@@ -7,12 +7,16 @@ namespace Attributes;
 public partial class TransactionalAttribute : Attribute
 {
 	public const TransactionErrorKind DefaultRetryErrors =
-		TransactionErrorKind.ConcurrencyConflict | TransactionErrorKind.Deadlock | TransactionErrorKind.LockUnavailable;
+		TransactionErrorKind.ConcurrencyConflict | TransactionErrorKind.Deadlock |
+		TransactionErrorKind.LockUnavailable;
 
 	/// <param name="isolationLevel">Уровень изоляции транзакции</param>
 	/// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
 	/// <param name="retryCount">Количество повторных попыток</param>
-	/// <param name="retryErrors">Дополнительные ошибки для повторения транзакции. Стандартные ошибки включаются всегда.</param>
+	/// <param name="retryErrors">
+	///     Дополнительные ошибки для повторения транзакции. Стандартные ошибки включаются
+	///     всегда.
+	/// </param>
 	public TransactionalAttribute(
 		IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
 		int retryDelayMs = 0,
@@ -34,18 +38,14 @@ public partial class TransactionalAttribute : Attribute
 	public TransactionErrorKind RetryErrors { get; }
 
 	public static TransactionalAttribute ReadCommitted(int delay, int retryCount)
-	{
-		return new TransactionalAttribute(
+		=> new(
 			IsolationLevel.ReadCommitted,
 			delay,
 			retryCount);
-	}
 
 	public static TransactionalAttribute Serializable(int delay, int retryCount)
-	{
-		return new TransactionalAttribute(
+		=> new(
 			IsolationLevel.Serializable,
 			delay,
 			retryCount);
-	}
 }

@@ -13,8 +13,7 @@ internal static class CatalogueSearchAnalysis
 	internal const string ContainsAnalyzer = "catalogue_contains";
 
 	internal static AnalysisDescriptor ConfigureCatalogueSearch(this AnalysisDescriptor analysis)
-	{
-		return analysis
+		=> analysis
 			.Normalizers(normalizers => normalizers.Custom(
 				LowercaseNormalizer,
 				normalizer => normalizer.Filters("lowercase")))
@@ -35,5 +34,4 @@ internal static class CatalogueSearchAnalysis
 				.Custom(
 					ContainsAnalyzer,
 					analyzer => analyzer.Tokenizer("catalogue_contains_tokenizer").Filters("lowercase")));
-	}
 }

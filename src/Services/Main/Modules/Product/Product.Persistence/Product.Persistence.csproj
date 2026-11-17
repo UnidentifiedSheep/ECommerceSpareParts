@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <AssemblyName>Main.Modules.Product.Persistence</AssemblyName>
+        <RootNamespace>Main.Modules.Product.Persistence</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.2"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Product.Application\Product.Application.csproj"/>
+        <ProjectReference Include="..\Product.Entities\Product.Entities.csproj"/>
+    </ItemGroup>
+
+</Project>

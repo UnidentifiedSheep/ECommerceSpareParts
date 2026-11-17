@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Handlers.Producers;
-using Main.Entities.Exceptions;
+using Main.Entities.Product.Exceptions;
+using Main.Modules.Product.Application.Handlers.Producers;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -15,7 +15,7 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
 		var producer = await new ProducerBuilder(Faker)
 			.WithName("Requested producer")
 			.WithDescription("Requested description")
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id), CancellationToken);
 

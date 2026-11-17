@@ -1,0 +1,15 @@
+{
+  "culture": "ru",
+  "messages": {
+    "lrt.document.generation.name": "Генерация документа",
+    "lrt.document.generation.description": "Создаёт документ по выбранному шаблону.",
+    "lrt.document.generation.system.name.required": "Необходимо указать тип документа.",
+    "lrt.document.generation.system.name.too.long": "Название типа документа слишком длинное.",
+    "lrt.document.generation.unknown.system.name": "Запрошенный тип документа недоступен.",
+    "lrt.document.generation.request.required": "Необходимо указать запрос на генерацию документа.",
+    "lrt.document.generation.invalid.requester.id": "Идентификатор инициатора не может быть пустым.",
+    "lrt.document.generation.invalid.request": "Не удалось прочитать запрос на генерацию документа.",
+    "lrt.expired.documents.removal.name": "Удаление просроченных документов",
+    "lrt.expired.documents.removal.description": "Удаляет документы с истёкшим сроком хранения."
+  }
+}

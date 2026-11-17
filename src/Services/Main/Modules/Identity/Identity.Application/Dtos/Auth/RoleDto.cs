@@ -1,0 +1,27 @@
+using System.Text.Json.Serialization;
+
+namespace Main.Modules.Identity.Application.Dtos.Auth;
+
+public record RoleDto
+{
+	[JsonPropertyName("systemName")]
+	public required string SystemName { get; init; }
+
+	[JsonPropertyName("localizedName")]
+	public required string? LocalizedName { get; init; }
+
+	[JsonPropertyName("description")]
+	public required string? Description { get; init; }
+
+	[JsonPropertyName("createdAt")]
+	public required DateTime CreatedAt { get; init; }
+
+	[JsonPropertyName("updatedAt")]
+	public required DateTime UpdatedAt { get; init; }
+
+	[JsonPropertyName("whoCreated")]
+	public required Guid? WhoCreated { get; init; }
+
+	[JsonPropertyName("whoUpdated")]
+	public required Guid? WhoUpdated { get; init; }
+}

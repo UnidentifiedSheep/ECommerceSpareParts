@@ -5,7 +5,7 @@ using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.ProductEnrichment;
-using Main.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Handlers.ProductEnrichment;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

@@ -1,22 +1,11 @@
-﻿using Domain.Interfaces;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Persistence.Common.BaseTableConfigurations;
 
 namespace Persistence.Common;
 
 public static class ModelBuilderExtensions
 {
-	public static ModelBuilder ApplyJobConfigurations(this ModelBuilder modelBuilder)
-	{
-		return modelBuilder
-			.ApplyConfiguration(new JobConfiguration())
-			.ApplyConfiguration(new MultiStepJobConfiguration())
-			.ApplyConfiguration(new JobStepDependencyConfiguration())
-			.ApplyConfiguration(new JobScheduleConfiguration())
-			.ApplyConfiguration(new JobScheduleRunConfiguration());
-	}
-
 	public static ModelBuilder AllDateTimesToUtc(this ModelBuilder modelBuilder)
 	{
 		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -58,6 +47,7 @@ public static class ModelBuilderExtensions
 				continue;
 
 			var builder = modelBuilder.Entity(entityType.ClrType);
+			var tableName = (entityType.GetTableName() ?? entityType.ClrType.Name).ToLowerInvariant();
 
 			builder.Property(nameof(IAuditable.CreatedAt)).HasColumnName("created_at");
 
@@ -69,11 +59,11 @@ public static class ModelBuilderExtensions
 
 			builder
 				.HasIndex(nameof(IAuditable.WhoUpdated))
-				.HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_updated_idx");
+				.HasDatabaseName($"{tableName}_who_updated_idx");
 
 			builder
 				.HasIndex(nameof(IAuditable.WhoCreated))
-				.HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_created_idx");
+				.HasDatabaseName($"{tableName}_who_created_idx");
 		}
 
 		return modelBuilder;

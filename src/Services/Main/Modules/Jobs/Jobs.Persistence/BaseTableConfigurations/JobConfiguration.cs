@@ -1,0 +1,81 @@
+using Domain.CommonEntities.Job;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Main.Modules.Jobs.Persistence.BaseTableConfigurations;
+
+public class JobConfiguration : IEntityTypeConfiguration<Job>
+{
+	public void Configure(EntityTypeBuilder<Job> builder)
+	{
+		builder.ToTable("jobs", "job");
+
+		builder.HasKey(e => e.Id).HasName("jobs_pk");
+
+		builder.Property(e => e.Id).HasColumnName("id").ValueGeneratedOnAdd();
+
+		builder.Property(e => e.Status).HasColumnName("status").HasConversion<string>();
+
+		builder.Property(e => e.Attempts).HasColumnName("attempts");
+
+		builder.Property(e => e.MaxAttempts).HasColumnName("max_attempts");
+
+		builder.Property(e => e.SystemName).HasColumnName("system_name").HasMaxLength(128);
+
+		builder.Property(e => e.NaturalKey).HasColumnName("natural_key").HasMaxLength(256).IsRequired(false);
+
+		builder.Property(e => e.ErrorMessage).HasColumnName("error_message");
+
+		builder.Property(e => e.LockedAt).HasColumnName("locked_at");
+
+		builder.Property(e => e.LeaseExpiresAt).HasColumnName("lease_expires_at");
+
+		builder.Property(e => e.LeaseHolderId).HasColumnName("lease_holder_id");
+
+		builder.Property(e => e.State).HasColumnName("state");
+
+		builder.Property(e => e.InputInitialized).HasColumnName("input_initialized").HasDefaultValue(false);
+
+		builder.Property(e => e.Output).HasColumnName("output");
+
+		builder.Property(e => e.StepKey).HasColumnName("step_key").HasMaxLength(128);
+
+		builder.Property(e => e.MultiStepJobId).HasColumnName("multi_step_job_id");
+
+		builder.HasIndex(e => e.CreatedAt, "jobs_created_at_idx");
+
+		builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
+		builder.HasIndex(
+			e => new
+			{
+				e.Status, e.Id
+			},
+			"jobs_status_id_idx");
+		builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
+		builder.HasIndex(e => e.MultiStepJobId, "jobs_multi_step_job_id_idx");
+		builder.HasIndex(e => new { e.MultiStepJobId, e.StepKey }, "jobs_multi_step_job_id_step_key_uq")
+			.IsUnique()
+			.HasFilter("step_key IS NOT NULL");
+		builder
+			.HasIndex(
+				e => new
+				{
+					e.SystemName, e.NaturalKey
+				},
+				"jobs_pending_system_name_natural_key_uq")
+			.IsUnique()
+			.HasFilter("status = 'Pending' AND natural_key IS NOT NULL");
+
+		builder
+			.HasOne(e => e.MultiStepJob)
+			.WithMany(e => e.Steps)
+			.HasForeignKey(e => e.MultiStepJobId)
+			.OnDelete(DeleteBehavior.Cascade)
+			.HasConstraintName("jobs_multi_step_job_id_fk");
+
+		builder
+			.HasDiscriminator<string>("job_type")
+			.HasValue<SingleRunJob>("job")
+			.HasValue<MultiStepJob>("multi_step_job");
+	}
+}

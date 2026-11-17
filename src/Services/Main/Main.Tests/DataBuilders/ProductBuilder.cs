@@ -1,8 +1,9 @@
 ﻿using Bogus;
-using Main.Entities.Producer;
-using Main.Entities.Product;
-using Main.Entities.Product.ValueObjects;
+using Main.Entities.Product.Producer;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.ValueObjects;
 using Tests.Abstractions;
+using Sku = Main.Entities.Product.Product.ValueObjects.Sku;
 
 namespace Tests.DataBuilders;
 
@@ -55,11 +56,9 @@ public class ProductBuilder(Faker faker) : BuilderBase<Product>(faker)
 	}
 
 	public override Product Build()
-	{
-		return Product.Create(
+		=> Product.Create(
 			Sku ?? Faker.Lorem.Letter(10),
 			Name ?? Faker.Commerce.ProductName(),
 			Faker.PickRandom<int>(ProducerIds),
 			Description);
-	}
 }

@@ -6,11 +6,3 @@
       dockerfile: src/Services/Main/Main.Migrator/Dockerfile
     extra_hosts:
       - "host.docker.internal:host-gateway"
-  
-  pricing.migrator:
-    image: pricing.migrator
-    build:
-      context: .
-      dockerfile: src/Services/Pricing/Pricing.Migrator/Dockerfile
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

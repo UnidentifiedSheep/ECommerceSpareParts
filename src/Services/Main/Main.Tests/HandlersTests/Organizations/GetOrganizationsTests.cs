@@ -1,16 +1,13 @@
-using Tests.Abstractions.Test;
-using FluentValidation.TestHelper;
-using Application.Common.Querying;
-using Main.Entities.Exceptions;
-using Abstractions.Models;
 using Application.Common.Models;
+using Application.Common.Querying;
 using Exceptions;
 using FluentAssertions;
-using Main.Application.Handlers.Organizations.GetOrganizations;
-using Main.Application.Static;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
-using Main.Enums;
+using Main.Entities.Enums;
+using Main.Entities.Exceptions;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
+using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
@@ -22,9 +19,7 @@ namespace Tests.HandlersTests.Organizations;
 public class GetOrganizationsTests : IntegrationTest
 {
 	public GetOrganizationsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	[Fact]
 	public async Task GetOrganizations_ByName_ReturnsMatchingOrganization()
@@ -38,7 +33,7 @@ public class GetOrganizationsTests : IntegrationTest
 		result.Organizations[0].Id.Should().Be(expected.Id);
 		result.Organizations[0].Owner.OrganizationId.Should().Be(expected.Id);
 		result.Organizations[0].Owner.Role.Should().Be(OrganizationRole.Owner);
-		result.Organizations[0].Owner.User.Id.Should().Be(GetContext<UsersTestContext>().Users.First().Id);
+		result.Organizations[0].Owner.UserId.Should().Be(GetContext<UsersTestContext>().Users.First().Id);
 	}
 
 	[Fact]
@@ -69,7 +64,7 @@ public class GetOrganizationsTests : IntegrationTest
 			.WithOwnerId(users[0].Id)
 			.WithName("Member organization")
 			.WithMember(member.Id)
-			.BuildAndAddToDb(Context);
+			.BuildAndAddToDb(Context, CancellationToken);
 
 		var result = await Mediator.Send(CreateQuery("Distinctive Membername"), CancellationToken);
 
@@ -83,15 +78,22 @@ public class GetOrganizationsTests : IntegrationTest
 	public async Task GetOrganizations_ByMemberContactWithoutProfile_ReturnsMatchingOrganization(string term)
 	{
 		var member = new UserBuilder(Faker).WithUserName("preview-member-login")
-			.WithEmail("organization.contact@contacts.example").Build();
-		member.AddUserPhone("+7 (999) 123-45-67", PhoneType.Unknown, false, false);
+			.WithEmail("organization.contact@contacts.example")
+			.Build();
+		member.AddUserPhone(
+			"+7 (999) 123-45-67",
+			PhoneType.Unknown,
+			false,
+			false);
 		Context.Add(member);
 		var expected = await CreateOrganization("First warehouse", "first-warehouse");
 		expected.AddMember(member.Id, OrganizationRole.Member);
 		await Context.SaveChangesAsync(CancellationToken);
 		var unrelated = await CreateOrganization("Second warehouse", "second-warehouse");
 
-		var result = await Mediator.Send(CreateQuery(term, ids: [expected.Id, unrelated.Id]), CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery(term, ids: [expected.Id, unrelated.Id]),
+			CancellationToken);
 
 		result.Organizations.Select(organization => organization.Id).Should().Equal(expected.Id);
 	}
@@ -100,9 +102,17 @@ public class GetOrganizationsTests : IntegrationTest
 	public async Task GetOrganizations_SearchRanksByBestMemberAndPaginatesWithoutDuplicates()
 	{
 		var strongMember = await new UserBuilder(Faker).WithUserName("organization-strong-member")
-			.WithUserInfo("Космонавтов", "Петров", null).BuildAndAddToDb(Context);
+			.WithUserInfo(
+				"Космонавтов",
+				"Петров",
+				null)
+			.BuildAndAddToDb(Context);
 		var weakMember = await new UserBuilder(Faker).WithUserName("organization-weak-member")
-			.WithUserInfo("Николай", "Иванов", "Космонавтов").BuildAndAddToDb(Context);
+			.WithUserInfo(
+				"Николай",
+				"Иванов",
+				"Космонавтов")
+			.BuildAndAddToDb(Context);
 		var first = await CreateOrganization("Alpha warehouse", "alpha-warehouse");
 		var second = await CreateOrganization("Beta warehouse", "beta-warehouse");
 		var weak = await CreateOrganization("Gamma warehouse", "gamma-warehouse");
@@ -118,17 +128,43 @@ public class GetOrganizationsTests : IntegrationTest
 		var organizations = new List<Guid>();
 		for (var page = 0; page < 3; page++)
 		{
-			var result = await Mediator.Send(CreateQuery("космонавтов", ids: ids, page: page, size: 1), CancellationToken);
+			var result = await Mediator.Send(
+				CreateQuery(
+					"космонавтов",
+					ids: ids,
+					page: page,
+					size: 1),
+				CancellationToken);
 			organizations.Add(result.Organizations.Should().ContainSingle().Which.Id);
 		}
 
-		organizations.Should().Equal(strongOrganizations[0].Id, strongOrganizations[1].Id, weak.Id);
-		var last = await Mediator.Send(CreateQuery("космонавтов", ids: ids, page: 3, size: 1), CancellationToken);
+		organizations.Should()
+			.Equal(
+				strongOrganizations[0].Id,
+				strongOrganizations[1].Id,
+				weak.Id);
+		var last = await Mediator.Send(
+			CreateQuery(
+				"космонавтов",
+				ids: ids,
+				page: 3,
+				size: 1),
+			CancellationToken);
 		last.Organizations.Should().BeEmpty();
 
 		var customSort = await Mediator.Send(
-			CreateQuery("космонавтов", ids: ids, sortBy: ["name_desc"]), CancellationToken);
-		customSort.Organizations.Select(organization => organization.Id).Should().Equal(weak.Id, second.Id, first.Id);
+			CreateQuery(
+				"космонавтов",
+				ids: ids,
+				sortBy: ["name_desc"]),
+			CancellationToken);
+		customSort.Organizations
+			.Select(organization => organization.Id)
+			.Should()
+			.Equal(
+				weak.Id,
+				second.Id,
+				first.Id);
 	}
 
 	[Fact]
@@ -222,7 +258,9 @@ public class GetOrganizationsTests : IntegrationTest
 	[Theory]
 	[InlineData("unknown", null)]
 	[InlineData("name", "unexpected")]
-	public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(string field, string? argument)
+	public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(
+		string field,
+		string? argument)
 	{
 		var query = CreateQuery(sortBy: [new SortExpression(field, Argument: argument)]);
 
@@ -284,16 +322,20 @@ public class GetOrganizationsTests : IntegrationTest
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var query = CreateQuery(
-			searchTerm: "organization",
-			userId: member.Id,
-			ids: [first.Id, shared.Id, other.Id],
-			types: [OrganizationType.Business],
-			sortBy: ["name_desc"],
+			"organization",
+			member.Id,
+			[first.Id, shared.Id, other.Id],
+			[OrganizationType.Business],
+			["name_desc"],
 			size: 1);
 
 		var firstPage = await Mediator.Send(query, CancellationToken);
-		var secondPage = await Mediator.Send(query with { Pagination = new Pagination(1, 1) }, CancellationToken);
-		var lastPage = await Mediator.Send(query with { Pagination = new Pagination(2, 1) }, CancellationToken);
+		var secondPage = await Mediator.Send(
+			query with { Pagination = new Pagination(1, 1) },
+			CancellationToken);
+		var lastPage = await Mediator.Send(
+			query with { Pagination = new Pagination(2, 1) },
+			CancellationToken);
 
 		firstPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(shared.Id);
 		secondPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(first.Id);
@@ -306,13 +348,21 @@ public class GetOrganizationsTests : IntegrationTest
 	public async Task GetOrganizations_ByUserId_ShowHiddenControlsHiddenMemberships(bool showHidden)
 	{
 		var member = GetContext<UsersTestContext>().Users.ElementAt(1);
-		var hidden = await CreateOrganization("Hidden organization", "hidden-organization", true);
-		var other = await CreateOrganization("Other hidden organization", "other-hidden-organization", true);
+		var hidden = await CreateOrganization(
+			"Hidden organization",
+			"hidden-organization",
+			true);
+		var other = await CreateOrganization(
+			"Other hidden organization",
+			"other-hidden-organization",
+			true);
 		hidden.AddMember(member.Id, OrganizationRole.Member);
 		await Context.SaveChangesAsync(CancellationToken);
 
 		var query = CreateQuery(
-			userId: member.Id, ids: [hidden.Id, other.Id], showHidden: showHidden);
+			userId: member.Id,
+			ids: [hidden.Id, other.Id],
+			showHidden: showHidden);
 
 		var result = await Mediator.Send(query, CancellationToken);
 
@@ -346,8 +396,7 @@ public class GetOrganizationsTests : IntegrationTest
 		int page = 0,
 		int size = 20,
 		bool showHidden = false)
-	{
-		return new GetOrganizationsQuery(
+		=> new(
 			new Pagination(page, size),
 			sortBy ?? [],
 			searchTerm,
@@ -355,7 +404,6 @@ public class GetOrganizationsTests : IntegrationTest
 			ids ?? [],
 			types ?? [],
 			showHidden);
-	}
 
 	private async Task<Organization> CreateOrganization(
 		string name,
@@ -372,12 +420,20 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 }
 
-public class GetOrganizationsValidationTests : ValidationTest<GetOrganizationsValidation, GetOrganizationsQuery>
+public class
+	GetOrganizationsValidationTests : ValidationTest<GetOrganizationsValidation, GetOrganizationsQuery>
 {
 	[Fact]
 	public async Task GetOrganizations_InvalidPagination_FailsValidation()
 	{
-		var query = new GetOrganizationsQuery(new(-1, 20), [], null, null, [], [], false);
+		var query = new GetOrganizationsQuery(
+			new Pagination(-1, 20),
+			[],
+			null,
+			null,
+			[],
+			[],
+			false);
 
 		var result = await ValidateAsync(query);
 		result.ShouldHaveValidationErrorFor("Pagination.Page");

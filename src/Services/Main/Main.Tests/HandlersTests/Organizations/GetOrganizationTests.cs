@@ -1,8 +1,8 @@
 using FluentAssertions;
-using Main.Application.Handlers.Organizations;
-using Main.Entities.Exceptions;
-using Main.Entities.Organization;
-using Main.Enums.Organization;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Entities.Organization.Exceptions;
+using Main.Entities.Organization.Organization;
+using Main.Modules.Organization.Application.Handlers.Organizations;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
@@ -13,9 +13,7 @@ namespace Tests.HandlersTests.Organizations;
 public sealed class GetOrganizationTests : IntegrationTest
 {
 	public GetOrganizationTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<UsersTestContext>();
-	}
+		=> RegisterBasicContext<UsersTestContext>();
 
 	[Fact]
 	public async Task GetOrganization_ById_ReturnsOrganization()
@@ -31,7 +29,7 @@ public sealed class GetOrganizationTests : IntegrationTest
 		result.Organization.Type.Should().Be(OrganizationType.Business);
 		result.Organization.Owner.OrganizationId.Should().Be(organization.Id);
 		result.Organization.Owner.Role.Should().Be(OrganizationRole.Owner);
-		result.Organization.Owner.User.Id.Should().Be(owner.Id);
+		result.Organization.Owner.UserId.Should().Be(owner.Id);
 	}
 
 	[Fact]

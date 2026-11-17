@@ -1,27 +1,23 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Abstractions.Interfaces;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Persistence;
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Options.S3;
 using CsvHelper.Configuration.Attributes;
-using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
 using FluentAssertions;
 using Locan.Core.Interfaces;
 using Locan.Core.Interfaces.Localizers;
 using Locan.Core.LocalizableMessages;
-using Main.Application.Lrts.Base;
-using Main.Entities;
-using MassTransit;
+using Main.Entities.Product;
+using Main.Modules.Product.Application.Lrts.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
+using S3.Core.Options;
 using SchemaGeneration.Abstractions.Attributes;
-using Tests.Abstractions.Test;
+using Tests.Jobs;
 using Tests.Stubs;
 using Tests.TestContainers.Combined;
 
@@ -49,12 +45,12 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		var state = execution.GetState<TestCsvImportState>();
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state
-		.ProcessedLines
-		.Should()
-		.Equal(
-			1,
-			3,
-			4);
+			.ProcessedLines
+			.Should()
+			.Equal(
+				1,
+				3,
+				4);
 		state.Errors.Should().ContainSingle(x => x.RowIdx == 2);
 	}
 
@@ -79,7 +75,10 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		var fileName = $"{Guid.NewGuid():N}.csv";
 		var content = "\uFEFFValue\n🙂\n\"two\nlines\"\nretry-once\nlast";
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
-		storage.SetFile(UploadsBucket, fileName, content);
+		storage.SetFile(
+			UploadsBucket,
+			fileName,
+			content);
 
 		var execution = await ExecuteLrt(
 			JsonSerializer.Serialize(new TestCsvImportInputState { FileName = fileName }),
@@ -87,13 +86,21 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<TestCsvImportState>();
-		state.ProcessedLines.Should().Equal(1, 2, 3, 4);
+		state.ProcessedLines
+			.Should()
+			.Equal(
+				1,
+				2,
+				3,
+				4);
 		state.Checkpoint!.CurrentLine.Should().Be(4);
 		state.Checkpoint!.Offset.Should().Be(Encoding.UTF8.GetByteCount(content));
 		state.Checkpoint.RawHeader.Should().Be("\uFEFFValue\n");
-		storage.GetDownloadOffsets(UploadsBucket, fileName).Should().Equal(
-			0,
-			Encoding.UTF8.GetByteCount("\uFEFFValue\n🙂\n\"two\nlines\"\n"));
+		storage.GetDownloadOffsets(UploadsBucket, fileName)
+			.Should()
+			.Equal(
+				0,
+				Encoding.UTF8.GetByteCount("\uFEFFValue\n🙂\n\"two\nlines\"\n"));
 	}
 
 	[Fact]
@@ -102,7 +109,10 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		var fileName = $"{Guid.NewGuid():N}.csv";
 		var content = "Value\nfail-on-succeed\nsecond";
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
-		storage.SetFile(UploadsBucket, fileName, content);
+		storage.SetFile(
+			UploadsBucket,
+			fileName,
+			content);
 
 		var execution = await ExecuteLrt(
 			JsonSerializer.Serialize(new TestCsvImportInputState { FileName = fileName }),
@@ -121,7 +131,10 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		var fileName = $"{Guid.NewGuid():N}.csv";
 		var content = "\"Val,ue\"\nfirst\nsecond\nretry-once\nlast";
 		var storage = Scope.ServiceProvider.GetRequiredService<S3StorageServiceStub>();
-		storage.SetFile(UploadsBucket, fileName, content);
+		storage.SetFile(
+			UploadsBucket,
+			fileName,
+			content);
 
 		var execution = await ExecuteLrt(
 			JsonSerializer.Serialize(new TestCsvImportInputState { FileName = fileName }),
@@ -129,11 +142,19 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 
 		execution.Job.Status.Should().Be(JobStatus.Succeeded, execution.Job.ErrorMessage);
 		var state = execution.GetState<TestCsvImportState>();
-		state.ProcessedLines.Should().Equal(1, 2, 3, 4);
+		state.ProcessedLines
+			.Should()
+			.Equal(
+				1,
+				2,
+				3,
+				4);
 		state.Checkpoint!.RawHeader.Should().Be("\"Val,ue\"\n");
-		storage.GetDownloadOffsets(UploadsBucket, fileName).Should().Equal(
-			0,
-			Encoding.UTF8.GetByteCount("\"Val,ue\"\nfirst\nsecond\n"));
+		storage.GetDownloadOffsets(UploadsBucket, fileName)
+			.Should()
+			.Equal(
+				0,
+				Encoding.UTF8.GetByteCount("\"Val,ue\"\nfirst\nsecond\n"));
 	}
 
 	private async Task<LrtExecutionResult> ExecuteCsv(bool stopOnFirstError, params string[] rows)
@@ -146,12 +167,12 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 				"Value"
 			}.Concat(rows));
 		Scope
-		.ServiceProvider
-		.GetRequiredService<S3StorageServiceStub>()
-		.SetFile(
-			UploadsBucket,
-			fileName,
-			csv);
+			.ServiceProvider
+			.GetRequiredService<S3StorageServiceStub>()
+			.SetFile(
+				UploadsBucket,
+				fileName,
+				csv);
 
 		return await ExecuteLrt(
 			JsonSerializer.Serialize(
@@ -174,9 +195,9 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 			s3Service,
 			stringLocalizer)
 	{
-		private bool _failedOnce;
 		private bool _failOnSucceed;
 		private bool _failedOnSucceed;
+		private bool _failedOnce;
 
 		protected override int BatchSize => 100;
 
@@ -186,14 +207,14 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 
 		public override string SystemName => nameof(TestCsvImportLrt);
 
-		public override ILocalizableMessage NameLocalizationMessage =>
-			new LocalizableMessage("test.csv.import.name");
+		public override ILocalizableMessage NameLocalizationMessage
+			=> new LocalizableMessage("test.csv.import.name");
 
-		public override ILocalizableMessage DescriptionLocalizationMessage =>
-			new LocalizableMessage("test.csv.import.description");
+		public override ILocalizableMessage DescriptionLocalizationMessage
+			=> new LocalizableMessage("test.csv.import.description");
 
-		protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage =>
-			ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
+		protected override ILocalizableMessage GetTooManyErrorsLocalizationMessage
+			=> ProducerTooManyErrorsWhileProcessingBatchMessage.Instance;
 
 		protected override bool TryProcessRow(
 			int rowIdx,
@@ -233,6 +254,7 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 				_failedOnSucceed = true;
 				throw new InvalidOperationException("Transient failure after final checkpoint.");
 			}
+
 			return base.SucceedJobAsync();
 		}
 	}
@@ -255,10 +277,11 @@ public sealed class CsvImportLrtBaseTests : LrtIntegrationTest<CsvImportLrtBaseT
 		[JsonPropertyName("checkpoint")]
 		public CsvImportCheckpoint? Checkpoint { get; init; }
 
-		public TestCsvImportState WithCheckpoint(CsvImportCheckpoint checkpoint) => this with
-		{
-			Checkpoint = checkpoint
-		};
+		public TestCsvImportState WithCheckpoint(CsvImportCheckpoint checkpoint)
+			=> this with
+			{
+				Checkpoint = checkpoint
+			};
 	}
 
 	[CsvSchema(typeof(TestCsvDto))]
