@@ -12,5 +12,7 @@ public enum InputControlType
 
 	EnumSelector,
 
-	NamedObjectSelector
+	NamedObjectSelector,
+
+	MonthPicker
 }

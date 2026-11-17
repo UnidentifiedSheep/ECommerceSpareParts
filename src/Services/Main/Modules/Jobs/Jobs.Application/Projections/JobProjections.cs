@@ -44,7 +44,7 @@ public sealed class JobScheduleDtoProjectionProvider : ProjectionProviderBase<Jo
 				schedule.Cron,
 				new Options
 				{
-					DayOfWeekStartIndexZero = false,
+					DayOfWeekStartIndexZero = true,
 					Use24HourTimeFormat = true,
 					Locale = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName
 				}),

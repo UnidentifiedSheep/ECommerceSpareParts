@@ -4,6 +4,7 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Cronos;
 using Domain.CommonEntities.Job;
+using Main.Modules.Analytics.Application.Lrts.RemoveOldAnalyticsRuns;
 using Main.Modules.Currency.Application.Lrts;
 using Main.Modules.Documents.Application.Lrts.RemoveExpiredDocuments;
 using Main.Modules.Identity.Application.Lrts;
@@ -40,6 +41,15 @@ public class ScheduledLrtSeed : ISeed<UnifiedDbContext>
 				ClearExpiredTokensLrt.Name,
 				"0 3 * * 0",
 				new NoneInputState()),
+			DefaultSchedule.Create(
+				"Remove old analytics runs",
+				"Removes unpinned analytics runs older than 90 days once a month.",
+				RemoveOldAnalyticsRunsLrt.Name,
+				"0 5 1 * *",
+				new RemoveOldAnalyticsRunsInputState
+				{
+					OlderThanDays = 90
+				}),
 			DefaultSchedule.Create(
 				"Remove deleted search products",
 				"Removes deleted product documents from the search index once a day.",

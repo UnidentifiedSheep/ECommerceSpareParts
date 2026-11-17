@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Projections;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Organization.Enums.Organization;
 using Main.Modules.Organization.Application.Dtos.Organizations;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,7 +32,7 @@ public sealed class GetOrganizationsByIdsHandler(
 			return new GetOrganizationsByIdsResult(new Dictionary<Guid, OrganizationDto>());
 
 		var organizations = await repository.Query
-			.Where(x => request.Ids.Contains(x.Id) && x.Type != OrganizationType.System)
+			.Where(x => request.Ids.Contains(x.Id))
 			.Project(projection)
 			.ToDictionaryAsync(x => x.Id, cancellationToken);
 

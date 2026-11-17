@@ -215,6 +215,9 @@ public enum PermissionCodes
 	// ===== CHARTS =====
 	CHARTS_GET,
 
+	// ===== ANALYTICS =====
+	ANALYTICS_RUNS_EDIT,
+
 	// ===== NOTIFICATIONS =====
 	NOTIFICATIONS_ME,
 	NOTIFICATIONS_ALL,
