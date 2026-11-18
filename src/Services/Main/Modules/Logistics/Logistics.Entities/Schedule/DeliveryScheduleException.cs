@@ -8,35 +8,27 @@ public class DeliveryScheduleException : Entity<DeliveryScheduleException, Sched
 	ILinqEntity<DeliveryScheduleException, ScheduleExceptionKey>
 {
 	public Guid DeliveryScheduleId { get; private set; }
-	public int Year { get; private set; }
-	public int Month { get; private set; }
-	public int Day { get; private set; }
+	public DateTime Date { get; private set; }
 
 	private DeliveryScheduleException() { }
 
 	internal DeliveryScheduleException(Guid deliveryScheduleId, DateTime exceptionDate)
 	{
 		DeliveryScheduleId = deliveryScheduleId;
-		Year = exceptionDate.Year;
-		Month = exceptionDate.Month;
-		Day = exceptionDate.Day;
+		Date = exceptionDate.Date;
+
+		if (DateTime.Today > Date)
+			throw new InvalidOperationException("The date cannot be in the past.");
 	}
 
-	public override ScheduleExceptionKey GetId() => new(DeliveryScheduleId, Year, Month, Day);
+	public override ScheduleExceptionKey GetId() => new(DeliveryScheduleId, Date);
 	public static Expression<Func<DeliveryScheduleException, ScheduleExceptionKey>> GetKeySelector()
-		=> x => new(x.DeliveryScheduleId, x.Year, x.Month, x.Day);
+		=> x => new(x.DeliveryScheduleId, x.Date);
 	public static Expression<Func<DeliveryScheduleException, bool>> GetEqualityExpression(ScheduleExceptionKey key)
-		=> x => x.DeliveryScheduleId == key.DeliveryScheduleId &&
-			x.Year == key.Year &&
-			x.Month == key.Month &&
-			x.Day == key.Day;
+		=> x => x.DeliveryScheduleId == key.DeliveryScheduleId && x.Date == key.Date;
 }
 
-public readonly record struct ScheduleExceptionKey(
-	Guid DeliveryScheduleId,
-	int Year,
-	int Month,
-	int Day) : ICompositeKey
+public readonly record struct ScheduleExceptionKey(Guid DeliveryScheduleId, DateTime Date) : ICompositeKey
 {
-	public object[] ToArray() => [DeliveryScheduleId, Year, Month, Day];
+	public object[] ToArray() => [DeliveryScheduleId, Date];
 }
