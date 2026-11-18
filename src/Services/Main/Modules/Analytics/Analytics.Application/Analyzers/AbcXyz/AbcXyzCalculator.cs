@@ -12,7 +12,7 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 		IEnumerable<ProductPeriodValue> rows,
 		AbcXyzParameters parameters)
 	{
-		var periods = BuildPeriods(parameters);
+		var periods = parameters.Periods();
 		var indexByKey = periods
 			.Select((period, index) => (Key: MonthKey(period), Index: index))
 			.ToDictionary(item => item.Key, item => item.Index);
@@ -122,16 +122,6 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 		}
 
 		return new AbcXyzSummary(items.Count, periodsCount, total, cells);
-	}
-
-	private static List<DateTime> BuildPeriods(AbcXyzParameters parameters)
-	{
-		var periods = new List<DateTime>();
-		for (var period = parameters.From; period < parameters.EndExclusive(); period = period.AddMonths(1))
-			if (parameters.Months is not { Count: > 0 } || parameters.Months.Contains((Month)period.Month))
-				periods.Add(period);
-
-		return periods;
 	}
 
 	private static int MonthKey(DateTime value) => value.Year * 12 + value.Month - 1;

@@ -9,6 +9,7 @@ public sealed record AbcXyzRunItemDataPoint : IChartDataPoint
 {
 	[JsonPropertyName("productId")]
 	[RequiredSchemaField]
+	[SchemaDependsOnEntity("Product", "id")]
 	[SchemaFieldLabel("chart.abc.xyz.run.items.point.product.id.name")]
 	[SchemaFieldDescription("chart.abc.xyz.run.items.point.product.id.description")]
 	public required int ProductId { get; init; }

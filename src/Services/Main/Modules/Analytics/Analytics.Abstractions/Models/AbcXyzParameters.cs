@@ -95,4 +95,14 @@ public record AbcXyzParameters
 	public Guid? BuyerId { get; init; }
 
 	public DateTime EndExclusive() => To.AddMonths(1);
+
+	public IReadOnlyList<DateTime> Periods()
+	{
+		var periods = new List<DateTime>();
+		for (var period = From; period < EndExclusive(); period = period.AddMonths(1))
+			if (Months is not { Count: > 0 } || Months.Contains((Month)period.Month))
+				periods.Add(period);
+
+		return periods;
+	}
 }

@@ -106,10 +106,15 @@ public sealed class AbcXyzAnalyzerTests : IntegrationTest
 		AddSale(ProductA, 1, 1, 20);
 		AddSale(ProductA, 2, 1, 30);
 
-		var result = await Analyze(Window() with { Months = [(Month)WindowStart.AddMonths(1).Month] });
+		var result = await Analyze(
+			Window() with
+			{
+				Months = [(Month)WindowStart.AddMonths(1).Month, (Month)WindowStart.AddMonths(2).Month],
+				MinPeriods = 2
+			});
 
-		result.Items.Single().Revenue.Should().Be(20m);
-		result.Summary.PeriodsCount.Should().Be(1);
+		result.Items.Single().Revenue.Should().Be(50m);
+		result.Summary.PeriodsCount.Should().Be(2);
 	}
 
 	[Fact]

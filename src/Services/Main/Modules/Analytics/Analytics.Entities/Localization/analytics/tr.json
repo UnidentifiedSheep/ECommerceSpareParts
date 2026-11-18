@@ -3,6 +3,7 @@
   "messages": {
     "chart.data.source.not.found": "{SystemName} grafik veri kaynağı bulunamadı.",
     "chart.data.source.query.input.invalid": "Grafik sorgusu girdisi geçersiz.",
+    "chart.data.point.reference.invalid": "Grafik veri noktası alanı {Field|string}, {EntityName|string} olarak çözümlenemez.",
     "lrt.markup.calculation.name": "Kâr marjı hesaplama",
     "lrt.markup.calculation.description": "Önerilen kâr marjı aralıklarını hesaplar.",
     "markup.calculation.input.invalid": "Geçersiz kâr marjı hesaplama verileri sağlandı.",
@@ -51,6 +52,7 @@
     "abc.xyz.parameters.shares.invalid": "ABC payları pozitif olmalı ve toplamları 1'i geçmemelidir.",
     "abc.xyz.parameters.coefficients.invalid": "XYZ katsayıları 0 < X < Y koşulunu sağlamalıdır.",
     "abc.xyz.parameters.min.periods.invalid": "Asgari dönem sayısı en az 2 olmalıdır.",
+    "abc.xyz.parameters.min.periods.exceed.window": "Minimum dönem sayısı seçilen penceredeki aylık dönem sayısını aşamaz.",
     "lrt.abc.xyz.calculation.name": "ABC/XYZ analizi",
     "lrt.abc.xyz.calculation.description": "Ürünleri gelire veya miktara göre sıralar (ABC), talep istikrarına göre sınıflandırır (XYZ) ve sonucu analiz çalıştırması olarak kaydeder.",
     "abc.xyz.parameters.from.name": "Dönem başlangıcı (ay)",

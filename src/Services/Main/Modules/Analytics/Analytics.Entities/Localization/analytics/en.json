@@ -3,6 +3,7 @@
   "messages": {
     "chart.data.source.not.found": "Chart data source {SystemName|string} was not found.",
     "chart.data.source.query.input.invalid": "Chart query input is invalid.",
+    "chart.data.point.reference.invalid": "Chart data point field {Field|string} cannot be resolved as {EntityName|string}.",
     "lrt.markup.calculation.name": "Markup calculation",
     "lrt.markup.calculation.description": "Calculates recommended markup ranges.",
     "markup.calculation.input.invalid": "Invalid markup calculation input data was provided.",
@@ -51,6 +52,7 @@
     "abc.xyz.parameters.shares.invalid": "ABC shares must be positive and their sum must not exceed 1.",
     "abc.xyz.parameters.coefficients.invalid": "XYZ coefficients must satisfy 0 < X < Y.",
     "abc.xyz.parameters.min.periods.invalid": "Minimum periods must be at least 2.",
+    "abc.xyz.parameters.min.periods.exceed.window": "Minimum periods cannot exceed the number of monthly periods in the selected window.",
     "lrt.abc.xyz.calculation.name": "ABC/XYZ analysis",
     "lrt.abc.xyz.calculation.description": "Ranks products by revenue or quantity (ABC) and classifies them by demand stability (XYZ), then saves the result as an analysis run.",
     "abc.xyz.parameters.from.name": "Period start (month)",

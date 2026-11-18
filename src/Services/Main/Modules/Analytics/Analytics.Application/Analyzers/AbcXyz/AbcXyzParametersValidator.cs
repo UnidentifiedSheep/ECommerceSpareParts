@@ -44,6 +44,11 @@ public sealed class AbcXyzParametersValidator : AbstractValidator<AbcXyzParamete
 		RuleFor(x => x.MinPeriods)
 			.GreaterThanOrEqualTo(2)
 			.WithLocalizableError(AbcXyzParametersMinPeriodsInvalidMessage.Instance);
+
+		RuleFor(x => x)
+			.Must(x => x.MinPeriods <= x.Periods().Count)
+			.When(x => x.MinPeriods >= 2)
+			.WithLocalizableError(AbcXyzParametersMinPeriodsExceedWindowMessage.Instance);
 	}
 
 	private static bool IsMonthStart(DateTime value)

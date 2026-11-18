@@ -31,7 +31,7 @@ public class AbcXyzCalculationLrtTests : IntegrationTest
 		return new AbcXyzParameters
 		{
 			From = start,
-			To = start,
+			To = start.AddMonths(1),
 			AbcMetric = AnalysisMetric.Revenue,
 			XyzMetric = AnalysisMetric.Quantity,
 			AShare = 0.80m,
@@ -55,7 +55,7 @@ public class AbcXyzCalculationLrtTests : IntegrationTest
 		run.AnalysisType.Should().Be("AbcXyz");
 		run.ParametersHash.Should().Be(AbcXyzRunFactory.ComputeHash(parameters));
 		run.PeriodStart.Should().Be(parameters.From);
-		run.PeriodEnd.Should().Be(parameters.From.AddMonths(1));
+		run.PeriodEnd.Should().Be(parameters.EndExclusive());
 		run.ItemsCount.Should().Be(1);
 		var item = await Context.Set<AnalyticsRunItem>().AsNoTracking().SingleAsync(CancellationToken);
 		item.RunId.Should().Be(run.Id);

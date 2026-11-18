@@ -3,6 +3,7 @@
   "messages": {
     "chart.data.source.not.found": "Источник данных графика {SystemName} не найден.",
     "chart.data.source.query.input.invalid": "Некорректные параметры запроса графика.",
+    "chart.data.point.reference.invalid": "Поле точки чарта {Field|string} нельзя получить как {EntityName|string}.",
     "lrt.markup.calculation.name": "Расчет наценок",
     "lrt.markup.calculation.description": "Рассчитывает рекомендуемые диапазоны наценок.",
     "markup.calculation.input.invalid": "Переданы некорректные входные данные для расчета наценки.",
@@ -51,6 +52,7 @@
     "abc.xyz.parameters.shares.invalid": "Доли ABC должны быть положительными, а их сумма не должна превышать 1.",
     "abc.xyz.parameters.coefficients.invalid": "Коэффициенты XYZ должны удовлетворять условию 0 < X < Y.",
     "abc.xyz.parameters.min.periods.invalid": "Минимальное количество периодов должно быть не меньше 2.",
+    "abc.xyz.parameters.min.periods.exceed.window": "Минимальное количество периодов не может превышать число месячных периодов в выбранном окне.",
     "lrt.abc.xyz.calculation.name": "ABC/XYZ-анализ",
     "lrt.abc.xyz.calculation.description": "Ранжирует товары по выручке или количеству (ABC), классифицирует их по стабильности спроса (XYZ) и сохраняет результат как запуск анализа.",
     "abc.xyz.parameters.from.name": "Начало периода (месяц)",

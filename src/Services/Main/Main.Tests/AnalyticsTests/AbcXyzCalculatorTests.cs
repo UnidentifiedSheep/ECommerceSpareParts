@@ -200,8 +200,8 @@ public class AbcXyzCalculatorTests
 		=> Validate(Parameters()).IsValid.Should().BeTrue();
 
 	[Fact]
-	public void Validator_AcceptsSingleMonthPeriod()
-		=> Validate(Parameters() with { To = WindowStart }).IsValid.Should().BeTrue();
+	public void Validator_AcceptsWindowWithExactlyMinPeriods()
+		=> Validate(Parameters() with { To = WindowStart.AddMonths(5) }).IsValid.Should().BeTrue();
 
 	[Fact]
 	public void Validator_AcceptsSelectedMonthsAndOptionalFilters()
@@ -209,6 +209,7 @@ public class AbcXyzCalculatorTests
 				Parameters() with
 				{
 					Months = [Month.January, Month.December],
+					MinPeriods = 2,
 					OrganizationId = Guid.NewGuid(),
 					BuyerId = Guid.NewGuid()
 				})
@@ -236,7 +237,10 @@ public class AbcXyzCalculatorTests
 			Parameters() with { AShare = 0.9m, BShare = 0.2m },
 			Parameters() with { XCoefficient = 0m },
 			Parameters() with { XCoefficient = 0.3m, YCoefficient = 0.2m },
-			Parameters() with { MinPeriods = 1 }
+			Parameters() with { MinPeriods = 1 },
+			Parameters() with { To = WindowStart.AddMonths(4) },
+			Parameters() with { To = WindowStart },
+			Parameters() with { Months = [Month.January, Month.February], MinPeriods = 12 }
 		};
 
 	private static FluentValidation.Results.ValidationResult Validate(AbcXyzParameters parameters)
