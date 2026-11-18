@@ -53,7 +53,10 @@ public static class AbcXyzRunFactory
 			YCoefficient = parameters.YCoefficient,
 			MinPeriods = parameters.MinPeriods,
 			OrganizationId = parameters.OrganizationId,
-			BuyerId = parameters.BuyerId
+			BuyerId = parameters.BuyerId,
+			Granularity = parameters.Granularity,
+			AdiCutoff = parameters.AdiCutoff,
+			Cv2Cutoff = parameters.Cv2Cutoff
 		};
 		return AnalyticsJson.Serialize(normalized);
 	}
@@ -67,13 +70,15 @@ public static class AbcXyzRunFactory
 				item.Rank,
 				item.Value,
 				item.Share,
-				new AbcXyzItemSegments(item.AbcClass, item.XyzClass),
+				new AbcXyzItemSegments(item.AbcClass, item.XyzClass, item.DemandPattern),
 				new AbcXyzItemData(
 					item.Quantity,
 					item.Revenue,
 					item.CumulativeShare,
 					item.CoefficientOfVariation,
-					item.PeriodsCount))
+					item.PeriodsCount,
+					item.Adi,
+					item.Cv2))
 			.ToEntity(runId);
 }
 

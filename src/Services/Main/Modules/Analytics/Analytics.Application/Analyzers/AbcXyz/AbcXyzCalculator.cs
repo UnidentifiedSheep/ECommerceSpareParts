@@ -20,7 +20,7 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 		var series = new Dictionary<int, ProductSeries>();
 		foreach (var row in rows)
 		{
-			if (!indexByKey.TryGetValue(MonthKey(row.PeriodStart), out var index))
+			if (!indexByKey.TryGetValue(MonthKey(parameters.PeriodOf(row.PeriodStart)), out var index))
 				continue;
 			if (!series.TryGetValue(row.ProductId, out var product))
 				series[row.ProductId] = product = new ProductSeries(periods.Count);
@@ -59,6 +59,7 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 			cumulative += share;
 
 			var (xyz, coefficient, count) = ClassifyXyz(product, parameters);
+			var (pattern, adi, cv2) = ClassifyDemand(product, parameters);
 			items.Add(
 				new AbcXyzItem(
 					productId,
@@ -71,7 +72,10 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 					abc,
 					xyz,
 					coefficient,
-					count));
+					count,
+					pattern,
+					adi,
+					cv2));
 		}
 
 		return new AbcXyzAnalysisResult(items, BuildSummary(items, periods.Count, total));
@@ -111,6 +115,39 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 		return (xyz, coefficient, count);
 	}
 
+	private static (DemandPattern? Pattern, decimal? Adi, decimal? Cv2) ClassifyDemand(
+		ProductSeries product,
+		AbcXyzParameters parameters)
+	{
+		var first = product.FirstSaleIndex;
+		var count = product.Length - first;
+		if (count < parameters.MinPeriods)
+			return (null, null, null);
+
+		var values = parameters.XyzMetric == AnalysisMetric.Quantity ? product.Quantity : product.Revenue;
+		var sizes = new List<decimal>();
+		for (var i = first; i < product.Length; i++)
+			if (values[i] > 0)
+				sizes.Add(values[i]);
+
+		if (sizes.Count == 0)
+			return (null, null, null);
+
+		var adi = Math.Round((decimal)count / sizes.Count, Scale);
+		if (sizes.Count < 2)
+			return (null, adi, null);
+
+		var mean = sizes.Average();
+		var variance = sizes.Sum(size => (size - mean) * (size - mean)) / sizes.Count;
+		var cv2 = Math.Round(variance / (mean * mean), Scale);
+		var pattern = adi <= parameters.AdiCutoff
+			? cv2 <= parameters.Cv2Cutoff ? DemandPattern.Smooth : DemandPattern.Erratic
+			: cv2 <= parameters.Cv2Cutoff
+				? DemandPattern.Intermittent
+				: DemandPattern.Lumpy;
+		return (pattern, adi, cv2);
+	}
+
 	private static AbcXyzSummary BuildSummary(IReadOnlyList<AbcXyzItem> items, int periodsCount, decimal total)
 	{
 		var cells = new List<AbcXyzCell>();
@@ -121,7 +158,15 @@ public sealed class AbcXyzCalculator : IAbcXyzCalculator
 			cells.Add(new AbcXyzCell(abc, xyz, matching.Count, matching.Sum(item => item.Value)));
 		}
 
-		return new AbcXyzSummary(items.Count, periodsCount, total, cells);
+		var patternCells = new List<AbcXyzPatternCell>();
+		foreach (var abc in Enum.GetValues<AbcClass>())
+		foreach (var pattern in Enum.GetValues<DemandPattern>().Select(x => (DemandPattern?)x).Append(null))
+		{
+			var matching = items.Where(item => item.AbcClass == abc && item.DemandPattern == pattern).ToList();
+			patternCells.Add(new AbcXyzPatternCell(abc, pattern, matching.Count, matching.Sum(item => item.Value)));
+		}
+
+		return new AbcXyzSummary(items.Count, periodsCount, total, cells, patternCells);
 	}
 
 	private static int MonthKey(DateTime value) => value.Year * 12 + value.Month - 1;

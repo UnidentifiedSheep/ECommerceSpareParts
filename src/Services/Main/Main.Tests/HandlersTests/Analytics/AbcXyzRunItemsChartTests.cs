@@ -65,6 +65,32 @@ public class AbcXyzRunItemsChartTests(CombinedContainerFixture fixture) : Integr
 	}
 
 	[Fact]
+	public async Task Query_FiltersByDemandPattern()
+	{
+		var run = await AnalyticsRunTestData.AddRunAsync(Context, CancellationToken);
+		await AnalyticsRunTestData.AddPatternItemsAsync(
+			Context,
+			run.Id,
+			CancellationToken,
+			(201, 1, DemandPattern.Smooth),
+			(202, 2, DemandPattern.Lumpy),
+			(203, 3, DemandPattern.Intermittent),
+			(204, 4, null));
+
+		var lumpy = await Query(new { runId = run.Id, pattern = "Lumpy" });
+		var unclassified = await Query(new { runId = run.Id, pattern = "Unclassified" });
+		var all = await Query(new { runId = run.Id });
+
+		lumpy.Points.Select(point => point.ProductId).Should().Equal(202);
+		lumpy.Points.Single().DemandPattern.Should().Be(DemandPattern.Lumpy);
+		lumpy.Points.Single().Adi.Should().Be(4m);
+		lumpy.Points.Single().Cv2.Should().Be(0.8m);
+		unclassified.Points.Select(point => point.ProductId).Should().Equal(204);
+		unclassified.Points.Single().DemandPattern.Should().BeNull();
+		all.Points.Should().HaveCount(4);
+	}
+
+	[Fact]
 	public async Task Query_ThrowsNotFoundForUnknownRunOrForeignAnalysisType()
 	{
 		var foreign = await AnalyticsRunTestData.AddRunAsync(Context, CancellationToken, "Other");
@@ -100,10 +126,10 @@ public class AbcXyzRunItemsChartTests(CombinedContainerFixture fixture) : Integr
 		chart.Description.Should().NotStartWith("chart.");
 		chart.QueryInputSchema.Fields.Select(field => field.Name)
 			.Should()
-			.BeEquivalentTo("runId", "abc", "xyz", "cursor", "size");
+			.BeEquivalentTo("runId", "abc", "xyz", "pattern", "cursor", "size");
 		chart.QueryInputSchema.Fields.Should().OnlyContain(field => !field.Label!.StartsWith("chart."));
 		chart.QueryInputSchema.Fields.Should().OnlyContain(field => !field.Label!.StartsWith("pagination."));
-		chart.DataPointSchema.Fields.Should().HaveCount(11);
+		chart.DataPointSchema.Fields.Should().HaveCount(14);
 		chart.DataPointSchema.Fields.Should().OnlyContain(field => !field.Label!.StartsWith("chart."));
 		chart.DataPointSchema.Fields.Should().OnlyContain(field => !field.Description!.StartsWith("chart."));
 	}

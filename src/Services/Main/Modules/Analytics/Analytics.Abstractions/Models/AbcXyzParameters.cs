@@ -6,6 +6,10 @@ namespace Main.Modules.Analytics.Abstractions.Models;
 
 public record AbcXyzParameters
 {
+	public const decimal DefaultAdiCutoff = 1.32m;
+
+	public const decimal DefaultCv2Cutoff = 0.49m;
+
 	[JsonPropertyName("from")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.MonthPicker)]
@@ -80,6 +84,26 @@ public record AbcXyzParameters
 	[SchemaFieldDescription("abc.xyz.parameters.min.periods.description")]
 	public required int MinPeriods { get; init; }
 
+	[JsonPropertyName("granularity")]
+	[SchemaInputControl(InputControlType.EnumSelector)]
+	[SchemaDependsOnEntity(SchemaEntity.AnalysisPeriodGranularity)]
+	[SchemaFieldLabel("abc.xyz.parameters.granularity.name")]
+	[SchemaFieldDescription("abc.xyz.parameters.granularity.description")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	public AnalysisPeriodGranularity Granularity { get; init; } = AnalysisPeriodGranularity.Month;
+
+	[JsonPropertyName("adiCutoff")]
+	[SchemaInputControl(InputControlType.TextField)]
+	[SchemaFieldLabel("abc.xyz.parameters.adi.cutoff.name")]
+	[SchemaFieldDescription("abc.xyz.parameters.adi.cutoff.description")]
+	public decimal AdiCutoff { get; init; } = DefaultAdiCutoff;
+
+	[JsonPropertyName("cv2Cutoff")]
+	[SchemaInputControl(InputControlType.TextField)]
+	[SchemaFieldLabel("abc.xyz.parameters.cv2.cutoff.name")]
+	[SchemaFieldDescription("abc.xyz.parameters.cv2.cutoff.description")]
+	public decimal Cv2Cutoff { get; init; } = DefaultCv2Cutoff;
+
 	[JsonPropertyName("organizationId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
 	[SchemaDependsOnEntity(SchemaEntity.Organization, "id")]
@@ -98,11 +122,24 @@ public record AbcXyzParameters
 
 	public IReadOnlyList<DateTime> Periods()
 	{
+		var quarterly = Granularity == AnalysisPeriodGranularity.Quarter;
 		var periods = new List<DateTime>();
-		for (var period = From; period < EndExclusive(); period = period.AddMonths(1))
-			if (Months is not { Count: > 0 } || Months.Contains((Month)period.Month))
+		for (var period = From; period < EndExclusive(); period = period.AddMonths(quarterly ? 3 : 1))
+			if (quarterly || Months is not { Count: > 0 } || Months.Contains((Month)period.Month))
 				periods.Add(period);
 
 		return periods;
 	}
+
+	public DateTime PeriodOf(DateTime monthStart)
+		=> Granularity == AnalysisPeriodGranularity.Quarter
+			? new DateTime(
+				monthStart.Year,
+				(monthStart.Month - 1) / 3 * 3 + 1,
+				1,
+				0,
+				0,
+				0,
+				DateTimeKind.Utc)
+			: monthStart;
 }

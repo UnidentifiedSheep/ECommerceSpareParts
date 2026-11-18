@@ -77,6 +77,22 @@ public sealed record AbcXyzRunItemDataPoint : IChartDataPoint
 	[SchemaFieldDescription("chart.abc.xyz.run.items.point.periods.count.description")]
 	public required int PeriodsCount { get; init; }
 
+	[JsonPropertyName("demandPattern")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	[SchemaFieldLabel("chart.abc.xyz.run.items.point.demand.pattern.name")]
+	[SchemaFieldDescription("chart.abc.xyz.run.items.point.demand.pattern.description")]
+	public DemandPattern? DemandPattern { get; init; }
+
+	[JsonPropertyName("adi")]
+	[SchemaFieldLabel("chart.abc.xyz.run.items.point.adi.name")]
+	[SchemaFieldDescription("chart.abc.xyz.run.items.point.adi.description")]
+	public decimal? Adi { get; init; }
+
+	[JsonPropertyName("cv2")]
+	[SchemaFieldLabel("chart.abc.xyz.run.items.point.cv2.name")]
+	[SchemaFieldDescription("chart.abc.xyz.run.items.point.cv2.description")]
+	public decimal? Cv2 { get; init; }
+
 	public IReadOnlyList<ChartReference> GetReferences()
 		=>
 		[

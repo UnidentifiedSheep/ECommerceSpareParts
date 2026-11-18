@@ -38,6 +38,34 @@ public static class AnalyticsRunTestData
 		return run;
 	}
 
+	public static async Task AddPatternItemsAsync(
+		DbContext context,
+		Guid runId,
+		CancellationToken cancellationToken,
+		params (int ProductId, int Rank, DemandPattern? Pattern)[] items)
+	{
+		foreach (var (productId, rank, pattern) in items)
+			await context.AddAsync(
+				new AnalyticsRunItemModel<AbcXyzItemSegments, AbcXyzItemData>(
+						productId.ToString(),
+						rank,
+						100m - rank,
+						0.1m,
+						new AbcXyzItemSegments(AbcClass.A, null, pattern),
+						new AbcXyzItemData(
+							rank * 2m,
+							100m - rank,
+							rank / 10m,
+							null,
+							12,
+							pattern is null ? null : 4m,
+							pattern is null ? null : 0.8m))
+					.ToEntity(runId),
+				cancellationToken);
+
+		await context.SaveChangesAsync(cancellationToken);
+	}
+
 	public static async Task AddItemsAsync(
 		DbContext context,
 		Guid runId,

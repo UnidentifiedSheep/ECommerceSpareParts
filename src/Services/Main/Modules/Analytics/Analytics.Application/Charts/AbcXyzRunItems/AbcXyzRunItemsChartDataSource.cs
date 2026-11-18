@@ -26,6 +26,8 @@ public sealed class AbcXyzRunItemsChartDataSource(
 
 	private const string XyzProperty = "xyz";
 
+	private const string DemandPatternProperty = "demandPattern";
+
 	public override string SystemName => DataSourceSystemName;
 
 	public override ILocalizableMessage NameLocalizationMessage
@@ -50,7 +52,7 @@ public sealed class AbcXyzRunItemsChartDataSource(
 
 		if (queryInput.Abc is { } abc)
 		{
-			var filter = AnalyticsJson.Serialize(new AbcXyzSegmentsFilter(abc, null));
+			var filter = AnalyticsJson.Serialize(new AbcXyzSegmentsFilter(abc, null, null));
 			query = query.Where(item => EF.Functions.JsonContains(item.Segments, filter));
 		}
 
@@ -63,6 +65,15 @@ public sealed class AbcXyzRunItemsChartDataSource(
 			{ } xyz => ApplyXyz(query, xyz)
 		};
 
+		query = queryInput.Pattern switch
+		{
+			null => query,
+			AbcXyzRunItemsPatternFilter.Unclassified => query.Where(item => !EF.Functions.JsonExists(
+				item.Segments,
+				DemandPatternProperty)),
+			{ } pattern => ApplyPattern(query, pattern)
+		};
+
 		var cursor = queryInput.GetCursor();
 		var rows = await query.ApplyCursor(cursor).ToListAsync(cancellationToken);
 
@@ -71,11 +82,20 @@ public sealed class AbcXyzRunItemsChartDataSource(
 			rows.GetNextCursor(cursor));
 	}
 
+	private static IQueryable<AnalyticsRunItem> ApplyPattern(
+		IQueryable<AnalyticsRunItem> query,
+		AbcXyzRunItemsPatternFilter pattern)
+	{
+		var filter = AnalyticsJson.Serialize(
+			new AbcXyzSegmentsFilter(null, null, Enum.Parse<DemandPattern>(pattern.ToString())));
+		return query.Where(item => EF.Functions.JsonContains(item.Segments, filter));
+	}
+
 	private static IQueryable<AnalyticsRunItem> ApplyXyz(
 		IQueryable<AnalyticsRunItem> query,
 		AbcXyzRunItemsXyzFilter xyz)
 	{
-		var filter = AnalyticsJson.Serialize(new AbcXyzSegmentsFilter(null, Enum.Parse<XyzClass>(xyz.ToString())));
+		var filter = AnalyticsJson.Serialize(new AbcXyzSegmentsFilter(null, Enum.Parse<XyzClass>(xyz.ToString()), null));
 		return query.Where(item => EF.Functions.JsonContains(item.Segments, filter));
 	}
 
@@ -94,7 +114,10 @@ public sealed class AbcXyzRunItemsChartDataSource(
 			Quantity = model.Data.Quantity,
 			Revenue = model.Data.Revenue,
 			CoefficientOfVariation = model.Data.CoefficientOfVariation,
-			PeriodsCount = model.Data.PeriodsCount
+			PeriodsCount = model.Data.PeriodsCount,
+			DemandPattern = model.Segments.DemandPattern,
+			Adi = model.Data.Adi,
+			Cv2 = model.Data.Cv2
 		};
 	}
 
@@ -102,5 +125,7 @@ public sealed class AbcXyzRunItemsChartDataSource(
 		[property: JsonConverter(typeof(JsonStringEnumConverter))]
 		AbcClass? Abc,
 		[property: JsonConverter(typeof(JsonStringEnumConverter))]
-		XyzClass? Xyz);
+		XyzClass? Xyz,
+		[property: JsonConverter(typeof(JsonStringEnumConverter))]
+		DemandPattern? DemandPattern);
 }
