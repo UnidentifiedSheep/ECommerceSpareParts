@@ -15,9 +15,13 @@ public class PriceCandidateCalculationLrt(
 		transactionService,
 		logger)
 {
+	public const string QuotaName = "price-candidate-calculation";
+
 	public static string LrtName => nameof(PriceCandidateCalculationLrt);
 
 	public override string SystemName => LrtName;
+
+	public override string? QuotaSystemName => QuotaName;
 
 	public override ILocalizableMessage NameLocalizationMessage
 		=> LrtPriceCandidateCalculationNameMessage.Instance;

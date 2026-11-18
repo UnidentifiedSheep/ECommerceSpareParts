@@ -10,6 +10,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
+using Pricing.Application.Lrts.PriceCandidateCalculation;
 using Pricing.Application.Services;
 using Pricing.Application.Services.Markup;
 using Pricing.Application.Services.Pricing;
@@ -22,6 +23,8 @@ namespace Pricing.Application;
 
 public static class ServiceCollectionExtensions
 {
+	private const int PriceCandidateCalculationMaxParallelPerWorker = 40;
+
 	public static IServiceCollection AddPricingApplication(this IServiceCollection services)
 	{
 		var assembly = typeof(Global).Assembly;
@@ -37,6 +40,7 @@ public static class ServiceCollectionExtensions
 				typeof(DynamicApplierNamedObject));
 
 		services.RegisterJobProviders(assembly);
+		services.AddLrtQuota(PriceCandidateCalculationLrt.QuotaName, PriceCandidateCalculationMaxParallelPerWorker);
 
 		services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
 		services.AddScoped<IPriceApplierProvider, PriceApplierProvider>();
