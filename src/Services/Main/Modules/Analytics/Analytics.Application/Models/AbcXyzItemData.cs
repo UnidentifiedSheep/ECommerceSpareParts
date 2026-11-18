@@ -21,4 +21,10 @@ public sealed record AbcXyzItemData(
 	[property: RequiredSchemaField]
 	[property: SchemaFieldLabel("abc.xyz.data.periods.count.name")]
 	[property: SchemaFieldDescription("abc.xyz.data.periods.count.description")]
-	int PeriodsCount);
+	int PeriodsCount,
+	[property: SchemaFieldLabel("abc.xyz.data.adi.name")]
+	[property: SchemaFieldDescription("abc.xyz.data.adi.description")]
+	decimal? Adi = null,
+	[property: SchemaFieldLabel("abc.xyz.data.cv2.name")]
+	[property: SchemaFieldDescription("abc.xyz.data.cv2.description")]
+	decimal? Cv2 = null);

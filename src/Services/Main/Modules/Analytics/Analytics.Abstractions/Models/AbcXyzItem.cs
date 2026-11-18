@@ -11,4 +11,7 @@ public sealed record AbcXyzItem(
 	AbcClass AbcClass,
 	XyzClass? XyzClass,
 	decimal? CoefficientOfVariation,
-	int PeriodsCount);
+	int PeriodsCount,
+	DemandPattern? DemandPattern = null,
+	decimal? Adi = null,
+	decimal? Cv2 = null);

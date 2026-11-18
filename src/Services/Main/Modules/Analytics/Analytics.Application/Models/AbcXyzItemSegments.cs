@@ -13,4 +13,8 @@ public sealed record AbcXyzItemSegments(
 	[property: SchemaFieldLabel("abc.xyz.segments.xyz.name")]
 	[property: SchemaFieldDescription("abc.xyz.segments.xyz.description")]
 	[property: JsonConverter(typeof(JsonStringEnumConverter))]
-	XyzClass? Xyz);
+	XyzClass? Xyz,
+	[property: SchemaFieldLabel("abc.xyz.segments.demand.pattern.name")]
+	[property: SchemaFieldDescription("abc.xyz.segments.demand.pattern.description")]
+	[property: JsonConverter(typeof(JsonStringEnumConverter))]
+	DemandPattern? DemandPattern = null);

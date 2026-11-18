@@ -30,15 +30,15 @@ public class GetAnalysesTests(CombinedContainerFixture fixture) : IntegrationTes
 			.Contain(["from", "to", "abcMetric", "xyzMetric", "minPeriods"]);
 		analysis.SummarySchema.Fields.Select(field => field.Name)
 			.Should()
-			.BeEquivalentTo("productsCount", "periodsCount", "totalValue", "cells");
+			.BeEquivalentTo("productsCount", "periodsCount", "totalValue", "cells", "patternCells");
 		analysis.SummarySchema.Fields.Single(field => field.Name == "cells").NestedSchema!.Fields
 			.Select(field => field.Name)
 			.Should()
 			.BeEquivalentTo("abc", "xyz", "productsCount", "value");
-		analysis.SegmentsSchema.Fields.Select(field => field.Name).Should().BeEquivalentTo("abc", "xyz");
+		analysis.SegmentsSchema.Fields.Select(field => field.Name).Should().BeEquivalentTo("abc", "xyz", "demandPattern");
 		analysis.DataSchema.Fields.Select(field => field.Name)
 			.Should()
-			.BeEquivalentTo("quantity", "revenue", "cumulativeShare", "coefficientOfVariation", "periodsCount");
+			.BeEquivalentTo("quantity", "revenue", "cumulativeShare", "coefficientOfVariation", "periodsCount", "adi", "cv2");
 	}
 
 	[Fact]
@@ -50,6 +50,7 @@ public class GetAnalysesTests(CombinedContainerFixture fixture) : IntegrationTes
 		foreach (var schema in new[] { analysis.SummarySchema, analysis.SegmentsSchema, analysis.DataSchema })
 			AssertLocalized(schema);
 		AssertLocalized(analysis.SummarySchema.Fields.Single(field => field.Name == "cells").NestedSchema!);
+		AssertLocalized(analysis.SummarySchema.Fields.Single(field => field.Name == "patternCells").NestedSchema!);
 	}
 
 	[Fact]

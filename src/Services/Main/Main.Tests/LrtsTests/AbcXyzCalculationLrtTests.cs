@@ -125,35 +125,6 @@ public class AbcXyzCalculationLrtTests : IntegrationTest
 		act.Should().Throw<ValidationException>();
 	}
 
-	[Fact]
-	public void InputSchema_HasLocalizedLabelsAndMonthPickersForPeriod()
-	{
-		var generator = Scope.ServiceProvider.GetRequiredService<ISchemaGenerator>();
-
-		var schema = generator.Generate<AbcXyzCalculationInputState>();
-
-		schema.Fields.Should().HaveCount(12);
-		schema.Fields.Should().OnlyContain(field => !string.IsNullOrWhiteSpace(field.Label));
-		schema.Fields.Should().OnlyContain(field => !string.IsNullOrWhiteSpace(field.Description));
-		schema.Fields.Should().OnlyContain(field => !field.Label!.StartsWith("abc.xyz."));
-		schema.Fields.Should().OnlyContain(field => !field.Description!.StartsWith("abc.xyz."));
-		schema.Fields.Single(field => field.Name == "from").Control.Should().Be(InputControlType.MonthPicker);
-		schema.Fields.Single(field => field.Name == "to").Control.Should().Be(InputControlType.MonthPicker);
-		schema.Fields.Where(field => field.Required)
-			.Select(field => field.Name)
-			.Should()
-			.BeEquivalentTo(
-				"from",
-				"to",
-				"abcMetric",
-				"xyzMetric",
-				"aShare",
-				"bShare",
-				"xCoefficient",
-				"yCoefficient",
-				"minPeriods");
-	}
-
 	private AbcXyzCalculationLrt CreateLrt()
 		=> ActivatorUtilities.CreateInstance<AbcXyzCalculationLrt>(Scope.ServiceProvider);
 

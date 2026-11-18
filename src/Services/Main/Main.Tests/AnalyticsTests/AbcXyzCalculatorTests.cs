@@ -196,6 +196,118 @@ public class AbcXyzCalculatorTests
 	}
 
 	[Fact]
+	public void DemandPattern_ClassifiesByAdiAndCv2()
+	{
+		var rows = Constant(1, 0, 12, 10m)
+			.Concat([Row(2, 0, 1, 1), Row(2, 1, 30, 30)])
+			.Concat(Enumerable.Range(2, 10).Select(month => Row(2, month, month % 2 == 0 ? 1 : 30, 1)))
+			.Concat([Row(3, 0, 10, 10), Row(3, 6, 10, 10), Row(3, 11, 10, 10)])
+			.Concat([Row(4, 0, 1, 1), Row(4, 5, 50, 50), Row(4, 11, 5, 5)]);
+
+		var result = _calculator.Calculate(rows, Parameters());
+
+		var items = result.Items.ToDictionary(item => item.ProductId);
+		items[1].DemandPattern.Should().Be(DemandPattern.Smooth);
+		items[1].Adi.Should().Be(1m);
+		items[1].Cv2.Should().Be(0m);
+		items[2].DemandPattern.Should().Be(DemandPattern.Erratic);
+		items[3].DemandPattern.Should().Be(DemandPattern.Intermittent);
+		items[3].Adi.Should().Be(4m);
+		items[4].DemandPattern.Should().Be(DemandPattern.Lumpy);
+	}
+
+	[Fact]
+	public void DemandPattern_IsEmptyForSingleSaleAndTooShortHistory()
+	{
+		var result = _calculator.Calculate([Row(1, 0, 10, 10), Row(2, 8, 5, 5), Row(2, 9, 5, 5)], Parameters());
+
+		var single = result.Items.Single(item => item.ProductId == 1);
+		single.DemandPattern.Should().BeNull();
+		single.Adi.Should().Be(12m);
+		single.Cv2.Should().BeNull();
+		var shortHistory = result.Items.Single(item => item.ProductId == 2);
+		shortHistory.DemandPattern.Should().BeNull();
+		shortHistory.Adi.Should().BeNull();
+	}
+
+	[Fact]
+	public void DemandPattern_UsesConfiguredCutoffs()
+	{
+		IEnumerable<ProductPeriodValue> rows =
+			[Row(1, 0, 10, 10), Row(1, 1, 20, 20), Row(1, 2, 10, 10), Row(1, 3, 20, 20)];
+
+		DemandPattern? Classify(AbcXyzParameters parameters)
+			=> _calculator.Calculate(rows, parameters).Items.Single().DemandPattern;
+
+		Classify(Parameters()).Should().Be(DemandPattern.Intermittent);
+		Classify(Parameters() with { Cv2Cutoff = 0.01m }).Should().Be(DemandPattern.Lumpy);
+		Classify(Parameters() with { AdiCutoff = 5m }).Should().Be(DemandPattern.Smooth);
+		Classify(Parameters() with { AdiCutoff = 5m, Cv2Cutoff = 0.01m }).Should().Be(DemandPattern.Erratic);
+	}
+
+	[Fact]
+	public void Quarterly_AggregatesMonthsIntoQuarterPeriods()
+	{
+		var parameters = Parameters() with
+		{
+			From = new DateTime(2025, 10, 1, 0, 0, 0, DateTimeKind.Utc),
+			To = new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc),
+			Granularity = AnalysisPeriodGranularity.Quarter,
+			MinPeriods = 2
+		};
+
+		var result = _calculator.Calculate([Row(1, 0, 10, 10), Row(1, 1, 20, 20), Row(1, 5, 30, 30)], parameters);
+
+		result.Summary.PeriodsCount.Should().Be(4);
+		var item = result.Items.Single();
+		item.Quantity.Should().Be(60m);
+		item.PeriodsCount.Should().Be(4);
+		item.Adi.Should().Be(2m);
+	}
+
+	[Fact]
+	public void Summary_ContainsPatternMatrixCoveringEveryProduct()
+	{
+		var result = _calculator.Calculate(
+			[Row(1, 0, 10, 100), Row(2, 3, 5, 50), Row(3, 4, 2, 10)],
+			Parameters());
+
+		var cells = result.Summary.PatternCells!;
+		cells.Should().HaveCount(Enum.GetValues<AbcClass>().Length * (Enum.GetValues<DemandPattern>().Length + 1));
+		cells.Sum(cell => cell.ProductsCount).Should().Be(result.Items.Count);
+	}
+
+	[Fact]
+	public void Validator_AcceptsQuarterlyWindowOfWholeQuarters()
+		=> Validate(QuarterlyParameters()).IsValid.Should().BeTrue();
+
+	[Theory]
+	[MemberData(nameof(InvalidQuarterlyParameters))]
+	public void Validator_RejectsInvalidQuarterlyAndCutoffParameters(AbcXyzParameters parameters)
+		=> Validate(parameters).IsValid.Should().BeFalse();
+
+	public static TheoryData<AbcXyzParameters> InvalidQuarterlyParameters()
+		=> new()
+		{
+			QuarterlyParameters() with { From = new DateTime(2025, 11, 1, 0, 0, 0, DateTimeKind.Utc) },
+			QuarterlyParameters() with { To = new DateTime(2026, 10, 1, 0, 0, 0, DateTimeKind.Utc) },
+			QuarterlyParameters() with { Months = [Month.January] },
+			QuarterlyParameters() with { MinPeriods = 5 },
+			Parameters() with { AdiCutoff = 0m },
+			Parameters() with { Cv2Cutoff = -1m },
+			Parameters() with { Granularity = (AnalysisPeriodGranularity)99 }
+		};
+
+	private static AbcXyzParameters QuarterlyParameters()
+		=> Parameters() with
+		{
+			From = new DateTime(2025, 10, 1, 0, 0, 0, DateTimeKind.Utc),
+			To = new DateTime(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc),
+			Granularity = AnalysisPeriodGranularity.Quarter,
+			MinPeriods = 2
+		};
+
+	[Fact]
 	public void Validator_AcceptsValidParameters()
 		=> Validate(Parameters()).IsValid.Should().BeTrue();
 

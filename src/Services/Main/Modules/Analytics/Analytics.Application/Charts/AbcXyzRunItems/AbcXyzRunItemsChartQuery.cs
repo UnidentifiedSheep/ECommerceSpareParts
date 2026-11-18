@@ -33,6 +33,14 @@ public sealed record AbcXyzRunItemsChartQuery : CursorChartQueryInput<int>
 	[SchemaFieldDescription("chart.abc.xyz.run.items.query.xyz.description")]
 	public AbcXyzRunItemsXyzFilter? Xyz { get; init; }
 
+	[JsonPropertyName("pattern")]
+	[JsonConverter(typeof(JsonStringEnumConverter))]
+	[SchemaInputControl(InputControlType.EnumSelector)]
+	[SchemaDependsOnEntity(SchemaEntity.AbcXyzRunItemsPatternFilter)]
+	[SchemaFieldLabel("chart.abc.xyz.run.items.query.pattern.name")]
+	[SchemaFieldDescription("chart.abc.xyz.run.items.query.pattern.description")]
+	public AbcXyzRunItemsPatternFilter? Pattern { get; init; }
+
 	public void Validate()
 	{
 		RunId.Ensure(id => id != Guid.Empty, ChartAbcXyzRunItemsQueryRunIdInvalidMessage.Instance);
@@ -42,6 +50,9 @@ public sealed record AbcXyzRunItemsChartQuery : CursorChartQueryInput<int>
 
 		if (Xyz is { } xyz)
 			xyz.Ensure(Enum.IsDefined, ChartAbcXyzRunItemsQueryXyzUnsupportedMessage.Instance);
+
+		if (Pattern is { } pattern)
+			pattern.Ensure(Enum.IsDefined, ChartAbcXyzRunItemsQueryPatternUnsupportedMessage.Instance);
 
 		if (Cursor is { } cursor)
 			cursor.Ensure(value => value >= 0, ChartAbcXyzRunItemsQueryCursorInvalidMessage.Instance);

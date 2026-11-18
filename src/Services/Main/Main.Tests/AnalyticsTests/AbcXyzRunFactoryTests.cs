@@ -46,7 +46,7 @@ public class AbcXyzRunFactoryTests
 		var draft = AbcXyzRunFactory.Create(Parameters(), Result(), jobId, userId);
 
 		draft.Run.AnalysisType.Should().Be("AbcXyz");
-		draft.Run.SchemaVersion.Should().Be(1);
+		draft.Run.SchemaVersion.Should().Be(2);
 		draft.Run.JobId.Should().Be(jobId);
 		draft.Run.CreatedBy.Should().Be(userId);
 		draft.Run.PeriodStart.Should().Be(From);

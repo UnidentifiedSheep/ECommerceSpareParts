@@ -14,7 +14,7 @@ public sealed class AbcXyzAnalysis(ISchemaGenerator schemaGenerator)
 {
 	public const string Name = "AbcXyz";
 
-	public const int Version = 1;
+	public const int Version = 2;
 
 	public override string SystemName => Name;
 

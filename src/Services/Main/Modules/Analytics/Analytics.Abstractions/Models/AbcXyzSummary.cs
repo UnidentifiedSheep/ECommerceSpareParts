@@ -19,7 +19,10 @@ public sealed record AbcXyzSummary(
 	[property: RequiredSchemaField]
 	[property: SchemaFieldLabel("abc.xyz.summary.cells.name")]
 	[property: SchemaFieldDescription("abc.xyz.summary.cells.description")]
-	IReadOnlyList<AbcXyzCell> Cells);
+	IReadOnlyList<AbcXyzCell> Cells,
+	[property: SchemaFieldLabel("abc.xyz.summary.pattern.cells.name")]
+	[property: SchemaFieldDescription("abc.xyz.summary.pattern.cells.description")]
+	IReadOnlyList<AbcXyzPatternCell>? PatternCells = null);
 
 public sealed record AbcXyzCell(
 	[property: RequiredSchemaField]

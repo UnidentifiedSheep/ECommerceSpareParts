@@ -32,5 +32,9 @@ public enum SchemaEntity
 
 	AbcClass,
 
-	AbcXyzRunItemsXyzFilter
+	AbcXyzRunItemsXyzFilter,
+
+	AbcXyzRunItemsPatternFilter,
+
+	AnalysisPeriodGranularity
 }
