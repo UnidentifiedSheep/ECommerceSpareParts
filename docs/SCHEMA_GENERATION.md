@@ -40,7 +40,7 @@ public sealed record ImportInput
 
     [JsonPropertyName("productId")]
     [SchemaInputControl(InputControlType.EntitySelector)]
-    [SchemaDependsOnEntity("Product", "id")]
+    [SchemaDependsOnEntity(SchemaEntity.Product)]
     public int ProductId { get; init; }
 }
 ```
@@ -54,6 +54,10 @@ public sealed record ImportInput
 | `SchemaFieldLabel` | Defines the localization key for the label. |
 | `SchemaFieldDescription` | Defines the localization key for the description. |
 | `CsvSchema` | Associates the input with a CSV row type. |
+
+`SchemaEntity` lists every entity or enum a field can depend on. The schema serializes the value name as `dependency.entityName` (for example `"Product"`); `fieldName` is passed explicitly (`"id"`, `"code"`) or omitted for enum selectors. The attribute has no string overload, so a new dependency target is added to the enum first.
+
+For chart data points, each `IChartDataPoint` declares its entity links through `GetReferences()` (entity, field name, key). GraphQL `ChartData.points[].references` turns them into the `ChartReferenceTarget` union (`Product | Organization | User`), checking that the key has the entity key type (`int` or `Guid`), so a client can fetch a point and its entities in one query. The `SchemaDependsOnEntity` attribute on the point property only describes the link in `dataPointSchema`; `AbcXyzItemsChart_DeclaresEveryPointReferenceInSchema` checks the two stay in sync. To support another entity in the union, add it to `ChartReferenceFactory.SupportedEntities`, its `Create` switch and `ChartReferenceTargetType`; `Factory_CreatesTargetForEverySupportedEntity` fails until the factory handles it.
 
 ## Generate a Schema
 

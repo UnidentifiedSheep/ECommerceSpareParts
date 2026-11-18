@@ -27,7 +27,7 @@ public record CurrencySettingData
 	[JsonPropertyName("baseCurrencyId")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("Currency")]
+	[SchemaDependsOnEntity(SchemaEntity.Currency)]
 	[SchemaFieldLabel(CurrencySettingBaseCurrencyNameMessage.Key)]
 	[SchemaFieldDescription(CurrencySettingBaseCurrencyDescriptionMessage.Key)]
 	public int BaseCurrencyId { get; init; } = 1;
@@ -35,7 +35,7 @@ public record CurrencySettingData
 	[JsonPropertyName("rateProvider")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
+	[SchemaDependsOnEntity(SchemaEntity.ExchangeRateProvider)]
 	[SchemaFieldLabel(CurrencySettingRateProviderNameMessage.Key)]
 	[SchemaFieldDescription(CurrencySettingRateProviderDescriptionMessage.Key)]
 	[JsonConverter(typeof(JsonStringEnumConverter))]

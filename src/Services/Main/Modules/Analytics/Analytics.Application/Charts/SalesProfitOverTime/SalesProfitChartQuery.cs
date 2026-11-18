@@ -12,14 +12,14 @@ public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 {
 	[JsonPropertyName("organizationId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("Organization", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.Organization, "id")]
 	[SchemaFieldLabel("chart.sales.profit.query.organization.id.name")]
 	[SchemaFieldDescription("chart.sales.profit.query.organization.id.description")]
 	public Guid? OrganizationId { get; init; }
 
 	[JsonPropertyName("buyerId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("User", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.User, "id")]
 	[SchemaFieldLabel("chart.sales.profit.query.buyer.id.name")]
 	[SchemaFieldDescription("chart.sales.profit.query.buyer.id.description")]
 	public Guid? BuyerId { get; init; }
@@ -42,7 +42,7 @@ public sealed record SalesProfitChartQuery : CursorChartQueryInput<DateTime>
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(TimeGranularity))]
+	[SchemaDependsOnEntity(SchemaEntity.TimeGranularity)]
 	[SchemaFieldLabel("chart.sales.profit.query.granularity.name")]
 	[SchemaFieldDescription("chart.sales.profit.query.granularity.description")]
 	public TimeGranularity Granularity { get; init; } = TimeGranularity.Day;

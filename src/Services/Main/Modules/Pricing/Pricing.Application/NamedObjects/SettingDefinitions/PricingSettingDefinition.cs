@@ -67,7 +67,7 @@ public record PricingSettingInputData
 {
 	[JsonPropertyName("selectedMarkupId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity(typeof(MarkupGroup), "id")]
+	[SchemaDependsOnEntity(SchemaEntity.MarkupGroup, "id")]
 	[SchemaFieldLabel(PricingSettingSelectedMarkupIdNameMessage.Key)]
 	[SchemaFieldDescription(PricingSettingSelectedMarkupIdDescriptionMessage.Key)]
 	public int? SelectedMarkupId { get; init; }

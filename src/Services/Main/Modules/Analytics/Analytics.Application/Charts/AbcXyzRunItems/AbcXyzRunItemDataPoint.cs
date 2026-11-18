@@ -2,14 +2,17 @@ using System.Text.Json.Serialization;
 using Main.Modules.Analytics.Abstractions.Interfaces.ChartData;
 using Main.Modules.Analytics.Abstractions.Models;
 using SchemaGeneration.Abstractions.Attributes;
+using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Modules.Analytics.Application.Charts.AbcXyzRunItems;
 
 public sealed record AbcXyzRunItemDataPoint : IChartDataPoint
 {
-	[JsonPropertyName("productId")]
+	private const string ProductIdField = "productId";
+
+	[JsonPropertyName(ProductIdField)]
 	[RequiredSchemaField]
-	[SchemaDependsOnEntity("Product", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.Product, "id")]
 	[SchemaFieldLabel("chart.abc.xyz.run.items.point.product.id.name")]
 	[SchemaFieldDescription("chart.abc.xyz.run.items.point.product.id.description")]
 	public required int ProductId { get; init; }
@@ -73,4 +76,10 @@ public sealed record AbcXyzRunItemDataPoint : IChartDataPoint
 	[SchemaFieldLabel("chart.abc.xyz.run.items.point.periods.count.name")]
 	[SchemaFieldDescription("chart.abc.xyz.run.items.point.periods.count.description")]
 	public required int PeriodsCount { get; init; }
+
+	public IReadOnlyList<ChartReference> GetReferences()
+		=>
+		[
+			new(SchemaEntity.Product, ProductIdField, ProductId)
+		];
 }

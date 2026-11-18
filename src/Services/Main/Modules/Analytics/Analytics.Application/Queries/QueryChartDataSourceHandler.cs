@@ -12,7 +12,7 @@ namespace Main.Modules.Analytics.Application.Queries;
 public sealed record QueryChartDataSourceQuery(string SystemName, string QueryInputJson)
 	: IQuery<QueryChartDataSourceResult>;
 
-public sealed record QueryChartDataSourceResult(IReadOnlyList<object> DataPoints, string? NextCursor);
+public sealed record QueryChartDataSourceResult(IReadOnlyList<IChartDataPoint> DataPoints, string? NextCursor);
 
 public sealed class QueryChartDataSourceHandler(
 	INamedObjectRegistry<ChartDataSourceNamedObject> registry,
@@ -30,7 +30,7 @@ public sealed class QueryChartDataSourceHandler(
 
 		var result = await dataSource.QueryAsync(queryInput, cancellationToken);
 
-		return new QueryChartDataSourceResult(result.DataPoints.Cast<object>().ToList(), result.NextCursor);
+		return new QueryChartDataSourceResult(result.DataPoints, result.NextCursor);
 	}
 
 	private IChartQueryInput DeserializeQueryInput(string json, Type queryInputType)

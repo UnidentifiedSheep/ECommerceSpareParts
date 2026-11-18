@@ -54,7 +54,7 @@ public record StorageContentSettingInputData
 {
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.NamedObjectSelector)]
-	[SchemaDependsOnEntity("StorageContentExtractPolicy")]
+	[SchemaDependsOnEntity(SchemaEntity.StorageContentExtractPolicy)]
 	[SchemaFieldLabel(StorageContentSettingExtractionPolicyNameMessage.Key)]
 	[SchemaFieldDescription(StorageContentSettingExtractionPolicyDescriptionMessage.Key)]
 	[JsonPropertyName("storageContentExtractionPolicy")]

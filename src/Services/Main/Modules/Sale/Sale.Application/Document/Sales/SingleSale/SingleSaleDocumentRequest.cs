@@ -10,7 +10,7 @@ public sealed record SingleSaleDocumentRequest : DocumentRequestBase
 {
 	[JsonPropertyName("saleId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity(nameof(Entities.Sale.Sale.Sale), "id")]
+	[SchemaDependsOnEntity(SchemaEntity.Sale, "id")]
 	[SchemaFieldLabel(SaleDocumentSingleRequestSaleIdNameMessage.Key)]
 	[SchemaFieldDescription(SaleDocumentSingleRequestSaleIdDescriptionMessage.Key)]
 	public required Guid SaleId { get; init; }

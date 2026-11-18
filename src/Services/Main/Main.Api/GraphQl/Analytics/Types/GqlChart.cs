@@ -39,14 +39,18 @@ public sealed record GqlChart([property: GraphQLIgnore]
 		var result = await sender.Send(
 			new QueryChartDataSourceQuery(SystemName, queryInput.GetRawText()),
 			cancellationToken);
-		return new GqlChartData
-		{
-			DataPoints = result.DataPoints
-				.Select(point => JsonSerializer.SerializeToElement(
+		var points = result.DataPoints
+			.Select(point => new GqlChartDataPoint(
+				JsonSerializer.SerializeToElement(
 					point,
 					point.GetType(),
-					JsonSerializerOptions.Web))
-				.ToArray(),
+					JsonSerializerOptions.Web),
+				point.GetReferences()))
+			.ToArray();
+		return new GqlChartData
+		{
+			DataPoints = points.Select(point => point.Data).ToArray(),
+			Points = points,
 			NextCursor = result.NextCursor
 		};
 	}

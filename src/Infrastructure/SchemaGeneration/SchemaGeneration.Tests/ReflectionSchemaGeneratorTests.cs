@@ -30,7 +30,7 @@ public sealed class ReflectionSchemaGeneratorTests
 		file.Control.Should().Be(InputControlType.UploadFile);
 		file.Accepts.Should().Equal(".csv", "text/csv");
 		file.Dependency.Should().NotBeNull();
-		file.Dependency!.EntityName.Should().Be(nameof(TestEntity));
+		file.Dependency!.EntityName.Should().Be("Product");
 		file.Dependency.FieldName.Should().Be("id");
 	}
 
@@ -144,6 +144,23 @@ public sealed class ReflectionSchemaGeneratorTests
 	}
 
 	[Fact]
+	public void Generate_ShouldSerializeSchemaEntityEnumAsEntityNameWithIdField()
+	{
+		var schema = _generator.Generate<EnumDependencyInput>();
+
+		schema
+			.Fields
+			.Single()
+			.Dependency
+			.Should()
+			.BeEquivalentTo(
+				new
+				{
+					EntityName = "Organization", FieldName = "id"
+				});
+	}
+
+	[Fact]
 	public void Generate_ShouldBuildDependencyFromEntityNameWithoutFieldName()
 	{
 		var schema = _generator.Generate<NamedDependencyInput>();
@@ -156,7 +173,7 @@ public sealed class ReflectionSchemaGeneratorTests
 			.BeEquivalentTo(
 				new
 				{
-					EntityName = "catalogue-product", FieldName = (string?)null
+					EntityName = "Currency", FieldName = (string?)null
 				});
 	}
 
@@ -177,7 +194,7 @@ public sealed class ReflectionSchemaGeneratorTests
 		[RequiredSchemaField]
 		[SchemaInputControl(InputControlType.UploadFile)]
 		[SchemaAccepts(".csv", "text/csv")]
-		[SchemaDependsOnEntity(typeof(TestEntity), "id")]
+		[SchemaDependsOnEntity(SchemaEntity.Product, "id")]
 		public required string File { get; init; }
 
 		public Guid Identifier { get; init; }
@@ -235,8 +252,6 @@ public sealed class ReflectionSchemaGeneratorTests
 		public RecursiveInput? Next { get; init; }
 	}
 
-	private sealed class TestEntity;
-
 	private abstract record BaseInput
 	{
 		[JsonPropertyName("baseValue")]
@@ -256,9 +271,15 @@ public sealed class ReflectionSchemaGeneratorTests
 		public string? DerivedValue { get; init; }
 	}
 
+	private sealed record EnumDependencyInput
+	{
+		[SchemaDependsOnEntity(SchemaEntity.Organization, "id")]
+		public Guid OrganizationId { get; init; }
+	}
+
 	private sealed record NamedDependencyInput
 	{
-		[SchemaDependsOnEntity("catalogue-product")]
+		[SchemaDependsOnEntity(SchemaEntity.Currency)]
 		public Guid ProductId { get; init; }
 	}
 

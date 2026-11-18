@@ -11,6 +11,9 @@ public sealed record GqlChartData
 	[GraphQLType<NonNullType<ListType<NonNullType<AnyType>>>>]
 	public required IReadOnlyList<JsonElement> DataPoints { get; init; }
 
+	[GraphQLName("points")]
+	public required IReadOnlyList<GqlChartDataPoint> Points { get; init; }
+
 	[GraphQLName("nextCursor")]
 	public string? NextCursor { get; init; }
 }

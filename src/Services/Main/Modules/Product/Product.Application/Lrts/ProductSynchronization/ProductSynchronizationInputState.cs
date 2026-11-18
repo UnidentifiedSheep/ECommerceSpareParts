@@ -11,7 +11,7 @@ public sealed record ProductSynchronizationInputState : IInputState
 	[JsonPropertyName("parts")]
 	[JsonConverter(typeof(JsonStringEnumConverter<ProductEventParts>))]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(ProductEventParts))]
+	[SchemaDependsOnEntity(SchemaEntity.ProductEventParts)]
 	[SchemaFieldLabel("lrt.product.synchronization.parts.name")]
 	[SchemaFieldDescription("lrt.product.synchronization.parts.description")]
 	public ProductEventParts Parts { get; init; } = ProductEventParts.All;

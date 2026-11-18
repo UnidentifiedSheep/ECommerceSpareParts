@@ -22,7 +22,7 @@ public record AbcXyzParameters
 
 	[JsonPropertyName("months")]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(Month))]
+	[SchemaDependsOnEntity(SchemaEntity.Month)]
 	[SchemaFieldLabel("abc.xyz.parameters.months.name")]
 	[SchemaFieldDescription("abc.xyz.parameters.months.description")]
 	public IReadOnlyCollection<Month>? Months { get; init; }
@@ -30,7 +30,7 @@ public record AbcXyzParameters
 	[JsonPropertyName("abcMetric")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(AnalysisMetric))]
+	[SchemaDependsOnEntity(SchemaEntity.AnalysisMetric)]
 	[SchemaFieldLabel("abc.xyz.parameters.abc.metric.name")]
 	[SchemaFieldDescription("abc.xyz.parameters.abc.metric.description")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
@@ -39,7 +39,7 @@ public record AbcXyzParameters
 	[JsonPropertyName("xyzMetric")]
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(AnalysisMetric))]
+	[SchemaDependsOnEntity(SchemaEntity.AnalysisMetric)]
 	[SchemaFieldLabel("abc.xyz.parameters.xyz.metric.name")]
 	[SchemaFieldDescription("abc.xyz.parameters.xyz.metric.description")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
@@ -82,14 +82,14 @@ public record AbcXyzParameters
 
 	[JsonPropertyName("organizationId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("Organization", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.Organization, "id")]
 	[SchemaFieldLabel("abc.xyz.parameters.organization.id.name")]
 	[SchemaFieldDescription("abc.xyz.parameters.organization.id.description")]
 	public Guid? OrganizationId { get; init; }
 
 	[JsonPropertyName("buyerId")]
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("User", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.User, "id")]
 	[SchemaFieldLabel("abc.xyz.parameters.buyer.id.name")]
 	[SchemaFieldDescription("abc.xyz.parameters.buyer.id.description")]
 	public Guid? BuyerId { get; init; }

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Modules.Analytics.Abstractions.Analyses;
+using Main.Modules.Analytics.Abstractions.Models;
 using Main.Modules.Analytics.Application.Analyses;
 using Main.Modules.Analytics.Application.Charts.AbcXyzRunItems;
 using Main.Modules.Analytics.Application.Queries;
@@ -60,6 +61,49 @@ public class GetAnalysesTests(CombinedContainerFixture fixture) : IntegrationTes
 		charts.Charts.Select(chart => chart.SystemName)
 			.Should()
 			.Contain(analyses.Analyses.Select(analysis => analysis.ItemsChartSystemName));
+	}
+
+	[Fact]
+	public async Task AbcXyzItemsChart_DeclaresProductIdAsProductReference()
+	{
+		var charts = await Mediator.Send(new GetChartsQuery(), CancellationToken);
+
+		var field = charts.Charts
+			.Single(chart => chart.SystemName == AbcXyzRunItemsChartDataSource.DataSourceSystemName)
+			.DataPointSchema.Fields.Single(field => field.Name == "productId");
+		field.Dependency.Should().NotBeNull();
+		field.Dependency!.EntityName.Should().Be("Product");
+		field.Dependency.FieldName.Should().Be("id");
+	}
+
+	[Fact]
+	public async Task AbcXyzItemsChart_DeclaresEveryPointReferenceInSchema()
+	{
+		var charts = await Mediator.Send(new GetChartsQuery(), CancellationToken);
+		var schema = charts.Charts
+			.Single(chart => chart.SystemName == AbcXyzRunItemsChartDataSource.DataSourceSystemName)
+			.DataPointSchema;
+		var point = new AbcXyzRunItemDataPoint
+		{
+			ProductId = 1,
+			Rank = 1,
+			Value = 1m,
+			Share = 1m,
+			CumulativeShare = 1m,
+			Abc = AbcClass.A,
+			Quantity = 1m,
+			Revenue = 1m,
+			PeriodsCount = 1
+		};
+
+		var references = point.GetReferences();
+
+		references.Should().NotBeEmpty();
+		foreach (var reference in references)
+			schema.Fields.Should()
+				.Contain(field => field.Name == reference.Field
+					&& field.Dependency != null
+					&& field.Dependency.EntityName == reference.Entity.ToString());
 	}
 
 	[Fact]

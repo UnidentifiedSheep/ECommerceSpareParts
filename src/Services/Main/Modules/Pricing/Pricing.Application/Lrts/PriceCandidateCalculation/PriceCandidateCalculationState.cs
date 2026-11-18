@@ -9,7 +9,7 @@ namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 public class PriceCandidateCalculationState : IInputState
 {
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("Product", "id")]
+	[SchemaDependsOnEntity(SchemaEntity.Product, "id")]
 	[RequiredSchemaField]
 	[SchemaFieldDescription(LrtPriceCandidateCalculationProductIdDescriptionMessage.Key)]
 	[SchemaFieldLabel(LrtPriceCandidateCalculationProductIdNameMessage.Key)]
@@ -17,7 +17,7 @@ public class PriceCandidateCalculationState : IInputState
 	public required int ProductId { get; init; }
 
 	[SchemaInputControl(InputControlType.EntitySelector)]
-	[SchemaDependsOnEntity("Storage", "code")]
+	[SchemaDependsOnEntity(SchemaEntity.Storage, "code")]
 	[RequiredSchemaField]
 	[SchemaFieldDescription(LrtPriceCandidateCalculationStorageCodeDescriptionMessage.Key)]
 	[SchemaFieldLabel(LrtPriceCandidateCalculationStorageCodeNameMessage.Key)]

@@ -11,7 +11,7 @@ public abstract record DocumentRequestBase : IDocumentRequest
 {
 	[JsonPropertyName("documentType")]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(DocumentType))]
+	[SchemaDependsOnEntity(SchemaEntity.DocumentType)]
 	[SchemaFieldLabel(DocumentRequestTypeNameMessage.Key)]
 	[SchemaFieldDescription(DocumentRequestTypeDescriptionMessage.Key)]
 	public required DocumentType DocumentType { get; init; }

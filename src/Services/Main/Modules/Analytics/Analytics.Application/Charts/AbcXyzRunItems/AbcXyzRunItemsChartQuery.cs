@@ -20,7 +20,7 @@ public sealed record AbcXyzRunItemsChartQuery : CursorChartQueryInput<int>
 	[JsonPropertyName("abc")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(AbcClass))]
+	[SchemaDependsOnEntity(SchemaEntity.AbcClass)]
 	[SchemaFieldLabel("chart.abc.xyz.run.items.query.abc.name")]
 	[SchemaFieldDescription("chart.abc.xyz.run.items.query.abc.description")]
 	public AbcClass? Abc { get; init; }
@@ -28,7 +28,7 @@ public sealed record AbcXyzRunItemsChartQuery : CursorChartQueryInput<int>
 	[JsonPropertyName("xyz")]
 	[JsonConverter(typeof(JsonStringEnumConverter))]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(AbcXyzRunItemsXyzFilter))]
+	[SchemaDependsOnEntity(SchemaEntity.AbcXyzRunItemsXyzFilter)]
 	[SchemaFieldLabel("chart.abc.xyz.run.items.query.xyz.name")]
 	[SchemaFieldDescription("chart.abc.xyz.run.items.query.xyz.description")]
 	public AbcXyzRunItemsXyzFilter? Xyz { get; init; }

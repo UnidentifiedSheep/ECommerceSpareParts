@@ -48,7 +48,7 @@ public record CurrencySettingInputData
 {
 	[RequiredSchemaField]
 	[SchemaInputControl(InputControlType.EnumSelector)]
-	[SchemaDependsOnEntity(nameof(ExchangeRateProvider))]
+	[SchemaDependsOnEntity(SchemaEntity.ExchangeRateProvider)]
 	[SchemaFieldLabel(CurrencySettingRateProviderNameMessage.Key)]
 	[SchemaFieldDescription(CurrencySettingRateProviderDescriptionMessage.Key)]
 	[JsonPropertyName("rateProvider")]
