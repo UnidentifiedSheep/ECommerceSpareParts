@@ -84,7 +84,7 @@ public class GetProductSaleHistoryTests : IntegrationTest
 				sale.StorageCode,
 				sale.OrganizationId,
 				sale.CurrencyId,
-				["averageBuyPrice_desc"]),
+				["saleDate_desc"]),
 			CancellationToken);
 
 		result.History.Should().ContainSingle();

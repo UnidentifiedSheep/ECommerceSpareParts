@@ -24,9 +24,6 @@ public static class SaleSortByConfig
 			.Map<SaleContent, int>("quantity", x => x.Count)
 			.Map<SaleContent, decimal>("originalPrice", x => x.OriginalPrice)
 			.Map<SaleContent, decimal>("discountedPrice", x => x.DiscountedPrice)
-			.Map<SaleContent, decimal>(
-				"averageBuyPrice",
-				x => x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count)
 			.Map<SaleContent, DateTime>("saleDate", x => x.Sale.SaleDatetime)
 			.MapParameterized<SaleContent, Guid, bool>(
 				"organizationMatch",

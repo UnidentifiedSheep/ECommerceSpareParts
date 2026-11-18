@@ -74,7 +74,6 @@ public sealed class
 			Quantity = x.Count,
 			OriginalPrice = x.OriginalPrice,
 			DiscountedPrice = x.DiscountedPrice,
-			AverageBuyPrice = x.Details.Sum(detail => detail.BuyPrice * detail.Count) / x.Count,
 			SaleDate = x.Sale.SaleDatetime,
 			WhoCreated = x.Sale.WhoCreated
 		};

@@ -29,7 +29,7 @@ public record ProductSaleHistoryDto
 	public required decimal DiscountedPrice { get; init; }
 
 	[JsonPropertyName("averageBuyPrice")]
-	public required decimal AverageBuyPrice { get; init; }
+	public decimal AverageBuyPrice { get; init; }
 
 	[JsonPropertyName("saleDate")]
 	public required DateTime SaleDate { get; init; }

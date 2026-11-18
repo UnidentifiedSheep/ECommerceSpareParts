@@ -8,6 +8,7 @@ using Main.Entities.Sale.Sale;
 using Main.Modules.Product.Abstractions;
 using Main.Modules.Sale.Application.Dtos.Sale;
 using Main.Modules.Sale.Application.Extensions;
+using Main.Modules.Sale.Application.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
@@ -26,7 +27,8 @@ public record GetProductSaleHistoryResult(IReadOnlyList<ProductSaleHistoryDto> H
 public class GetProductSaleHistoryHandler(
 	IReadRepository<SaleContent, int> repository,
 	IProjectionProvider<SaleContent, ProductSaleHistoryDto> projectionProvider,
-	IProductCrosses productCrosses)
+	IProductCrosses productCrosses,
+	ISaleBuyCostCalculator buyCosts)
 	: IQueryHandler<GetProductSaleHistoryQuery, GetProductSaleHistoryResult>
 {
 	public async Task<GetProductSaleHistoryResult> Handle(
@@ -52,13 +54,22 @@ public class GetProductSaleHistoryHandler(
 			query = query.Where(x => x.Sale.CurrencyId == request.CurrencyId);
 
 
-		var result = await query
+		var page = await query
 			.SortBy(request.SortBy)
 			.ThenByDescending(x => x.Id)
 			.Project(projectionProvider)
 			.ApplyPagination(request.Pagination)
 			.ToListAsync(cancellationToken);
 
-		return new GetProductSaleHistoryResult(result);
+		var costs = await buyCosts.CalculateAsync(page, cancellationToken);
+
+		var history = page
+			.Select(x => x with
+			{
+				AverageBuyPrice = x.Quantity > 0 ? costs[x.SaleContentId] / x.Quantity : 0m
+			})
+			.ToList();
+
+		return new GetProductSaleHistoryResult(history);
 	}
 }

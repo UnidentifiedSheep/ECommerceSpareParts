@@ -18,6 +18,7 @@ public static class ServiceCollectionExtensions
 
 		services.AddModuleApplication(SaleApplicationAssembly.Value);
 		services.AddScoped<ISaleService, SaleService>();
+		services.AddScoped<ISaleBuyCostCalculator, SaleBuyCostCalculator>();
 		services.AddScoped<ISaleSnapshots, SaleSnapshots>();
 		services.AddScoped<ISaleContentSource, SaleContentSource>();
 		services.AddScoped<IProductDeletionRule, SaleContentProductDeletionRule>();
