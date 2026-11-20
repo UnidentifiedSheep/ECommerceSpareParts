@@ -3,7 +3,8 @@ using Api.Common.Extensions;
 using Application.Common.Dtos;
 using Carter;
 using Enums;
-using Main.Modules.Platform.Application.Handlers.Settings;
+using Main.Modules.Platform.Application.Commands.Settings;
+using Main.Modules.Platform.Application.Queries.Settings;
 using MediatR;
 
 namespace Main.Api.Settings;

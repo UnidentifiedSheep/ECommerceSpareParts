@@ -1,6 +1,6 @@
 using GreenDonut;
 using Main.Modules.Product.Application.Dtos.Product.Enrichment;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Queries.ProductEnrichment;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

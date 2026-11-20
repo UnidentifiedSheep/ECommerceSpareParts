@@ -1,8 +1,8 @@
 using Enums;
 using FluentAssertions;
 using Main.Entities.Storage.Storage;
+using Main.Modules.Storage.Application.Commands.StorageContents.AddContent;
 using Main.Modules.Storage.Application.Dtos.Storage;
-using Main.Modules.Storage.Application.Handlers.StorageContents.AddContent;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;

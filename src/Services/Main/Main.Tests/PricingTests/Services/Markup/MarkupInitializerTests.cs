@@ -4,7 +4,7 @@ using FluentAssertions;
 using Main.Modules.Currency.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Pricing.Application.Handlers.Markup;
+using Pricing.Application.Commands.Markup;
 using Pricing.Application.Services.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;

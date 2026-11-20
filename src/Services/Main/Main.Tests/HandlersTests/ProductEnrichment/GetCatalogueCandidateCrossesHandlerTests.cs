@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Queries.ProductEnrichment;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

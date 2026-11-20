@@ -4,9 +4,9 @@ using HotChocolate;
 using MediatR;
 using Pricing.Api.GraphQl.Types;
 using Pricing.Api.GraphQl.Types.Inputs;
+using Pricing.Application.Commands.Markup;
+using Pricing.Application.Commands.Markup.UpsertMarkupGroup;
 using Pricing.Application.Dtos.Markup;
-using Pricing.Application.Handlers.Markup;
-using Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
 
 namespace Pricing.Api.GraphQl.Mutations;
 

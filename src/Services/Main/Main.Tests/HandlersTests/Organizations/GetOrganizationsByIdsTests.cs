@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Modules.Organization.Application.Handlers.Organizations;
+using Main.Modules.Organization.Application.Queries.Organizations;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 

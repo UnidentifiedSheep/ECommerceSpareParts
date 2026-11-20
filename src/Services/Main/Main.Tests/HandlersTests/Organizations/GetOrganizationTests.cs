@@ -2,7 +2,7 @@ using FluentAssertions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations;
+using Main.Modules.Organization.Application.Queries.Organizations;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

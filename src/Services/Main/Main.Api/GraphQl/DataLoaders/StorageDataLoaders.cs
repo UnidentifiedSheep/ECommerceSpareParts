@@ -1,6 +1,6 @@
 using GreenDonut;
 using Main.Modules.Storage.Application.Dtos.Storage;
-using Main.Modules.Storage.Application.Handlers.Storages;
+using Main.Modules.Storage.Application.Queries.Storages;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

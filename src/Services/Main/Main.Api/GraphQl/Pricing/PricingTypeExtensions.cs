@@ -11,8 +11,8 @@ using MediatR;
 using Pricing.Api.GraphQl.DataLoaders;
 using Pricing.Api.GraphQl.Types;
 using Pricing.Api.GraphQl.Types.Inputs;
-using Pricing.Application.Handlers.Pricing;
-using Pricing.Application.Handlers.Pricing.GetRecommendedPrice;
+using Pricing.Application.Queries.Pricing;
+using Pricing.Application.Queries.Pricing.GetRecommendedPrice;
 
 namespace Main.Api.GraphQl.Pricing;
 

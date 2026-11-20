@@ -8,7 +8,7 @@ using Main.Entities.Purchase.Exceptions;
 using Main.Entities.Purchase.Purchase;
 using Main.Entities.Storage.Exceptions;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
+using Main.Modules.Purchase.Application.Commands.Purchases.DeletePurchase;
 using Main.Modules.Storage.Abstractions.Interfaces;
 using Main.Modules.Storage.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;

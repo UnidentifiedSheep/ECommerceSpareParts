@@ -4,7 +4,7 @@ using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types;
-using Main.Modules.Currency.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Queries.Currencies;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

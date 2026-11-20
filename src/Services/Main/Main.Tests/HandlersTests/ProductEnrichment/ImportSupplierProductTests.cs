@@ -2,7 +2,7 @@ using Contracts.Models.Supplier;
 using Enums;
 using FluentAssertions;
 using Main.Entities.Product.Product.Enrichment;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Commands.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 

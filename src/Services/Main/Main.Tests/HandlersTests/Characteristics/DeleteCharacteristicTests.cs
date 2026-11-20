@@ -3,7 +3,7 @@ using FluentValidation.TestHelper;
 using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
-using Main.Modules.Product.Application.Handlers.Characteristics.DeleteCharacteristic;
+using Main.Modules.Product.Application.Commands.Characteristics.DeleteCharacteristic;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

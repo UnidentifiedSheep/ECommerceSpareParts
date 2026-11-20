@@ -5,7 +5,7 @@ using Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.Producers;
-using Search.Application.Handlers.Producers.SearchProducers;
+using Search.Application.Queries.Producers.SearchProducers;
 
 namespace Search.Api.EndPoints.Producers;
 

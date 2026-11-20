@@ -1,0 +1,62 @@
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
+using Application.Common.Interfaces.Repositories;
+using Exceptions;
+using Main.Entities;
+using Main.Entities.Documents.Documents;
+using Main.Modules.Documents.Application.Dtos.Documents;
+using Microsoft.EntityFrameworkCore;
+
+namespace Main.Modules.Documents.Application.Queries.Documents;
+
+public sealed record GetDocumentsByIdsQuery : IQuery<GetDocumentsByIdsResult>
+{
+
+	public GetDocumentsByIdsQuery(
+		IEnumerable<Guid> requestIds,
+		Guid? callerId,
+		bool canAccessAll)
+	{
+		RequestIds = requestIds.Distinct().ToArray();
+		CallerId = callerId;
+		CanAccessAll = canAccessAll;
+	}
+	public IReadOnlyList<Guid> RequestIds { get; }
+	public Guid? CallerId { get; }
+	public bool CanAccessAll { get; }
+}
+
+public sealed record GetDocumentsByIdsResult(
+	IReadOnlyDictionary<Guid, DocumentGenerationRequestDto> Documents);
+
+public sealed class GetDocumentsByIdsHandler(
+	IReadRepository<DocumentGenerationRequest, Guid> repository,
+	IProjectionProvider<DocumentGenerationRequest, DocumentGenerationRequestDto> projection)
+	: IQueryHandler<GetDocumentsByIdsQuery, GetDocumentsByIdsResult>
+{
+	public async Task<GetDocumentsByIdsResult> Handle(
+		GetDocumentsByIdsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var query = repository.Query;
+
+		if (!request.CanAccessAll)
+		{
+			if (request.CallerId == null)
+				throw new InvalidInputException(DocumentReadCallerIdRequiredMessage.Instance);
+
+			query = query.Where(document => document.RequesterId == request.CallerId.Value);
+		}
+
+		if (request.RequestIds.Count == 0)
+			return new GetDocumentsByIdsResult(new Dictionary<Guid, DocumentGenerationRequestDto>());
+
+		var documents = await query
+			.Where(document => request.RequestIds.Contains(document.RequestId))
+			.Project(projection)
+			.ToDictionaryAsync(document => document.RequestId, cancellationToken);
+
+		return new GetDocumentsByIdsResult(documents);
+	}
+}

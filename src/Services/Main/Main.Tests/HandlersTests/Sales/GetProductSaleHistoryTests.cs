@@ -3,7 +3,7 @@ using Application.Common.Querying;
 using Exceptions;
 using FluentAssertions;
 using Main.Entities.Product.Product;
-using Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
+using Main.Modules.Sale.Application.Queries.Sales.GetProductSaleHistory;
 using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

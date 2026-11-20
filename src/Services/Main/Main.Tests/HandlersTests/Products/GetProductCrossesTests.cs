@@ -3,7 +3,7 @@ using Application.Common.Querying;
 using FluentAssertions;
 using Main.Entities.Product.Stock;
 using Main.Modules.Product.Application.Products.Interfaces;
-using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
+using Main.Modules.Product.Application.Queries.Products.GetProductCrosses;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

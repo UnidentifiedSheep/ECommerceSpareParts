@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Entities.Sale.Sale;
-using Main.Modules.Sale.Application.Handlers.Sales;
+using Main.Modules.Sale.Application.Queries.Sales;
 using Tests.DataBuilders.Sale;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;

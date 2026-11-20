@@ -1,9 +1,9 @@
 using Application.Common.Models;
 using Contracts.Products;
 using Enums.Units;
-using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Models.CatalogueSearch.Criteria;
 using Search.Application.Models.ProductUpdates;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Enums;
 using Tests.TestContainers.Search;
 

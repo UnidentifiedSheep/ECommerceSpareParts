@@ -7,7 +7,7 @@ using Main.Entities.Sale.Enums;
 using Main.Entities.Sale.Exceptions;
 using Main.Entities.Sale.Sale;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Sale.Application.Handlers.Sales;
+using Main.Modules.Sale.Application.Commands.Sales;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Extensions;

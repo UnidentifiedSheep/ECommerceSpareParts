@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Producer;
-using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings;
+using Main.Modules.Product.Application.Commands.ProducerSupplierMappings;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

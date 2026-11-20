@@ -2,7 +2,7 @@ using FluentAssertions;
 using FluentValidation.TestHelper;
 using Main.Entities.Sale;
 using Main.Entities.Sale.Exceptions;
-using Main.Modules.Sale.Application.Handlers.Sales.GetSale;
+using Main.Modules.Sale.Application.Queries.Sales.GetSale;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;

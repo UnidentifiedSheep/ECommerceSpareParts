@@ -1,7 +1,7 @@
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
-using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+using Main.Modules.Product.Application.Queries.ProducerSupplierMappings.GetProducerSupplierMappings;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;
 using Tests.Extensions;

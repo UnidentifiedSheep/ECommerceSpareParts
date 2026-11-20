@@ -1,7 +1,7 @@
 using Enums;
 using Main.Modules.Product.Abstractions;
 using Main.Modules.Product.Application.Dtos.Product.References;
-using Main.Modules.Product.Application.Products.Queries;
+using Main.Modules.Product.Application.Queries.Products;
 using MediatR;
 
 namespace Main.Modules.Product.Application.Services;

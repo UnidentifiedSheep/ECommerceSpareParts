@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Pricing.Application.Handlers.Markup;
+using Pricing.Application.Queries.Markup;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Markup;
 using Tests.TestContainers.Combined;

@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Pricing.Application.Handlers.Markup.GetMarkups;
+using Pricing.Application.Queries.Markup.GetMarkups;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Markup;

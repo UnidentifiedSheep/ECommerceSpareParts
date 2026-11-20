@@ -3,7 +3,7 @@ using FluentValidation.TestHelper;
 using Main.Entities.Product;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
-using Main.Modules.Product.Application.Handlers.Characteristics.UpsertCharacteristic;
+using Main.Modules.Product.Application.Commands.Characteristics.UpsertCharacteristic;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

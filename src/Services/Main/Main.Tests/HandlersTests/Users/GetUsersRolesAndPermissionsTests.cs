@@ -2,7 +2,7 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
-using Main.Modules.Identity.Application.Handlers.Users;
+using Main.Modules.Identity.Application.Queries.Users;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Modules.Notifications.Application.Handlers.Notifications.GetNotifications;
+using Main.Modules.Notifications.Application.Queries.Notifications.GetNotifications;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 

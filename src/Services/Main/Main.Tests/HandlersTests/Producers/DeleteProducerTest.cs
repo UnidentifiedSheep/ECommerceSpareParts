@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
-using Main.Modules.Product.Application.Handlers.Producers;
+using Main.Modules.Product.Application.Commands.Producers;
 using Microsoft.EntityFrameworkCore;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;

@@ -6,7 +6,7 @@ using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizations;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Organization;

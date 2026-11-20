@@ -1,7 +1,7 @@
 using GreenDonut;
 using MediatR;
 using Pricing.Application.Dtos.Markup;
-using Pricing.Application.Handlers.Markup;
+using Pricing.Application.Queries.Markup;
 
 namespace Pricing.Api.GraphQl.DataLoaders;
 

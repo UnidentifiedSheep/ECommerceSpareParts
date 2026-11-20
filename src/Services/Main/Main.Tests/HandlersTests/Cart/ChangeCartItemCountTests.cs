@@ -1,7 +1,7 @@
 using Domain;
 using FluentValidation.TestHelper;
 using Main.Entities.Cart.Exceptions;
-using Main.Modules.Cart.Application.Handlers.Cart.ChangeCartItemCount;
+using Main.Modules.Cart.Application.Commands.Cart.ChangeCartItemCount;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;

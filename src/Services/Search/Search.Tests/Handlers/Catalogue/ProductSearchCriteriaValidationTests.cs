@@ -1,8 +1,8 @@
 using Application.Common.Models;
 using Enums.Units;
 using FluentAssertions;
-using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Models.CatalogueSearch.Criteria;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Enums;
 
 namespace Search.Tests.Handlers.Catalogue;

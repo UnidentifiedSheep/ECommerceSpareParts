@@ -8,10 +8,10 @@ using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Producer;
 using Main.Entities.Product.Exceptions;
 using Main.Modules.Product.Application.Dtos.Product;
-using Main.Modules.Product.Application.Products.Queries.GetProductCrosses;
-using Main.Modules.Sale.Application.Handlers.Sales.GetProductSaleHistory;
-using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
-using Main.Modules.Storage.Application.Products.Queries;
+using Main.Modules.Product.Application.Queries.Products.GetProductCrosses;
+using Main.Modules.Sale.Application.Queries.Sales.GetProductSaleHistory;
+using Main.Modules.Storage.Application.Queries.Products;
+using Main.Modules.Storage.Application.Queries.StorageContents.GetProductStorageContents;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.Product;

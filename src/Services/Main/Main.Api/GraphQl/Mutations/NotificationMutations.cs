@@ -2,10 +2,10 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Notification;
+using Main.Modules.Notifications.Application.Commands.NotificationPreferences.UpsertNotificationPreferences;
+using Main.Modules.Notifications.Application.Commands.Notifications;
+using Main.Modules.Notifications.Application.Commands.Notifications.SeeNotifications;
 using Main.Modules.Notifications.Application.Dtos.NotificationPreference;
-using Main.Modules.Notifications.Application.Handlers.NotificationPreferences.UpsertNotificationPreferences;
-using Main.Modules.Notifications.Application.Handlers.Notifications;
-using Main.Modules.Notifications.Application.Handlers.Notifications.SeeNotifications;
 using MediatR;
 using Security.Core.Interfaces;
 

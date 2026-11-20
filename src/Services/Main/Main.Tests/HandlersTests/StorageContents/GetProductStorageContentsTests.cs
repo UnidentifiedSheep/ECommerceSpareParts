@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
+using Main.Modules.Storage.Application.Queries.StorageContents.GetProductStorageContents;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
 using Tests.Extensions;
