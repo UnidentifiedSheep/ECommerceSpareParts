@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -13,6 +14,7 @@ public sealed record GqlStorageContentsSearchInput
 	public string? StorageCode { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Storage.Storage.StorageContent>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("pagination")]

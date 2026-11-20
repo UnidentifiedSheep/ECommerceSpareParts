@@ -43,11 +43,11 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var first = new GetProductCrossesQuery(
 			productId,
 			new Pagination(0, 1),
-			["count_desc"]);
+			["stock_desc"]);
 		var second = new GetProductCrossesQuery(
 			productId,
 			new Pagination(1, 1),
-			["count_desc"]);
+			["stock_desc"]);
 		var firstResult = await Mediator.Send(first, CancellationToken);
 		var secondResult = await Mediator.Send(second, CancellationToken);
 
@@ -75,7 +75,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var item = new GetProductCrossesQuery(
 			productId,
 			new Pagination(0, 1),
-			["count_desc"]);
+			["stock_desc"]);
 
 		var initial = await Mediator.Send(item, CancellationToken);
 		initial.Crosses.Should().ContainSingle().Which.Id.Should().Be(ids[0]);
@@ -102,7 +102,7 @@ public sealed class GetProductCrossesTests : IntegrationTest
 		var item = new GetProductCrossesQuery(
 			productId,
 			new Pagination(0, 100),
-			["count"]);
+			["stock"]);
 
 		var result = await Mediator.Send(item, CancellationToken);
 
@@ -136,9 +136,9 @@ public sealed class GetProductCrossesTests : IntegrationTest
 					2));
 		await Context.SaveChangesAsync(CancellationToken);
 		var sort = parseFromText
-			? SortExpression.Parse($"count_{storages[0].Code}_desc")
+			? SortExpression.Parse($"stock_{storages[0].Code}_desc")
 			: new SortExpression(
-				"count",
+				"stock",
 				true,
 				storages[0].Code);
 

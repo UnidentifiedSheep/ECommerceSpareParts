@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -10,6 +11,7 @@ public sealed record GqlSearchProductGroupsInput
 	public string? SearchTerm { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Product.Product.ProductGroup>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("pagination")]

@@ -2,21 +2,17 @@
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq.Expressions;
+using Application.Common.Querying.Models;
 
 namespace Application.Common.Querying;
 
 public class QueryableSortBy
 {
-	private const string DefaultKey = "__default__";
-
 	public static readonly QueryableSortBy Value = new();
 
-	private readonly ConcurrentDictionary<Type, bool> _defaultDirectionMap = new();
+	private readonly ConcurrentDictionary<Type, SortEntityDescriptor> _entities = new();
 
-	private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
-
-	private readonly ConcurrentDictionary<(Type Entity, string Field), Func<string, LambdaExpression>>
-		_parameterizedMappings = new();
+	private readonly Lock _lock = new();
 
 	public char Delimiter { get; private set; } = '_';
 
@@ -26,16 +22,13 @@ public class QueryableSortBy
 
 	public QueryableSortBy Map<TSource, TKey>(string source, Expression<Func<TSource, TKey>> keySelector)
 	{
-		var type = typeof(TSource);
-		source = source.ToLowerInvariant();
+		lock (_lock)
+		{
+			var field = GetOrAddEntity(typeof(TSource)).GetOrAddField(source, typeof(TKey));
+			field.KeyType = typeof(TKey);
+			field.Selector = ToObjectSelector(keySelector);
+		}
 
-		var primary = _mapDictionary.GetOrAdd(type, _ => new ConcurrentDictionary<string, object>());
-
-		var objectSelector = Expression.Lambda<Func<TSource, object>>(
-			Expression.Convert(keySelector.Body, typeof(object)),
-			keySelector.Parameters);
-
-		primary[source] = objectSelector;
 		return this;
 	}
 
@@ -43,18 +36,101 @@ public class QueryableSortBy
 		string field,
 		Expression<Func<TEntity, TArgument, TKey>> selector)
 	{
-		_parameterizedMappings[(typeof(TEntity), field.ToLowerInvariant())] = argument =>
+		lock (_lock)
 		{
-			var value = ConvertArgument<TArgument>(argument);
-			var body = new ParameterSubstitution(
-				selector.Parameters[1],
-				Expression.Constant(value, typeof(TArgument))).Visit(selector.Body)!;
-			return Expression.Lambda<Func<TEntity, object?>>(
-				Expression.Convert(body, typeof(object)),
-				selector.Parameters[0]);
-		};
+			var descriptor = GetOrAddEntity(typeof(TEntity)).GetOrAddField(field, typeof(TKey));
+			descriptor.ArgumentType = typeof(TArgument);
+			descriptor.ParameterizedSelector = argument =>
+			{
+				var value = ConvertArgument<TArgument>(argument);
+				var body = new ParameterSubstitution(
+					selector.Parameters[1],
+					Expression.Constant(value, typeof(TArgument))).Visit(selector.Body)!;
+				return Expression.Lambda<Func<TEntity, object?>>(
+					Expression.Convert(body, typeof(object)),
+					selector.Parameters[0]);
+			};
+		}
+
 		return this;
 	}
+
+	public QueryableSortBy MapDefault<TSource, TKey>(
+		Expression<Func<TSource, TKey>> keySelector,
+		bool desc = false)
+	{
+		lock (_lock)
+		{
+			var entity = GetOrAddEntity(typeof(TSource));
+			entity.DefaultSelector = ToObjectSelector(keySelector);
+			entity.DefaultDescending = desc;
+		}
+
+		return this;
+	}
+
+	public SortEntityDescriptor? FindEntity(Type entityType)
+		=> _entities.GetValueOrDefault(entityType);
+
+	public IReadOnlyCollection<SortFieldDescriptor> GetFields(Type entityType)
+		=> FindEntity(entityType)?.Fields ?? [];
+
+	public Expression<Func<TEntity, object?>> GetMapping<TEntity>(string source, string? argument = null)
+	{
+		var type = typeof(TEntity);
+		var entity = FindEntity(type);
+
+		if (argument is not null)
+		{
+			if (entity?.FindField(source)?.ParameterizedSelector is not { } parameterized)
+				throw new ArgumentException(
+					$"Sort mapping '{source}' for {type} does not accept an argument.");
+			return (Expression<Func<TEntity, object?>>)parameterized(argument);
+		}
+
+		if (entity is null)
+			throw new ArgumentException($"{type} mapping not exists");
+
+		if (string.IsNullOrEmpty(source))
+			return entity.DefaultSelector is { } defaultSelector
+				? (Expression<Func<TEntity, object?>>)defaultSelector
+				: throw new ArgumentException($"Default sort mapping for {type} does not exist.");
+
+		var field = entity.FindField(source) ??
+			throw new ArgumentException($"Sort mapping '{source}' for {type} does not exist.");
+
+		return field.Selector is { } selector
+			? (Expression<Func<TEntity, object?>>)selector
+			: throw new ArgumentException($"Sort mapping '{source}' for {type} requires an argument.");
+	}
+
+	public bool GetDefaultDesc<TEntity>()
+		=> FindEntity(typeof(TEntity))?.DefaultDescending ?? false;
+
+	public static KeySelectorSortDefinition<TEntity> ParseToKeySelector<TEntity>(SortExpression? sort)
+	{
+		var field = sort?.Field.Trim() ?? string.Empty;
+		var map = Value.GetMapping<TEntity>(field, sort?.Argument);
+		var desc = string.IsNullOrEmpty(field) ? Value.GetDefaultDesc<TEntity>() : sort!.Descending;
+		return new KeySelectorSortDefinition<TEntity>(map, desc);
+	}
+
+	public static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseToKeySelectors<TEntity>(
+		IReadOnlyCollection<SortExpression>? sortParams)
+	{
+		if (sortParams is null || sortParams.Count == 0)
+			return [ParseToKeySelector<TEntity>(null)];
+		return sortParams.Select(ParseToKeySelector<TEntity>).ToArray();
+	}
+
+	private SortEntityDescriptor GetOrAddEntity(Type entityType)
+		=> _entities.GetOrAdd(entityType, type => new SortEntityDescriptor(type));
+
+	private static Expression<Func<TSource, object?>> ToObjectSelector<TSource, TKey>(
+		Expression<Func<TSource, TKey>> keySelector)
+		=> Expression.Lambda<Func<TSource, object?>>(
+			Expression.Convert(keySelector.Body, typeof(object)),
+			keySelector.Parameters);
 
 	private static TArgument ConvertArgument<TArgument>(string argument)
 	{
@@ -77,67 +153,6 @@ public class QueryableSortBy
 				$"Invalid sort argument '{argument}' for {typeof(TArgument).Name}.",
 				exception);
 		}
-	}
-
-	public QueryableSortBy MapDefault<TSource, TKey>(
-		Expression<Func<TSource, TKey>> keySelector,
-		bool desc = false)
-	{
-		var type = typeof(TSource);
-
-		var primary = _mapDictionary.GetOrAdd(type, _ => new ConcurrentDictionary<string, object>());
-
-		var objectSelector = Expression.Lambda<Func<TSource, object>>(
-			Expression.Convert(keySelector.Body, typeof(object)),
-			keySelector.Parameters);
-
-		primary[DefaultKey] = objectSelector;
-		_defaultDirectionMap[type] = desc;
-		return this;
-	}
-
-	public Expression<Func<TEntity, object?>> GetMapping<TEntity>(string source, string? argument = null)
-	{
-		source = source.ToLowerInvariant();
-		var type = typeof(TEntity);
-
-		if (argument is not null)
-		{
-			if (!_parameterizedMappings.TryGetValue((type, source), out var mapping))
-				throw new ArgumentException(
-					$"Sort mapping '{source}' for {type} does not accept an argument.");
-			return (Expression<Func<TEntity, object?>>)mapping(argument);
-		}
-
-		if (!_mapDictionary.TryGetValue(type, out var primary))
-			throw new ArgumentException($"{type} mapping not exists");
-
-		if (primary.TryGetValue(source, out var value))
-			return (Expression<Func<TEntity, object?>>)value;
-
-		if (string.IsNullOrEmpty(source) && primary.TryGetValue(DefaultKey, out var defaultValue))
-			return (Expression<Func<TEntity, object?>>)defaultValue;
-
-		throw new ArgumentException($"Sort mapping '{source}' for {type} does not exist.");
-	}
-
-	public bool GetDefaultDesc<TEntity>()
-		=> _defaultDirectionMap.TryGetValue(typeof(TEntity), out var desc) && desc;
-
-	public static KeySelectorSortDefinition<TEntity> ParseToKeySelector<TEntity>(SortExpression? sort)
-	{
-		var field = sort?.Field.Trim() ?? string.Empty;
-		var map = Value.GetMapping<TEntity>(field, sort?.Argument);
-		var desc = string.IsNullOrEmpty(field) ? Value.GetDefaultDesc<TEntity>() : sort!.Descending;
-		return new KeySelectorSortDefinition<TEntity>(map, desc);
-	}
-
-	public static IReadOnlyList<KeySelectorSortDefinition<TEntity>> ParseToKeySelectors<TEntity>(
-		IReadOnlyCollection<SortExpression>? sortParams)
-	{
-		if (sortParams is null || sortParams.Count == 0)
-			return [ParseToKeySelector<TEntity>(null)];
-		return sortParams.Select(ParseToKeySelector<TEntity>).ToArray();
 	}
 
 	private sealed class ParameterSubstitution(ParameterExpression parameter, Expression replacement)

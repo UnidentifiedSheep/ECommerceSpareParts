@@ -130,6 +130,76 @@ public sealed class QueryableSortByTests
 	}
 
 	[Fact]
+	public void Descriptors_KeepOriginalNameAndMergeRegularAndParameterizedMappings()
+	{
+		var sorting = new QueryableSortBy()
+			.MapDefault<Item, int>(item => item.Id, true)
+			.Map<Item, long>("stockCount", item => item.Stocks.Sum(stock => (long)stock.Quantity))
+			.MapParameterized<Item, string, long>(
+				"stockCount",
+				(item, storage) => item.Stocks.Where(stock => stock.Code == storage).Sum(stock => (long)stock.Quantity))
+			.MapParameterized<Item, Guid, bool>("ownerMatch", (item, owner) => owner == Guid.Empty);
+
+		var entity = sorting.FindEntity(typeof(Item))!;
+
+		entity.Fields.Select(field => field.Name).Should().BeEquivalentTo("stockCount", "ownerMatch");
+		var stockCount = entity.FindField("STOCKCOUNT")!;
+		stockCount.Name.Should().Be("stockCount");
+		stockCount.KeyType.Should().Be<long>();
+		stockCount.ArgumentType.Should().Be<string>();
+		stockCount.AcceptsArgument.Should().BeTrue();
+		stockCount.RequiresArgument.Should().BeFalse();
+		entity.FindField("ownerMatch")!.RequiresArgument.Should().BeTrue();
+		entity.DefaultSelector.Should().NotBeNull();
+		entity.DefaultDescending.Should().BeTrue();
+	}
+
+	[Fact]
+	public void GetMapping_UsesDefaultForEmptyFieldAndRequiresArgumentForParameterizedOnlyField()
+	{
+		var sorting = new QueryableSortBy()
+			.MapDefault<Item, int>(item => item.Id)
+			.MapParameterized<Item, Guid, bool>("ownerMatch", (item, owner) => owner == Guid.Empty);
+		var items = new[] { new Item(7, []) };
+
+		items.Select(sorting.GetMapping<Item>(string.Empty).Compile()).Single().Should().Be(7);
+		var withoutArgument = () => sorting.GetMapping<Item>("ownerMatch");
+		var unknown = () => sorting.GetMapping<Item>("missing");
+		var unregistered = () => sorting.GetMapping<Stock>("id");
+
+		withoutArgument.Should().Throw<ArgumentException>();
+		unknown.Should().Throw<ArgumentException>();
+		unregistered.Should().Throw<ArgumentException>();
+		sorting.GetFields(typeof(Stock)).Should().BeEmpty();
+	}
+
+	[Fact]
+	public void Map_RejectsFieldsDifferingOnlyByCase()
+	{
+		var sorting = new QueryableSortBy().Map<Item, int>("id", item => item.Id);
+
+		var caseConflict = () => sorting.Map<Item, int>("ID", item => item.Id);
+		var remap = () => sorting.Map<Item, int>("id", item => item.Id + 1);
+
+		caseConflict.Should().Throw<InvalidOperationException>();
+		remap.Should().NotThrow();
+	}
+
+	[Fact]
+	public void Descriptors_AllowDifferentKeyTypesForRegularAndParameterizedMappings()
+	{
+		var sorting = new QueryableSortBy()
+			.MapParameterized<Item, string, int>("stock", (item, storage) => item.Id)
+			.Map<Item, long?>("stock", item => item.Id);
+
+		var field = sorting.FindEntity(typeof(Item))!.FindField("stock")!;
+
+		field.KeyType.Should().Be<long?>();
+		field.AcceptsArgument.Should().BeTrue();
+		field.RequiresArgument.Should().BeFalse();
+	}
+
+	[Fact]
 	public void GraphQlSort_PreservesArgumentWithoutStringEncoding()
 	{
 		var input = new GqlSortBy { Field = "count", IsDescending = true, Argument = "Main_Warehouse" };
