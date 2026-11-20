@@ -68,7 +68,7 @@ public sealed class OrganizationFinancialProfileRelationsConfiguration
 	public void Configure(EntityTypeBuilder<OrganizationFinancialProfile> builder)
 		=> builder
 			.HasOne<Organization>()
-			.WithOne()
+			.WithOne(nameof(Organization.FinancialProfile))
 			.HasForeignKey<OrganizationFinancialProfile>(d => d.OrganizationId)
 			.OnDelete(DeleteBehavior.Restrict)
 			.HasConstraintName("organization_financial_profile_organization_id_fk");
