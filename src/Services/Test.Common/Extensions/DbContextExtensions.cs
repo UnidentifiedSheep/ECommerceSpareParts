@@ -11,16 +11,18 @@ public static class DbContextExtensions
 		var sql = """
 				DO $$
 				DECLARE
-				    r RECORD;
+				    tables text;
 				BEGIN
-				    FOR r IN
-				        SELECT schemaname, tablename
-				        FROM pg_tables
-				        WHERE schemaname IN ('audit', 'auth', 'catalogue_enrichment', 'job', 'public')
-				          AND tablename <> '__EFMigrationsHistory'
-				    LOOP
-				        EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
-				    END LOOP;
+				    SELECT string_agg(format('%I.%I', schemaname, tablename), ', ')
+				    INTO tables
+				    FROM pg_tables
+				    WHERE schemaname NOT IN ('pg_catalog', 'information_schema', 'materialized')
+				      AND schemaname NOT LIKE 'pg\_%'
+				      AND tablename <> '__EFMigrationsHistory';
+
+				    IF tables IS NOT NULL THEN
+				        EXECUTE 'TRUNCATE TABLE ' || tables || ' RESTART IDENTITY CASCADE';
+				    END IF;
 				END $$;
 				""";
 		await context.Database.ExecuteSqlRawAsync(sql, cancellationToken);
