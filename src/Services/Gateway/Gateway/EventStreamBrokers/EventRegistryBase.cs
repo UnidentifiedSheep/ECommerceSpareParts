@@ -1,4 +1,5 @@
 using System.Collections.Frozen;
+using Abstractions.Interfaces;
 
 namespace Gateway.EventStreamBrokers;
 
@@ -47,14 +48,16 @@ public abstract class EventRegistryBase : IEventRegistry
 	protected void Add<TEvent>(
 		string topic,
 		Func<TEvent, object> mapper,
-		Func<TEvent, EventAudience> resolveAudience)
+		Func<TEvent, EventAudience> resolveAudience,
+		params IServiceDefinition[] routedFrom)
 	{
 		EnsureRegistrationOpen();
 		var descriptor = new FusionEventDescriptor(
 			topic,
 			typeof(TEvent),
 			value => mapper((TEvent)value),
-			value => resolveAudience((TEvent)value));
+			value => resolveAudience((TEvent)value),
+			routedFrom);
 
 		_byType.Add(typeof(TEvent), descriptor);
 		_byTopic.Add(topic, descriptor);
