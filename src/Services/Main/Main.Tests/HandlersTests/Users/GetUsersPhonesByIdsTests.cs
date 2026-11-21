@@ -1,16 +1,13 @@
 using FluentAssertions;
-using Main.Modules.Identity.Application.Handlers.Users;
-using Tests.TestContainers.Combined;
+using Main.Modules.Identity.Application.Queries.Users;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Users;
 
-public class GetUsersPhonesByIdsTests : IntegrationTest
+public class GetUsersPhonesByIdsTests(ReadScenarioFixture<GetUsersPhonesByIdsTests.GetUsersPhonesByIdsScenario> fixture)
+	: ReadScenarioTest<GetUsersPhonesByIdsTests.GetUsersPhonesByIdsScenario>(fixture)
 {
-	public GetUsersPhonesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UserContactsTestContext>();
-
-	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
+	private UserContactsTestContext TestContext => Scenario.Get<UserContactsTestContext>();
 
 	[Fact]
 	public async Task Batch_ReturnsRequestedUsersPhonesWithPrimaryFirst()
@@ -76,5 +73,12 @@ public class GetUsersPhonesByIdsTests : IntegrationTest
 		var result = await Mediator.Send(new GetUsersPhonesByIdsQuery([]), CancellationToken);
 
 		result.Phones.Should().BeEmpty();
+	}
+
+	public sealed class GetUsersPhonesByIdsScenario : ReadScenario
+	{
+		public GetUsersPhonesByIdsScenario() => RegisterBasicContext<UserContactsTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

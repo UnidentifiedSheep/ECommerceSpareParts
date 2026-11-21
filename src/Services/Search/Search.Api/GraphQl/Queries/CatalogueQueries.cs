@@ -6,8 +6,8 @@ using MediatR;
 using Search.Api.GraphQl.Types;
 using Search.Api.GraphQl.Types.Highlights;
 using Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
-using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Models.CatalogueSearch;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Enums;
 
 namespace Search.Api.GraphQl.Queries;

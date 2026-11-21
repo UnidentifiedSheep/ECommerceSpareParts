@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Pricing.Application.Handlers.PriceApplier;
-using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
 using Pricing.Application.Interfaces.Cache;
+using Pricing.Application.Queries.PriceApplier;
+using Pricing.Application.Queries.PriceApplier.GetPriceAppliers;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Exceptions;

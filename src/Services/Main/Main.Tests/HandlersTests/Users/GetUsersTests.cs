@@ -3,38 +3,18 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Users.GetUsers;
+using Main.Modules.Identity.Application.Queries.Users.GetUsers;
 using Tests.DataBuilders.User;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Users;
 
-public sealed class GetUsersTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public sealed class GetUsersTests(ReadScenarioFixture<GetUsersTests.UsersScenario> fixture)
+	: ReadScenarioTest<GetUsersTests.UsersScenario>(fixture)
 {
 	[Fact]
 	public async Task Filters_ApplyTogetherAndEscapeLiteralWildcards()
 	{
-		var expected = new UserBuilder(Faker).WithUserName("filter-target-user")
-			.WithUserInfo(
-				"Николай",
-				"Петров",
-				"Contains 100%_proof literally")
-			.WithEmail("filter.person@contacts.example")
-			.WithRole(Role.Admin.ToString())
-			.Build();
-		expected.AddUserPhone(
-			"+7 (999) 222-33-44",
-			PhoneType.Unknown,
-			false,
-			false);
-		Context.Add(expected);
-		await Context.SaveChangesAsync(CancellationToken);
-		await CreateUser(
-			"filter-other-user",
-			"Николай",
-			"Петров");
-
+		var expected = Scenario.FilterTarget;
 		var unfiltered = new GetUsersQuery(
 			new Pagination(0, 25),
 			null,
@@ -93,12 +73,6 @@ public sealed class GetUsersTests(CombinedContainerFixture fixture) : Integratio
 	[Fact]
 	public async Task Filters_PaginateWithoutLosingUsersWithoutProfiles()
 	{
-		var users = new List<User>();
-		for (var index = 0; index < 3; index++)
-			users.Add(
-				await new UserBuilder(Faker).WithUserName($"no-profile-filter-{index}")
-					.BuildAndAddToDb(Context));
-
 		var first = await Mediator.Send(
 			new GetUsersQuery(
 				new Pagination(0, 2),
@@ -128,18 +102,37 @@ public sealed class GetUsersTests(CombinedContainerFixture fixture) : Integratio
 			.Concat(second.Users)
 			.Select(user => user.Id)
 			.Should()
-			.Equal(users.Select(user => user.Id).Order());
+			.Equal(Scenario.UsersWithoutProfiles.Select(user => user.Id).Order());
 	}
 
-	private Task<User> CreateUser(
-		string login,
-		string name,
-		string surname,
-		string? description = null)
-		=> new UserBuilder(Faker).WithUserName(login)
-			.WithUserInfo(
-				name,
-				surname,
-				description)
-			.BuildAndAddToDb(Context);
+	public sealed class UsersScenario : ReadScenario
+	{
+		public User FilterTarget { get; private set; } = null!;
+
+		public IReadOnlyList<User> UsersWithoutProfiles { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			FilterTarget = new UserBuilder(Faker).WithUserName("filter-target-user")
+				.WithUserInfo(
+					"Николай",
+					"Петров",
+					"Contains 100%_proof literally")
+				.WithEmail("filter.person@contacts.example")
+				.WithRole(Role.Admin.ToString())
+				.Build();
+			FilterTarget.AddUserPhone(
+				"+7 (999) 222-33-44",
+				PhoneType.Unknown,
+				false,
+				false);
+			var other = new UserBuilder(Faker).WithUserName("filter-other-user")
+				.WithUserInfo("Николай", "Петров", null)
+				.Build();
+			UsersWithoutProfiles = Enumerable.Range(0, 3)
+				.Select(index => new UserBuilder(Faker).WithUserName($"no-profile-filter-{index}").Build())
+				.ToArray();
+			return [FilterTarget, other, ..UsersWithoutProfiles];
+		}
+	}
 }

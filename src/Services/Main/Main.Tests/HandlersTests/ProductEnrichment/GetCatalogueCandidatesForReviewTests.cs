@@ -1,26 +1,23 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Entities.Product.Product;
+using Main.Entities.Product.Product.Enrichment;
+using Main.Modules.Product.Application.Queries.ProductEnrichment;
 using Tests.DataBuilders;
 using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.ProductEnrichment;
 
 namespace Tests.HandlersTests.ProductEnrichment;
 
-public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
+public sealed class GetCatalogueCandidatesForReviewTests(
+	ReadScenarioFixture<GetCatalogueCandidatesForReviewTests.CandidatesForReviewScenario> fixture)
+	: ReadScenarioTest<GetCatalogueCandidatesForReviewTests.CandidatesForReviewScenario>(fixture)
 {
-	public GetCatalogueCandidatesForReviewTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<CatalogueCandidateTestContext>();
-
-	private CatalogueCandidateTestContext TestContext => GetContext<CatalogueCandidateTestContext>();
-
 	[Fact]
 	public async Task ExistingCandidate_ReturnsCompleteReviewProjection()
 	{
-		var candidate = TestContext.Candidates[0];
+		var candidate = Scenario.Get<CatalogueCandidateTestContext>().Candidates[0];
 		var supplierProduct = candidate.SupplierProducts.Should().ContainSingle().Subject;
-		Context.ChangeTracker.Clear();
 
 		var result = await Mediator.Send(CreateQuery(sku: candidate.Sku.Value), CancellationToken);
 
@@ -46,50 +43,23 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 	[Fact]
 	public async Task ProductIdSpecified_ReturnsOnlyMappedCandidate()
 	{
-		var producerId = TestContext.Candidates[0].ProducerId;
-		var requestedProduct = await new ProductBuilder(Faker)
-			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var requestedCandidate = await new CatalogueCandidateBuilder(Faker)
-			.WithProducerId(producerId)
-			.WithProductId(requestedProduct.Id)
-			.BuildAndAddToDb(Context, CancellationToken);
+		var result = await Mediator.Send(CreateQuery(Scenario.RequestedProduct.Id), CancellationToken);
 
-		var result = await Mediator.Send(CreateQuery(requestedProduct.Id), CancellationToken);
-
-		result.Candidates.Should().ContainSingle(x => x.Id == requestedCandidate.Id);
+		result.Candidates.Should().ContainSingle(x => x.Id == Scenario.RequestedCandidate.Id);
 	}
 
 	[Fact]
 	public async Task SkuSpecified_SearchesByNormalizedExactValue()
 	{
-		var producerId = TestContext.Candidates[0].ProducerId;
-		var requestedCandidate = await new CatalogueCandidateBuilder(Faker)
-			.WithSku("AB-12 34")
-			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context, CancellationToken);
-		await new CatalogueCandidateBuilder(Faker)
-			.WithSku("AB-12 345")
-			.WithProducerId(producerId)
-			.BuildAndAddToDb(Context, CancellationToken);
-
 		var result = await Mediator.Send(CreateQuery(sku: "ab_1234"), CancellationToken);
 
-		result.Candidates.Should().ContainSingle(x => x.Id == requestedCandidate.Id);
+		result.Candidates.Should().ContainSingle(x => x.Id == Scenario.SkuCandidate.Id);
 	}
 
 	[Fact]
 	public async Task ProductIdAndSkuSpecified_AppliesBothFilters()
 	{
-		var producerId = TestContext.Candidates[0].ProducerId;
-		var product = await new ProductBuilder(Faker).WithProducerId(producerId).BuildAndAddToDb(Context, CancellationToken);
-		await new CatalogueCandidateBuilder(Faker)
-			.WithSku("mapped-sku")
-			.WithProducerId(producerId)
-			.WithProductId(product.Id)
-			.BuildAndAddToDb(Context, CancellationToken);
-
-		var result = await Mediator.Send(CreateQuery(product.Id, "missing-sku"), CancellationToken);
+		var result = await Mediator.Send(CreateQuery(Scenario.RequestedProduct.Id, "missing-sku"), CancellationToken);
 
 		result.Candidates.Should().BeEmpty();
 	}
@@ -99,4 +69,40 @@ public sealed class GetCatalogueCandidatesForReviewTests : IntegrationTest
 			productId,
 			sku,
 			new Pagination(0, 20));
+
+	public sealed class CandidatesForReviewScenario : ReadScenario
+	{
+		public CandidatesForReviewScenario() => RegisterBasicContext<CatalogueCandidateTestContext>();
+
+		public Product RequestedProduct { get; private set; } = null!;
+
+		public CatalogueCandidate RequestedCandidate { get; private set; } = null!;
+
+		public CatalogueCandidate SkuCandidate { get; private set; } = null!;
+
+		private int ProducerId => Get<CatalogueCandidateTestContext>().Candidates[0].ProducerId;
+
+		protected override async Task PrepareAsync()
+			=> RequestedProduct = await new ProductBuilder(Faker)
+				.WithProducerId(ProducerId)
+				.BuildAndAddToDb(Context, CancellationToken);
+
+		protected override IEnumerable<object> Seed()
+		{
+			RequestedCandidate = new CatalogueCandidateBuilder(Faker)
+				.WithSku("mapped-sku")
+				.WithProducerId(ProducerId)
+				.WithProductId(RequestedProduct.Id)
+				.Build();
+			SkuCandidate = new CatalogueCandidateBuilder(Faker)
+				.WithSku("AB-12 34")
+				.WithProducerId(ProducerId)
+				.Build();
+			var similarSkuCandidate = new CatalogueCandidateBuilder(Faker)
+				.WithSku("AB-12 345")
+				.WithProducerId(ProducerId)
+				.Build();
+			return [RequestedCandidate, SkuCandidate, similarSkuCandidate];
+		}
+	}
 }

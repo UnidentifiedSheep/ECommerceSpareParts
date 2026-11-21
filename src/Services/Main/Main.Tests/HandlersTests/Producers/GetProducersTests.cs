@@ -1,50 +1,38 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Modules.Product.Application.Handlers.Producers.GetProducers;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Queries.Producers.GetProducers;
 using Tests.DataBuilders;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Producers;
 
-public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class GetProducersTests(ReadScenarioFixture<GetProducersTests.ProducersScenario> fixture)
+	: ReadScenarioTest<GetProducersTests.ProducersScenario>(fixture)
 {
 	[Fact]
 	public async Task GetProducers_WithMultipleIds_ReturnsOnlyRequestedProducers()
 	{
-		var first = await new ProducerBuilder(Faker)
-			.WithName("First requested producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		var second = await new ProducerBuilder(Faker)
-			.WithName("Second requested producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context, CancellationToken);
+		var result = await Mediator.Send(
+			CreateQuery([Scenario.AlphaRequested.Id, Scenario.BetaRequested.Id]),
+			CancellationToken);
 
-		var result = await Mediator.Send(CreateQuery([first.Id, second.Id]), CancellationToken);
-
-		result.Producers.Select(x => x.Id).Should().BeEquivalentTo([first.Id, second.Id]);
-		result.Producers.Should().NotContain(x => x.Id == skipped.Id);
+		result.Producers.Select(x => x.Id).Should().BeEquivalentTo([Scenario.AlphaRequested.Id, Scenario.BetaRequested.Id]);
+		result.Producers.Should().NotContain(x => x.Id == Scenario.Gamma.Id);
 	}
 
 	[Fact]
 	public async Task GetProducers_WithEmptyIds_DoesNotFilterById()
 	{
-		var first = await new ProducerBuilder(Faker).WithName("First producer").BuildAndAddToDb(Context, CancellationToken);
-		var second = await new ProducerBuilder(Faker).WithName("Second producer").BuildAndAddToDb(Context, CancellationToken);
-
 		var result = await Mediator.Send(CreateQuery([]), CancellationToken);
 
-		result.Producers.Should().Contain(x => x.Id == first.Id);
-		result.Producers.Should().Contain(x => x.Id == second.Id);
+		result.Producers.Should().Contain(x => x.Id == Scenario.AlphaRequested.Id);
+		result.Producers.Should().Contain(x => x.Id == Scenario.Gamma.Id);
 	}
 
 	[Fact]
 	public async Task GetProducers_WithDuplicateAndMissingIds_ReturnsExistingProducerOnce()
 	{
-		var producer = await new ProducerBuilder(Faker)
-			.WithName("Existing producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		var skipped = await new ProducerBuilder(Faker).WithName("Skipped producer").BuildAndAddToDb(Context, CancellationToken);
+		var producer = Scenario.AlphaRequested;
 
 		var result = await Mediator.Send(
 			CreateQuery([producer.Id, producer.Id, int.MaxValue]),
@@ -52,49 +40,32 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 
 		result.Producers.Should().ContainSingle();
 		result.Producers.Single().Id.Should().Be(producer.Id);
-		result.Producers.Should().NotContain(x => x.Id == skipped.Id);
 	}
 
 	[Fact]
 	public async Task GetProducers_WithIdsAndSearchTerm_AppliesBothFilters()
 	{
-		var matchingRequested = await new ProducerBuilder(Faker)
-			.WithName("Alpha requested producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		var notMatchingRequested = await new ProducerBuilder(Faker)
-			.WithName("Beta requested producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		var matchingNotRequested = await new ProducerBuilder(Faker)
-			.WithName("Alpha skipped producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-
 		var result = await Mediator.Send(
-			CreateQuery([matchingRequested.Id, notMatchingRequested.Id], "Alpha"),
+			CreateQuery([Scenario.AlphaRequested.Id, Scenario.BetaRequested.Id], "Alpha"),
 			CancellationToken);
 
 		result.Producers.Should().ContainSingle();
-		result.Producers.Single().Id.Should().Be(matchingRequested.Id);
-		result.Producers.Should().NotContain(x => x.Id == notMatchingRequested.Id);
-		result.Producers.Should().NotContain(x => x.Id == matchingNotRequested.Id);
+		result.Producers.Single().Id.Should().Be(Scenario.AlphaRequested.Id);
+		result.Producers.Should().NotContain(x => x.Id == Scenario.AlphaSkipped.Id);
 	}
 
 	[Fact]
 	public async Task GetProducers_WithIds_AppliesPaginationAfterFiltering()
 	{
-		var first = await new ProducerBuilder(Faker).WithName("Alpha producer").BuildAndAddToDb(Context, CancellationToken);
-		var second = await new ProducerBuilder(Faker).WithName("Beta producer").BuildAndAddToDb(Context, CancellationToken);
-		var third = await new ProducerBuilder(Faker).WithName("Gamma producer").BuildAndAddToDb(Context, CancellationToken);
-		await new ProducerBuilder(Faker).WithName("Aardvark skipped producer").BuildAndAddToDb(Context, CancellationToken);
-
 		var result = await Mediator.Send(
 			CreateQuery(
-				[first.Id, second.Id, third.Id],
+				[Scenario.AlphaRequested.Id, Scenario.BetaRequested.Id, Scenario.Gamma.Id],
 				page: 1,
 				size: 1),
 			CancellationToken);
 
 		result.Producers.Should().ContainSingle();
-		result.Producers.Single().Id.Should().Be(second.Id);
+		result.Producers.Single().Id.Should().Be(Scenario.BetaRequested.Id);
 	}
 
 	private static GetProducersQuery CreateQuery(
@@ -106,4 +77,25 @@ public class GetProducersTests(CombinedContainerFixture fixture) : IntegrationTe
 			searchTerm,
 			ids,
 			new Pagination(page, size));
+
+	public sealed class ProducersScenario : ReadScenario
+	{
+		public Producer AlphaRequested { get; private set; } = null!;
+
+		public Producer BetaRequested { get; private set; } = null!;
+
+		public Producer AlphaSkipped { get; private set; } = null!;
+
+		public Producer Gamma { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			AlphaRequested = new ProducerBuilder(Faker).WithName("Alpha requested producer").Build();
+			BetaRequested = new ProducerBuilder(Faker).WithName("Beta requested producer").Build();
+			AlphaSkipped = new ProducerBuilder(Faker).WithName("Alpha skipped producer").Build();
+			Gamma = new ProducerBuilder(Faker).WithName("Gamma producer").Build();
+			var aardvark = new ProducerBuilder(Faker).WithName("Aardvark skipped producer").Build();
+			return [AlphaRequested, BetaRequested, AlphaSkipped, Gamma, aardvark];
+		}
+	}
 }

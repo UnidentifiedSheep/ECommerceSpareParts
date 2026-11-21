@@ -3,7 +3,7 @@ using Api.Common.Extensions;
 using Enums;
 using MediatR;
 using Search.Application.Dtos.Producers;
-using Search.Application.Handlers.Producers;
+using Search.Application.Queries.Producers;
 
 namespace Search.Api.EndPoints.Producers;
 

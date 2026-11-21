@@ -3,7 +3,7 @@ using Api.Common.Extensions;
 using Enums;
 using Main.Modules.Product.Application.Dtos.Product.References;
 using Main.Modules.Product.Application.Dtos.Product.SupplierReferences;
-using Main.Modules.Product.Application.Products.Queries;
+using Main.Modules.Product.Application.Queries.Products;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

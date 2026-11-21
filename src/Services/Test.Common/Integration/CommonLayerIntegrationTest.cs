@@ -54,6 +54,7 @@ public abstract class CommonLayerIntegrationTest : TestBase
 		Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
 		await Context.Database.EnsureCreatedAsync();
+		await Context.ClearDatabase();
 		await LoadLocales();
 		await InitializeBasicContexts();
 	}
@@ -70,7 +71,6 @@ public abstract class CommonLayerIntegrationTest : TestBase
 
 	public override async ValueTask DisposeAsync()
 	{
-		await Context.ClearDatabase();
 		await _environmentLease.DisposeAsync();
 		Scope.Dispose();
 	}

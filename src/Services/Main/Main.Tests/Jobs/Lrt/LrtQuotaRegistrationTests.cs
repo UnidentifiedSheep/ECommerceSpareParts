@@ -9,17 +9,16 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using NamedObject.Core.Interfaces;
 using Tests.Stubs;
-using Tests.TestContainers.Combined;
 
 namespace Tests.Jobs.Lrt;
 
-public class LrtQuotaRegistrationTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class LrtQuotaRegistrationTests : ServiceTest
 {
 	[Fact]
 	public void DefaultQuota_IsRegisteredAndUsesWorkerLimit()
 	{
-		var quotas = Scope.ServiceProvider.GetRequiredService<INamedObjectRegistry<ILrtQuotaManager>>();
-		var limit = Scope.ServiceProvider.GetRequiredService<IOptions<LrtExecutorOptions>>()
+		var quotas = Services.GetRequiredService<INamedObjectRegistry<ILrtQuotaManager>>();
+		var limit = Services.GetRequiredService<IOptions<LrtExecutorOptions>>()
 			.Value
 			.MaxParallelPerWorker;
 
@@ -32,7 +31,7 @@ public class LrtQuotaRegistrationTests(CombinedContainerFixture fixture) : Integ
 	[Fact]
 	public void RegisteredGroup_IsAvailableByName()
 	{
-		var quotas = Scope.ServiceProvider.GetRequiredService<INamedObjectRegistry<ILrtQuotaManager>>();
+		var quotas = Services.GetRequiredService<INamedObjectRegistry<ILrtQuotaManager>>();
 
 		var manager = quotas.GetBySystemName(QuotaTestLrt.QuotaName);
 
@@ -42,7 +41,7 @@ public class LrtQuotaRegistrationTests(CombinedContainerFixture fixture) : Integ
 	[Fact]
 	public void EveryRegisteredLrt_ReferencesAnExistingQuota()
 	{
-		var catalog = Scope.ServiceProvider.GetRequiredService<LrtQuotaCatalog>();
+		var catalog = Services.GetRequiredService<LrtQuotaCatalog>();
 
 		var act = catalog.Validate;
 

@@ -1,5 +1,4 @@
 using Enums;
-using Main.Entities.Organization.Enums.Organization;
 using GraphQL.Common.Attributes;
 using GraphQL.Common.Extensions;
 using HotChocolate;
@@ -7,8 +6,9 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
+using Main.Entities.Organization.Enums.Organization;
+using Main.Modules.Organization.Application.Queries.Organizations;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizations;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

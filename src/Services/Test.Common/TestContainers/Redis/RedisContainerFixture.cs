@@ -6,7 +6,7 @@ namespace Tests.TestContainers.Redis;
 
 public sealed class RedisContainerFixture : IAsyncLifetime
 {
-	private const int DatabaseCount = AssemblyFixture.MaxThreads;
+	private const int DatabaseCount = AssemblyFixture.MaxThreads + AssemblyFixture.ReadScenarioSlots;
 
 	private readonly RedisContainer _redisContainer =
 		new RedisBuilder("redis/redis-stack:latest").WithPortBinding(6379, true).Build();

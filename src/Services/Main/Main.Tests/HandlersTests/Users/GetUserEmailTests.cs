@@ -1,17 +1,14 @@
 using FluentAssertions;
 using Main.Entities.Exceptions;
-using Main.Modules.Identity.Application.Handlers.Users.GetUserEmail;
-using Tests.TestContainers.Combined;
+using Main.Modules.Identity.Application.Queries.Users.GetUserEmail;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Users;
 
-public class GetUserEmailTests : IntegrationTest
+public class GetUserEmailTests(ReadScenarioFixture<GetUserEmailTests.GetUserEmailScenario> fixture)
+	: ReadScenarioTest<GetUserEmailTests.GetUserEmailScenario>(fixture)
 {
-	public GetUserEmailTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UserContactsTestContext>();
-
-	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
+	private UserContactsTestContext TestContext => Scenario.Get<UserContactsTestContext>();
 
 	[Fact]
 	public async Task ExistingEmail_ReturnsProjectedEmail()
@@ -36,5 +33,12 @@ public class GetUserEmailTests : IntegrationTest
 		var act = () => Mediator.Send(new GetUserEmailQuery(TestContext.SecondUser.Id, email.GetId()));
 
 		await act.Should().ThrowAsync<UserEmailNotFoundException>();
+	}
+
+	public sealed class GetUserEmailScenario : ReadScenario
+	{
+		public GetUserEmailScenario() => RegisterBasicContext<UserContactsTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

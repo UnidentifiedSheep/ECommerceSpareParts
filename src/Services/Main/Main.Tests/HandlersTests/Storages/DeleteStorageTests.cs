@@ -1,6 +1,6 @@
 using Main.Entities.Storage.Exceptions;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Storage.Application.Handlers.Storages.DeleteStorage;
+using Main.Modules.Storage.Application.Commands.Storages.DeleteStorage;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

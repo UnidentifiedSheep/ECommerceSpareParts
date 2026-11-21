@@ -44,6 +44,5 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 	{
 		await using var lease = _environmentLease;
 		using var scope = Scope;
-		await ResetDataStoresAsync();
 	}
 }

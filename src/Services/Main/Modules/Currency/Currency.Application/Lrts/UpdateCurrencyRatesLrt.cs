@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Locan.Core.Interfaces;
 using Main.Entities.Currency;
-using Main.Modules.Currency.Application.Handlers.Currencies.UpdateCurrenciesRates;
+using Main.Modules.Currency.Application.Commands.Currencies.UpdateCurrenciesRates;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

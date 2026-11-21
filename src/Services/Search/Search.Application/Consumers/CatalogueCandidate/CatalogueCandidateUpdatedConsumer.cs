@@ -1,7 +1,7 @@
 using Contracts.ProductEnrichment;
 using MassTransit;
 using MediatR;
-using Search.Application.Handlers.CatalogueCandidates.UpsertCatalogueCandidates;
+using Search.Application.Commands.CatalogueCandidates.UpsertCatalogueCandidates;
 
 namespace Search.Application.Consumers.CatalogueCandidate;
 

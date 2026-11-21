@@ -3,7 +3,7 @@ using Application.Common.LRT;
 using Locan.Core.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using Pricing.Application.Handlers.Pricing;
+using Pricing.Application.Commands.Pricing;
 using Pricing.Entities;
 
 namespace Pricing.Application.Lrts.PriceCandidateCalculation;

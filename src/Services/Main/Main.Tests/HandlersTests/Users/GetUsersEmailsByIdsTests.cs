@@ -1,16 +1,13 @@
 using FluentAssertions;
-using Main.Modules.Identity.Application.Handlers.Users;
-using Tests.TestContainers.Combined;
+using Main.Modules.Identity.Application.Queries.Users;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Users;
 
-public class GetUsersEmailsByIdsTests : IntegrationTest
+public class GetUsersEmailsByIdsTests(ReadScenarioFixture<GetUsersEmailsByIdsTests.GetUsersEmailsByIdsScenario> fixture)
+	: ReadScenarioTest<GetUsersEmailsByIdsTests.GetUsersEmailsByIdsScenario>(fixture)
 {
-	public GetUsersEmailsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UserContactsTestContext>();
-
-	private UserContactsTestContext TestContext => GetContext<UserContactsTestContext>();
+	private UserContactsTestContext TestContext => Scenario.Get<UserContactsTestContext>();
 
 	[Fact]
 	public async Task Batch_ReturnsRequestedUsersEmailsWithPrimaryFirst()
@@ -84,5 +81,12 @@ public class GetUsersEmailsByIdsTests : IntegrationTest
 			CancellationToken);
 
 		result.Emails.Should().BeEmpty();
+	}
+
+	public sealed class GetUsersEmailsByIdsScenario : ReadScenario
+	{
+		public GetUsersEmailsByIdsScenario() => RegisterBasicContext<UserContactsTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

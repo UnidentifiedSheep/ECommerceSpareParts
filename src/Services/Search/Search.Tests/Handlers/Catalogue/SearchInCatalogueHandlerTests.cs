@@ -1,12 +1,12 @@
 using Application.Common.Models;
 using FluentAssertions;
 using Moq;
-using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Interfaces.CatalogueCandidate;
 using Search.Application.Interfaces.Product;
 using Search.Application.Models.CatalogueSearch;
 using Search.Application.Models.CatalogueSearch.Criteria;
 using Search.Application.Projections;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Enums;
 using CatalogueCandidateDocument = Search.Entities.CatalogueCandidate;
 using ProductDocument = Search.Entities.Product;

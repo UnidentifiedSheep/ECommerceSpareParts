@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -25,6 +26,7 @@ public sealed record GqlGetPurchasesInput
 	public IReadOnlyCollection<int>? ProductIds { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Purchase.Purchase.Purchase>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("searchTerm")]

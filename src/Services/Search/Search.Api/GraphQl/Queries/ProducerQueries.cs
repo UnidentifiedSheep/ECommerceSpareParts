@@ -2,7 +2,7 @@ using HotChocolate;
 using MediatR;
 using Search.Api.GraphQl.Types;
 using Search.Api.GraphQl.Types.Inputs;
-using Search.Application.Handlers.Producers.SearchProducers;
+using Search.Application.Queries.Producers.SearchProducers;
 
 namespace Search.Api.GraphQl.Queries;
 

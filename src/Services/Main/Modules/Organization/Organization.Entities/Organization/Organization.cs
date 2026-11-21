@@ -9,7 +9,7 @@ using Main.Entities.Organization.Enums.Organization;
 
 namespace Main.Entities.Organization.Organization;
 
-public class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Organization, Guid>
+public partial class Organization : AuditableEntity<Organization, Guid>, ILinqEntity<Organization, Guid>
 {
 
 	private readonly List<OrganizationMember> _members = [];

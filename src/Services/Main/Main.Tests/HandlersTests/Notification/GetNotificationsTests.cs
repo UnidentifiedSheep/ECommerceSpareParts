@@ -1,17 +1,14 @@
 using Application.Common.Models;
 using FluentAssertions;
-using Main.Modules.Notifications.Application.Handlers.Notifications.GetNotifications;
-using Tests.TestContainers.Combined;
+using Main.Modules.Notifications.Application.Queries.Notifications.GetNotifications;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Notification;
 
-public class GetNotificationsTests : IntegrationTest
+public class GetNotificationsTests(ReadScenarioFixture<GetNotificationsTests.GetNotificationsScenario> fixture)
+	: ReadScenarioTest<GetNotificationsTests.GetNotificationsScenario>(fixture)
 {
-	public GetNotificationsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<InAppNotificationsTestContext>();
-
-	private InAppNotificationsTestContext NotificationsContext => GetContext<InAppNotificationsTestContext>();
+	private InAppNotificationsTestContext NotificationsContext => Scenario.Get<InAppNotificationsTestContext>();
 
 	[Theory]
 	[InlineData(0)]
@@ -79,5 +76,12 @@ public class GetNotificationsTests : IntegrationTest
 			CancellationToken);
 
 		result.Notifications.Should().BeEmpty();
+	}
+
+	public sealed class GetNotificationsScenario : ReadScenario
+	{
+		public GetNotificationsScenario() => RegisterBasicContext<InAppNotificationsTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

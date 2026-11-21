@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Purchase;
 using Main.Api.GraphQl.Types.Purchase;
-using Main.Modules.Purchase.Application.Handlers.Purchases.CreatePurchase;
-using Main.Modules.Purchase.Application.Handlers.Purchases.DeletePurchase;
-using Main.Modules.Purchase.Application.Handlers.Purchases.EditPurchase;
+using Main.Modules.Purchase.Application.Commands.Purchases.CreatePurchase;
+using Main.Modules.Purchase.Application.Commands.Purchases.DeletePurchase;
+using Main.Modules.Purchase.Application.Commands.Purchases.EditPurchase;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

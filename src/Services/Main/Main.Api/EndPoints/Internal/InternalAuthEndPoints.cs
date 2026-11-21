@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Commands.Auth;
 using MediatR;
 
 namespace Main.Api.EndPoints.Internal;

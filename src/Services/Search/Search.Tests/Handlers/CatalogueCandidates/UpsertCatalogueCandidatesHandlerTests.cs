@@ -2,7 +2,7 @@ using Contracts.Models.CatalogueCandidate;
 using Contracts.ProductEnrichment;
 using FluentAssertions;
 using Moq;
-using Search.Application.Handlers.CatalogueCandidates.UpsertCatalogueCandidates;
+using Search.Application.Commands.CatalogueCandidates.UpsertCatalogueCandidates;
 using Search.Application.Interfaces.CatalogueCandidate;
 using CatalogueCandidateDocument = Search.Entities.CatalogueCandidate;
 

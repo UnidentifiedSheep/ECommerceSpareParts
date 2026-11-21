@@ -35,6 +35,12 @@ public static class ValidationExtensions
 
 	public static bool IsNullOrDefault<T>(this T? value) where T : struct => !value.IsNotNullOrDefault();
 
+	public static bool IsNotDefault<T>(this T value) where T : struct
+		=> !EqualityComparer<T>.Default.Equals(value, default);
+
+	public static bool HasOnlyDefinedFlags<T>(this T value) where T : struct, Enum
+		=> (Convert.ToInt64(value) & ~DefinedFlags<T>.Mask) == 0;
+
 	public static bool IsInRange<T>(
 		this T value,
 		T min,
@@ -73,4 +79,9 @@ public static class ValidationExtensions
 	}
 
 	public static bool IsNotEmpty<T>(this IEnumerable<T> value) => value.Any();
+
+	private static class DefinedFlags<T> where T : struct, Enum
+	{
+		public static readonly long Mask = Enum.GetValues<T>().Aggregate(0L, (mask, flag) => mask | Convert.ToInt64(flag));
+	}
 }

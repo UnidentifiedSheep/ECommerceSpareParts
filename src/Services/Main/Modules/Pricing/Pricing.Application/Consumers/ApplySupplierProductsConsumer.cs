@@ -2,7 +2,7 @@ using Application.Common.Extensions;
 using Main.Modules.Product.Abstractions.Events;
 using MassTransit;
 using MediatR;
-using Pricing.Application.Handlers.Pricing;
+using Pricing.Application.Commands.Pricing;
 
 namespace Pricing.Application.Consumers;
 

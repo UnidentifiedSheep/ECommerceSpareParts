@@ -2,57 +2,27 @@ using Application.Common.Models;
 using Application.Common.Querying;
 using Exceptions;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Storage.Application.Handlers.StorageContents.GetStorageContents;
+using Main.Modules.Storage.Application.Queries.StorageContents.GetStorageContents;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.StorageContents;
 
-public sealed class GetStorageContentsTests : IntegrationTest
+public sealed class GetStorageContentsTests(ReadScenarioFixture<GetStorageContentsTests.StorageContentsScenario> fixture)
+	: ReadScenarioTest<GetStorageContentsTests.StorageContentsScenario>(fixture)
 {
-	public GetStorageContentsTests(CombinedContainerFixture fixture) : base(fixture)
-	{
-		RegisterBasicContext<ProductTestContext>();
-		RegisterBasicContext<CurrencyRatesTestContext>();
-		RegisterBasicContext<StorageTestContext>();
-	}
-
 	[Fact]
 	public async Task GetStorageContents_WithProductAndStorage_FiltersContent()
 	{
-		var products = GetContext<ProductTestContext>().Products.Take(2).ToArray();
-		var storages = GetContext<StorageTestContext>().Storages.Take(2).ToArray();
-		var currencyId = GetCurrencyId();
-		var expected = await CreateContent(
-			products[0].Id,
-			storages[0].Code,
-			currencyId,
-			5);
-		await CreateContent(
-			products[0].Id,
-			storages[0].Code,
-			currencyId,
-			0);
-		await CreateContent(
-			products[0].Id,
-			storages[1].Code,
-			currencyId,
-			7);
-		await CreateContent(
-			products[1].Id,
-			storages[0].Code,
-			currencyId,
-			9);
+		var expected = Scenario.FilteredContent;
 
 		var result = await Mediator.Send(
 			new GetStorageContentsQuery(
-				products[0].Id,
-				storages[0].Code,
+				expected.ProductId,
+				expected.StorageCode,
 				[],
 				new Pagination(0, 20),
 				false),
@@ -64,37 +34,21 @@ public sealed class GetStorageContentsTests : IntegrationTest
 	[Fact]
 	public async Task GetStorageContents_WithSortAndPagination_ReturnsRequestedPage()
 	{
-		var productId = GetContext<ProductTestContext>().Products.First().Id;
-		var storageCode = GetContext<StorageTestContext>().Storages.First().Code;
-		var currencyId = GetCurrencyId();
-		await CreateContent(
-			productId,
-			storageCode,
-			currencyId,
-			10);
-		var highest = await CreateContent(
-			productId,
-			storageCode,
-			currencyId,
-			30);
-		var middle = await CreateContent(
-			productId,
-			storageCode,
-			currencyId,
-			20);
+		var highest = Scenario.HighestContent;
+		var middle = Scenario.MiddleContent;
 
 		var firstPage = await Mediator.Send(
 			new GetStorageContentsQuery(
-				productId,
-				storageCode,
+				highest.ProductId,
+				highest.StorageCode,
 				["count_desc"],
 				new Pagination(0, 2),
 				true),
 			CancellationToken);
 		var secondPage = await Mediator.Send(
 			new GetStorageContentsQuery(
-				productId,
-				storageCode,
+				highest.ProductId,
+				highest.StorageCode,
 				["count_desc"],
 				new Pagination(1, 2),
 				true),
@@ -108,18 +62,12 @@ public sealed class GetStorageContentsTests : IntegrationTest
 	[Fact]
 	public async Task GetStorageContents_WithShowZeroCount_ReturnsZeroContent()
 	{
-		var productId = GetContext<ProductTestContext>().Products.First().Id;
-		var storageCode = GetContext<StorageTestContext>().Storages.First().Code;
-		var zeroContent = await CreateContent(
-			productId,
-			storageCode,
-			GetCurrencyId(),
-			0);
+		var zeroContent = Scenario.ZeroContent;
 
 		var result = await Mediator.Send(
 			new GetStorageContentsQuery(
-				productId,
-				storageCode,
+				zeroContent.ProductId,
+				zeroContent.StorageCode,
 				[],
 				new Pagination(0, 20),
 				true),
@@ -148,71 +96,93 @@ public sealed class GetStorageContentsTests : IntegrationTest
 	[Fact]
 	public async Task AvailableCountSort_UsesActiveLocksClampsZeroAndBreaksTiesById()
 	{
-		var product = GetContext<ProductTestContext>().Products[0];
-		var storage = GetContext<StorageTestContext>().Storages.First();
-		var first = await CreateContent(
-			product.Id,
-			storage.Code,
-			GetCurrencyId(),
-			10);
-		var second = await CreateContent(
-			product.Id,
-			storage.Code,
-			GetCurrencyId(),
-			5);
-		var third = await CreateContent(
-			product.Id,
-			storage.Code,
-			GetCurrencyId(),
-			8);
-		var overlocked = await CreateContent(
-			product.Id,
-			storage.Code,
-			GetCurrencyId(),
-			1);
-		var now = DateTimeOffset.UtcNow;
-		var released = StorageContentLock.Create(second.Id, 100);
-		released.Release(now.UtcDateTime);
-		Context.Set<StorageContentLock>()
-			.AddRange(
-				StorageContentLock.Create(
-					first.Id,
-					8,
-					now.AddHours(1).UtcDateTime),
-				StorageContentLock.Create(third.Id, 3),
-				StorageContentLock.Create(overlocked.Id, 4),
-				released);
-		await Context.SaveChangesAsync(CancellationToken);
+		var locked = Scenario.LockedContents;
 		var sort = new SortExpression("availableCount");
 
 		var result = await Mediator.Send(
 			new GetStorageContentsQuery(
-				product.Id,
-				storage.Code,
+				locked[0].ProductId,
+				locked[0].StorageCode,
 				[sort],
 				new Pagination(0, 100),
 				true),
 			CancellationToken);
 
 		Assert.Equal(
-			new[] { overlocked.Id, first.Id, second.Id, third.Id },
+			new[] { locked[3].Id, locked[0].Id, locked[1].Id, locked[2].Id },
 			result.Content.Select(content => content.Id));
 	}
 
-	private int GetCurrencyId()
-		=> GetContext<CurrencyRatesTestContext>().CurrencyTestContext.Currencies[0].Id;
+	public sealed class StorageContentsScenario : ReadScenario
+	{
+		public StorageContentsScenario()
+		{
+			RegisterBasicContext<ProductTestContext>();
+			RegisterBasicContext<CurrencyRatesTestContext>();
+			RegisterBasicContext<StorageTestContext>();
+		}
 
-	private async Task<StorageContent> CreateContent(
-		int productId,
-		string storageCode,
-		int currencyId,
-		int count)
-		=> await new StorageContentBuilder(Faker)
-			.WithProductIds(productId)
-			.WithStorageCode(storageCode)
-			.WithCurrencyId(currencyId)
-			.WithCount(count)
-			.BuildAndAddToDb(Context);
+		public StorageContent FilteredContent { get; private set; } = null!;
+
+		public StorageContent ZeroContent { get; private set; } = null!;
+
+		public StorageContent HighestContent { get; private set; } = null!;
+
+		public StorageContent MiddleContent { get; private set; } = null!;
+
+		public IReadOnlyList<StorageContent> LockedContents { get; private set; } = null!;
+
+		protected override async Task PrepareAsync()
+		{
+			var products = Get<ProductTestContext>().Products;
+			var storages = Get<StorageTestContext>().Storages.Select(x => x.Code).ToArray();
+			FilteredContent = CreateContent(products[0].Id, storages[0], 5);
+			ZeroContent = CreateContent(products[0].Id, storages[0], 0);
+			HighestContent = CreateContent(products[2].Id, storages[0], 30);
+			MiddleContent = CreateContent(products[2].Id, storages[0], 20);
+			LockedContents =
+			[
+				CreateContent(products[3].Id, storages[0], 10),
+				CreateContent(products[3].Id, storages[0], 5),
+				CreateContent(products[3].Id, storages[0], 8),
+				CreateContent(products[3].Id, storages[0], 1)
+			];
+			Context.AddRange(
+				[
+					FilteredContent,
+					ZeroContent,
+					CreateContent(products[0].Id, storages[1], 7),
+					CreateContent(products[1].Id, storages[0], 9),
+					CreateContent(products[2].Id, storages[0], 10),
+					HighestContent,
+					MiddleContent,
+					..LockedContents
+				]);
+			await Context.SaveChangesAsync(CancellationToken);
+		}
+
+		protected override IEnumerable<object> Seed()
+		{
+			var now = DateTime.UtcNow;
+			var released = StorageContentLock.Create(LockedContents[1].Id, 100);
+			released.Release(now);
+			return
+			[
+				StorageContentLock.Create(LockedContents[0].Id, 8, now.AddHours(1)),
+				StorageContentLock.Create(LockedContents[2].Id, 3),
+				StorageContentLock.Create(LockedContents[3].Id, 4),
+				released
+			];
+		}
+
+		private StorageContent CreateContent(int productId, string storageCode, int count)
+			=> new StorageContentBuilder(Faker)
+				.WithProductIds(productId)
+				.WithStorageCode(storageCode)
+				.WithCurrencyId(Get<CurrencyRatesTestContext>().CurrencyTestContext.Currencies[0].Id)
+				.WithCount(count)
+				.Build();
+	}
 }
 
 public class

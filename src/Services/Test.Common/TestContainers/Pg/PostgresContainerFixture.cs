@@ -6,7 +6,7 @@ namespace Tests.TestContainers.Pg;
 
 public sealed class PostgresContainerFixture : IAsyncLifetime
 {
-	private const int DatabaseCount = AssemblyFixture.MaxThreads;
+	private const int DatabaseCount = AssemblyFixture.MaxThreads + AssemblyFixture.ReadScenarioSlots;
 
 	private readonly PostgreSqlContainer _postgresqlContainer =
 		new PostgreSqlBuilder("postgres:latest").Build();

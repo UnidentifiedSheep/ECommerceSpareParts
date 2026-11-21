@@ -6,10 +6,11 @@ using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.Order.Enums.Orders;
 using Main.Entities.Order.Exceptions;
-using Main.Modules.Order.Application.Orders.Queries;
-using Main.Modules.Order.Application.Orders.Queries.GetOrders;
+using Main.Modules.Order.Application.Queries.Orders;
+using Main.Modules.Order.Application.Queries.Orders.GetOrders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Context;
 using Security.Core.Interfaces;
 using Tests.Abstractions.Test;
 using Tests.Stubs;
@@ -20,15 +21,12 @@ using Product = Main.Entities.Product.Product.Product;
 
 namespace Tests.HandlersTests.Orders;
 
-public sealed class GetOrdersTests : IntegrationTest
+public sealed class GetOrdersTests(ReadScenarioFixture<GetOrdersTests.OrdersScenario> fixture)
+	: ReadScenarioTest<GetOrdersTests.OrdersScenario>(fixture)
 {
-	public GetOrdersTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<OrderTestContext>();
+	private OrderTestContext TestContext => Scenario.Get<OrderTestContext>();
 
-	private OrderTestContext TestContext => GetContext<OrderTestContext>();
-
-	private UserContextMock UserContext
-		=> (UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>();
+	private UserContextMock UserContext => (UserContextMock)Services.GetRequiredService<IUserContext>();
 
 	private DomainOrder[] Orders
 		=>
@@ -151,6 +149,137 @@ public sealed class GetOrdersTests : IntegrationTest
 			.BeEquivalentTo([TestContext.OnlineOrder.Id, TestContext.ManualOrder.Id]);
 	}
 
+	[Theory]
+	[InlineData("organization")]
+	[InlineData("user")]
+	[InlineData("name")]
+	[InlineData("sku")]
+	[InlineData("id")]
+	public async Task SearchTerm_FindsOrderThroughRelatedData(string field)
+	{
+		var order = TestContext.ConfirmedOrder;
+		var term = field switch
+		{
+			"organization" => "pArTnEr PaRtS",
+			"user" => "ORDER-BUYER",
+			"name" => "search pump",
+			"sku" => "r p 00999",
+			_ => order.Id.ToString()
+		};
+
+		var result = await Search(Query() with { SearchTerm = term });
+
+		result.Orders.Should().ContainSingle(item => item.Id == order.Id);
+	}
+
+	[Fact]
+	public async Task DefaultSorting_IsNewestFirst()
+	{
+		var result = await Search();
+
+		result.Orders
+			.Select(order => order.Id)
+			.Should()
+			.Equal(
+				Orders.OrderByDescending(order => order.CreatedAt)
+					.ThenBy(order => order.Id)
+					.Select(order => order.Id));
+	}
+
+	[Theory]
+	[InlineData("status")]
+	[InlineData("fulfillmentStatus")]
+	[InlineData("source")]
+	[InlineData("confirmedAt")]
+	[InlineData("updatedAt")]
+	public async Task ExplicitSorting_IsApplied(string field)
+	{
+		var result = await Search(Query() with { SortBy = [new SortExpression(field)] });
+		var ids = Orders.Select(order => order.Id).ToArray();
+		var stored = await Services.GetRequiredService<UnifiedDbContext>()
+			.Set<DomainOrder>()
+			.AsNoTracking()
+			.Where(order => ids.Contains(order.Id))
+			.ToListAsync(CancellationToken);
+
+		var expected = field switch
+		{
+			"status" => stored.OrderBy(order => order.Status).ThenBy(order => order.Id),
+			"fulfillmentStatus" => stored.OrderBy(order => order.FulfillmentStatus).ThenBy(order => order.Id),
+			"source" => stored.OrderBy(order => order.Source).ThenBy(order => order.Id),
+			"confirmedAt" => stored.OrderBy(order => order.ConfirmedAt == null)
+				.ThenBy(order => order.ConfirmedAt)
+				.ThenBy(order => order.Id),
+			_ => stored.OrderBy(order => order.UpdatedAt).ThenBy(order => order.Id)
+		};
+		result.Orders.Select(order => order.Id).Should().Equal(expected.Select(order => order.Id));
+	}
+
+	[Fact]
+	public async Task InvalidSorting_ThrowsInvalidInputException()
+		=> await Assert.ThrowsAsync<InvalidInputException>(()
+			=> Search(Query() with { SortBy = [new SortExpression("unknown")] }));
+
+	private static GetOrdersQuery Query()
+		=> new(
+			new RangeModel<DateTime>(),
+			new Pagination(0, 100),
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			[],
+			null);
+
+	private Task<GetOrdersResult> Search(
+		GetOrdersQuery? query = null,
+		PermissionCodes? permission = PermissionCodes.ORDERS_GET)
+	{
+		if (permission.HasValue)
+			UserContext.SetPermissions([Permission.ToNormalizedPermission(permission.Value)]);
+		return Mediator.Send(query ?? Query(), CancellationToken);
+	}
+
+	public sealed class OrdersScenario : ReadScenario
+	{
+		public OrdersScenario() => RegisterBasicContext<OrderTestContext>();
+
+		protected override IEnumerable<object> Seed()
+		{
+			var orders = Get<OrderTestContext>();
+			var productId = orders.ConfirmedOrder.Items[0].ProductId;
+			var product = Context.Set<Product>().Single(item => item.Id == productId);
+			product.SetName("Order search pump");
+			product.SetSku("RP-00999");
+			orders.ManualOrder.Confirm(null);
+			orders.ManualOrder.Complete();
+			orders.ManualOrder.SetFulfillmentStatus(OrderFulfillmentStatus.PartiallyAvailable);
+			orders.EmptyOrder.Cancel();
+			return [];
+		}
+	}
+}
+
+public sealed class GetOrdersMutationTests : IntegrationTest
+{
+	public GetOrdersMutationTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<OrderTestContext>();
+
+	private OrderTestContext TestContext => GetContext<OrderTestContext>();
+
+	private UserContextMock UserContext
+		=> (UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>();
+
+	private DomainOrder[] Orders
+		=>
+		[
+			TestContext.OnlineOrder, TestContext.ManualOrder, TestContext.EmptyOrder,
+			TestContext.ConfirmedOrder
+		];
+
 	[Fact]
 	public async Task CreatedAtRange_IsInclusive()
 	{
@@ -185,34 +314,6 @@ public sealed class GetOrdersTests : IntegrationTest
 	}
 
 	[Theory]
-	[InlineData("organization")]
-	[InlineData("user")]
-	[InlineData("name")]
-	[InlineData("sku")]
-	[InlineData("id")]
-	public async Task SearchTerm_FindsOrderThroughRelatedData(string field)
-	{
-		var order = TestContext.ConfirmedOrder;
-		var product = await Context.Set<Product>()
-			.SingleAsync(item => item.Id == order.Items[0].ProductId, CancellationToken);
-		product.SetName("Order search pump");
-		product.SetSku("RP-00999");
-		await Context.SaveChangesAsync(CancellationToken);
-		var term = field switch
-		{
-			"organization" => "pArTnEr PaRtS",
-			"user" => "ORDER-BUYER",
-			"name" => "search pump",
-			"sku" => "r p 00999",
-			_ => order.Id.ToString()
-		};
-
-		var result = await Search(Query() with { SearchTerm = term });
-
-		result.Orders.Should().ContainSingle(item => item.Id == order.Id);
-	}
-
-	[Theory]
 	[InlineData("%")]
 	[InlineData("_")]
 	[InlineData("\\")]
@@ -224,20 +325,6 @@ public sealed class GetOrdersTests : IntegrationTest
 		var result = await Search(Query() with { SearchTerm = term });
 
 		result.Orders.Should().ContainSingle(order => order.Id == TestContext.ConfirmedOrder.Id);
-	}
-
-	[Fact]
-	public async Task DefaultSorting_IsNewestFirst()
-	{
-		var result = await Search();
-
-		result.Orders
-			.Select(order => order.Id)
-			.Should()
-			.Equal(
-				Orders.OrderByDescending(order => order.CreatedAt)
-					.ThenBy(order => order.Id)
-					.Select(order => order.Id));
 	}
 
 	[Fact]
@@ -263,48 +350,6 @@ public sealed class GetOrdersTests : IntegrationTest
 			.Should()
 			.Equal(Orders.Select(order => order.Id).Order());
 	}
-
-	[Theory]
-	[InlineData("status")]
-	[InlineData("fulfillmentStatus")]
-	[InlineData("source")]
-	[InlineData("confirmedAt")]
-	[InlineData("updatedAt")]
-	public async Task ExplicitSorting_IsApplied(string field)
-	{
-		if (field == "status")
-		{
-			TestContext.ManualOrder.Confirm(null);
-			TestContext.ManualOrder.Complete();
-			TestContext.EmptyOrder.Cancel();
-			await Context.SaveChangesAsync(CancellationToken);
-		}
-
-		if (field == "fulfillmentStatus")
-		{
-			TestContext.ManualOrder.SetFulfillmentStatus(OrderFulfillmentStatus.PartiallyAvailable);
-			await Context.SaveChangesAsync(CancellationToken);
-		}
-
-		var result = await Search(Query() with { SortBy = [new SortExpression(field)] });
-
-		var expected = field switch
-		{
-			"status" => Orders.OrderBy(order => order.Status).ThenBy(order => order.Id),
-			"fulfillmentStatus" => Orders.OrderBy(order => order.FulfillmentStatus).ThenBy(order => order.Id),
-			"source" => Orders.OrderBy(order => order.Source).ThenBy(order => order.Id),
-			"confirmedAt" => Orders.OrderBy(order => order.ConfirmedAt == null)
-				.ThenBy(order => order.ConfirmedAt)
-				.ThenBy(order => order.Id),
-			_ => Orders.OrderBy(order => order.UpdatedAt).ThenBy(order => order.Id)
-		};
-		result.Orders.Select(order => order.Id).Should().Equal(expected.Select(order => order.Id));
-	}
-
-	[Fact]
-	public async Task InvalidSorting_ThrowsInvalidInputException()
-		=> await Assert.ThrowsAsync<InvalidInputException>(()
-			=> Search(Query() with { SortBy = [new SortExpression("unknown")] }));
 
 	[Fact]
 	public async Task RemovedItems_DoNotMatchProductFilterOrSearch()

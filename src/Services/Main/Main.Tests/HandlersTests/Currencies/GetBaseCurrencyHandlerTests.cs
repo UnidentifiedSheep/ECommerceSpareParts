@@ -3,8 +3,8 @@ using FluentAssertions;
 using Main.Entities.Currency;
 using Main.Entities.Currency.Settings;
 using Main.Modules.Currency.Application.Dtos;
-using Main.Modules.Currency.Application.Handlers.Currencies;
 using Main.Modules.Currency.Application.Interfaces;
+using Main.Modules.Currency.Application.Queries.Currencies;
 using Moq;
 
 namespace Tests.HandlersTests.Currencies;

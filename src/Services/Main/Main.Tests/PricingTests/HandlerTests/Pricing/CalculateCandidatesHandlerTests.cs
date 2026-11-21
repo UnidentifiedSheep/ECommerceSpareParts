@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Pricing.Application.Handlers.Pricing;
+using Pricing.Application.Commands.Pricing;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;

@@ -2,24 +2,20 @@ using FluentAssertions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations;
+using Main.Modules.Organization.Application.Queries.Organizations;
 using Tests.DataBuilders.Organization;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Organizations;
 
-public sealed class GetOrganizationTests : IntegrationTest
+public sealed class GetOrganizationTests(ReadScenarioFixture<GetOrganizationTests.OrganizationScenario> fixture)
+	: ReadScenarioTest<GetOrganizationTests.OrganizationScenario>(fixture)
 {
-	public GetOrganizationTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UsersTestContext>();
-
 	[Fact]
 	public async Task GetOrganization_ById_ReturnsOrganization()
 	{
-		var organization = await CreateOrganization();
-		var owner = GetContext<UsersTestContext>().Users.First();
+		var organization = Scenario.Organization;
+		var owner = Scenario.Get<UsersTestContext>().Users.First();
 
 		var result = await Mediator.Send(new GetOrganizationQuery(organization.Id), CancellationToken);
 
@@ -35,7 +31,7 @@ public sealed class GetOrganizationTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganization_BySystemName_NormalizesAndReturnsOrganization()
 	{
-		var organization = await CreateOrganization();
+		var organization = Scenario.Organization;
 
 		var result = await Mediator.Send(
 			new GetOrganizationQuery($"  {organization.SystemName.ToUpperInvariant()}  "),
@@ -63,25 +59,28 @@ public sealed class GetOrganizationTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganization_SystemOrganization_ThrowsNotFoundException()
 	{
-		var owner = GetContext<UsersTestContext>().Users.First();
-		var organization = Organization.CreateSystem(Guid.NewGuid(), owner.Id);
-		await Context.AddAsync(organization, CancellationToken);
-		await Context.SaveChangesAsync(CancellationToken);
-		Context.ChangeTracker.Clear();
-
-		var act = () => Mediator.Send(new GetOrganizationQuery(organization.Id));
+		var act = () => Mediator.Send(new GetOrganizationQuery(Scenario.SystemOrganization.Id));
 
 		await act.Should().ThrowAsync<OrganizationNotFoundException>();
 	}
 
-	private async Task<Organization> CreateOrganization()
+	public sealed class OrganizationScenario : ReadScenario
 	{
-		var owner = GetContext<UsersTestContext>().Users.First();
-		var organization = await new OrganizationBuilder(Faker)
-			.WithOwnerId(owner.Id)
-			.WithName("Requested organization")
-			.BuildAndAddToDb(Context);
-		Context.ChangeTracker.Clear();
-		return organization;
+		public OrganizationScenario() => RegisterBasicContext<UsersTestContext>();
+
+		public Organization Organization { get; private set; } = null!;
+
+		public Organization SystemOrganization { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			var owner = Get<UsersTestContext>().Users.First();
+			Organization = new OrganizationBuilder(Faker)
+				.WithOwnerId(owner.Id)
+				.WithName("Requested organization")
+				.Build();
+			SystemOrganization = Organization.CreateSystem(Guid.NewGuid(), owner.Id);
+			return [Organization, SystemOrganization];
+		}
 	}
 }

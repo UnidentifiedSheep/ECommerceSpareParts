@@ -39,6 +39,12 @@ public static class ValidationGuardExtensions
 			? throw new InvalidInputException(message)
 			: value.GetValueOrDefault();
 
+	public static T EnsureNotDefault<T>(this T value, ILocalizableMessage message) where T : struct
+		=> !value.IsNotDefault() ? throw new InvalidInputException(message) : value;
+
+	public static T EnsureOnlyDefinedFlags<T>(this T value, ILocalizableMessage message) where T : struct, Enum
+		=> !value.HasOnlyDefinedFlags() ? throw new InvalidInputException(message) : value;
+
 	public static T EnsureInRange<T>(
 		this T value,
 		T min,
@@ -140,6 +146,13 @@ public static class ValidationGuardExtensions
 	public static T EnsureNullOrDefault<T>(this T? value, Func<Exception> exceptionFactory)
 		where T : struct
 		=> !value.IsNullOrDefault() ? throw exceptionFactory() : value.GetValueOrDefault();
+
+	public static T EnsureNotDefault<T>(this T value, Func<Exception> exceptionFactory) where T : struct
+		=> !value.IsNotDefault() ? throw exceptionFactory() : value;
+
+	public static T EnsureOnlyDefinedFlags<T>(this T value, Func<Exception> exceptionFactory)
+		where T : struct, Enum
+		=> !value.HasOnlyDefinedFlags() ? throw exceptionFactory() : value;
 
 	public static T EnsureInRange<T>(
 		this T value,

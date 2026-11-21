@@ -44,6 +44,7 @@
         <ProjectReference Include="..\Modules\Purchase\Purchase.Entities\Purchase.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Sale\Sale.Entities\Sale.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Entities\Storage.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Logistics\Logistics.Entities\Logistics.Entities.csproj"/>
         <ProjectReference Include="..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
@@ -65,6 +66,10 @@
                        CopyToOutput="true"/>
 
         <LocanResource Include="../Modules/Storage/Storage.Entities/Localization/**/*.json"
+                       GenerateMessages="false"
+                       CopyToOutput="true"/>
+
+        <LocanResource Include="../Modules/Logistics/Logistics.Entities/Localization/**/*.json"
                        GenerateMessages="false"
                        CopyToOutput="true"/>
 

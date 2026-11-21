@@ -1,11 +1,10 @@
 using FluentAssertions;
 using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 using Main.Modules.Analytics.Application.Queries;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Analytics;
 
-public class GetChartsTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class GetChartsTests : ServiceTest
 {
 	[Fact]
 	public async Task GetCharts_ReturnsRegisteredChartWithSchemasAndLocalizedDescriptions()

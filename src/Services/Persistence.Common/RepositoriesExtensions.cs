@@ -7,6 +7,7 @@ using Domain;
 using Domain.Interfaces;
 using Marten;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Persistence.DbValidator;
@@ -55,6 +56,8 @@ public static class RepositoriesExtensions
 
 				options.AddInterceptors(
 					serviceProvider.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
+
+				options.AddInterceptors(serviceProvider.GetServices<IInterceptor>());
 			});
 
 			services

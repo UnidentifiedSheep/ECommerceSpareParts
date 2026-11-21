@@ -1,47 +1,33 @@
 using Application.Common.Models;
 using Enums;
 using FluentAssertions;
-using Main.Modules.Product.Application.Handlers.ProducerSupplierMappings.GetProducerSupplierMappings;
+using Main.Entities.Product.Producer;
+using Main.Modules.Product.Application.Queries.ProducerSupplierMappings.GetProducerSupplierMappings;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class GetProducerSupplierMappingsTests : IntegrationTest
+public class GetProducerSupplierMappingsTests(
+	ReadScenarioFixture<GetProducerSupplierMappingsTests.ProducerSupplierMappingsScenario> fixture)
+	: ReadScenarioTest<GetProducerSupplierMappingsTests.ProducerSupplierMappingsScenario>(fixture)
 {
-	public GetProducerSupplierMappingsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<ProducerTestContext>();
-
-	private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-
 	[Fact]
 	public async Task GetProducerSupplierMappings_ByProducer_ReturnsOnlyProducerMappings()
 	{
-		var producer = TestContext.Producers[0];
-		var anotherProducer = TestContext.Producers[1];
-		var expected = await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producer.Id)
-			.WithSupplier(Supplier.Armtek)
-			.WithSupplierProducerName("Armtek producer")
-			.BuildAndAddToDb(Context, CancellationToken);
-		await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(anotherProducer.Id)
-			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context, CancellationToken);
+		var expected = Scenario.OtherProducerMapping;
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
-				producer.Id,
+				expected.ProducerId,
 				[],
 				new Pagination(0, 10)),
 			CancellationToken);
 
 		result.Mappings.Should().ContainSingle();
 		result.Mappings[0].Id.Should().Be(expected.Id);
-		result.Mappings[0].ProducerId.Should().Be(producer.Id);
+		result.Mappings[0].ProducerId.Should().Be(expected.ProducerId);
 		result.Mappings[0].Supplier.Should().Be(expected.Supplier);
 		result.Mappings[0].SupplierProducerName.Should().Be(expected.Name);
 	}
@@ -49,19 +35,11 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 	[Fact]
 	public async Task GetProducerSupplierMappings_BySupplier_ReturnsOnlyRequestedSuppliers()
 	{
-		var producer = TestContext.Producers[0];
-		var expected = await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producer.Id)
-			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context, CancellationToken);
-		await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producer.Id)
-			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context, CancellationToken);
+		var expected = Scenario.ArmtekMapping;
 
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
-				producer.Id,
+				expected.ProducerId,
 				[Supplier.Armtek],
 				new Pagination(0, 10)),
 			CancellationToken);
@@ -74,24 +52,42 @@ public class GetProducerSupplierMappingsTests : IntegrationTest
 	[Fact]
 	public async Task GetProducerSupplierMappings_WithPagination_ReturnsRequestedPage()
 	{
-		var producer = TestContext.Producers[0];
-		await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producer.Id)
-			.WithSupplier(Supplier.Armtek)
-			.BuildAndAddToDb(Context, CancellationToken);
-		await new ProducerSupplierMappingBuilder(Faker)
-			.WithProducerId(producer.Id)
-			.WithSupplier(Supplier.FavoritParts)
-			.BuildAndAddToDb(Context, CancellationToken);
-
 		var result = await Mediator.Send(
 			new GetProducerSupplierMappingsQuery(
-				producer.Id,
+				Scenario.ArmtekMapping.ProducerId,
 				[],
 				new Pagination(0, 1)),
 			CancellationToken);
 
 		result.Mappings.Should().ContainSingle();
+	}
+
+	public sealed class ProducerSupplierMappingsScenario : ReadScenario
+	{
+		public ProducerSupplierMappingsScenario() => RegisterBasicContext<ProducerTestContext>();
+
+		public ProducerSupplierMapping ArmtekMapping { get; private set; } = null!;
+
+		public ProducerSupplierMapping OtherProducerMapping { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			var producers = Get<ProducerTestContext>().Producers;
+			ArmtekMapping = new ProducerSupplierMappingBuilder(Faker)
+				.WithProducerId(producers[0].Id)
+				.WithSupplier(Supplier.Armtek)
+				.Build();
+			var favoritMapping = new ProducerSupplierMappingBuilder(Faker)
+				.WithProducerId(producers[0].Id)
+				.WithSupplier(Supplier.FavoritParts)
+				.Build();
+			OtherProducerMapping = new ProducerSupplierMappingBuilder(Faker)
+				.WithProducerId(producers[1].Id)
+				.WithSupplier(Supplier.Armtek)
+				.WithSupplierProducerName("Armtek producer")
+				.Build();
+			return [ArmtekMapping, favoritMapping, OtherProducerMapping];
+		}
 	}
 }
 

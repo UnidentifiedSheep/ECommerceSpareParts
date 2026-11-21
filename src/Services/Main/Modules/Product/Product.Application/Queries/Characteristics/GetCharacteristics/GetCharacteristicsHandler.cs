@@ -1,0 +1,43 @@
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Projections;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
+using Application.Common.Querying;
+using Main.Entities.Product.Product;
+using Main.Modules.Product.Application.Dtos.Product;
+using Microsoft.EntityFrameworkCore;
+
+namespace Main.Modules.Product.Application.Queries.Characteristics.GetCharacteristics;
+
+public record GetCharacteristicsQuery(
+	string? SearchTerm,
+	IReadOnlyCollection<SortExpression>? SortBy,
+	Pagination Pagination) : IQuery<GetCharacteristicsResult>;
+
+public record GetCharacteristicsResult(IReadOnlyList<CharacteristicDto> Characteristics);
+
+public class GetCharacteristicsHandler(
+	IReadRepository<Characteristic, int> repository,
+	IProjectionProvider<Characteristic, CharacteristicDto> projection)
+	: IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
+{
+	public async Task<GetCharacteristicsResult> Handle(
+		GetCharacteristicsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var query = repository.Query;
+		var searchTerm = request.SearchTerm?.Trim();
+		if (!string.IsNullOrWhiteSpace(searchTerm))
+			query = query.Where(characteristic => EF.Functions.ILike(characteristic.Name, $"%{searchTerm}%"));
+
+		var characteristics = await query
+			.SortBy(request.SortBy)
+			.ThenBy(characteristic => characteristic.Id)
+			.Project(projection)
+			.ApplyPagination(request.Pagination)
+			.ToListAsync(cancellationToken);
+
+		return new GetCharacteristicsResult(characteristics);
+	}
+}

@@ -7,8 +7,8 @@ using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Purchase;
 using Main.Api.GraphQl.Types.Purchase;
-using Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchase;
-using Main.Modules.Purchase.Application.Handlers.Purchases.GetPurchases;
+using Main.Modules.Purchase.Application.Queries.Purchases.GetPurchase;
+using Main.Modules.Purchase.Application.Queries.Purchases.GetPurchases;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

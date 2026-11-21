@@ -4,8 +4,8 @@ using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Order;
 using Main.Api.GraphQl.Types.Order;
 using Main.Entities.Order.Enums.Orders;
-using Main.Modules.Order.Application.Orders.Commands.ChangeOrderStatus;
-using Main.Modules.Order.Application.Orders.Commands.UpsertOrder;
+using Main.Modules.Order.Application.Commands.Orders.ChangeOrderStatus;
+using Main.Modules.Order.Application.Commands.Orders.UpsertOrder;
 using MediatR;
 using Security.Core.Interfaces;
 

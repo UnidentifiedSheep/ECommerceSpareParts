@@ -1,0 +1,78 @@
+using Abstractions;
+using Abstractions.Interfaces;
+using Application.Common.Interfaces.Cqrs;
+using Gateway.Application.Dtos;
+using Internal.Integration.Core.Interfaces.Common;
+
+namespace Gateway.Application.Queries;
+
+public record GetAggregatedAvailableJobsQuery(string? Locale) : IQuery<GetAggregatedAvailableJobsResult>;
+
+public record GetAggregatedAvailableJobsResult(ServiceJobsDto[] Jobs);
+
+public class GetAggregatedAvailableJobsHandler(ICommonClient commonClient)
+	: IQueryHandler<GetAggregatedAvailableJobsQuery, GetAggregatedAvailableJobsResult>
+{
+	private static readonly IServiceDefinition[] Services =
+	[
+		ServicesDefinitions.Main,
+		ServicesDefinitions.Search
+	];
+
+	public async Task<GetAggregatedAvailableJobsResult> Handle(
+		GetAggregatedAvailableJobsQuery request,
+		CancellationToken cancellationToken)
+	{
+		var tasks = Services.Select(service => GetJobsForAsync(
+			service,
+			request.Locale,
+			cancellationToken));
+		var results = await Task.WhenAll(tasks);
+		return new GetAggregatedAvailableJobsResult(results);
+	}
+
+	private async Task<ServiceJobsDto> GetJobsForAsync(
+		IServiceDefinition serviceDefinition,
+		string? locale,
+		CancellationToken token)
+	{
+		try
+		{
+			var result = await commonClient.JobNode.GetAvailableJobs(
+				serviceDefinition,
+				locale,
+				token);
+
+			if (!result.Success)
+				return Fail(serviceDefinition.ServiceName);
+
+			return new ServiceJobsDto
+			{
+				Available = true,
+				Jobs = result
+					.ValueOrThrow
+					.Select(x => new GatewayJobInfoDto
+					{
+						SystemName = x.SystemName,
+						Name = x.Name,
+						InitStateSchema = x.InitStateSchema,
+						Description = x.Description
+					})
+					.ToList(),
+				ServiceName = serviceDefinition.ServiceName
+			};
+		}
+		catch (Exception)
+		{
+			return Fail(serviceDefinition.ServiceName);
+		}
+	}
+
+	private static ServiceJobsDto Fail(string serviceName)
+		=> new()
+		{
+			Available = false,
+			Jobs = [],
+			ServiceName = serviceName
+		};
+}

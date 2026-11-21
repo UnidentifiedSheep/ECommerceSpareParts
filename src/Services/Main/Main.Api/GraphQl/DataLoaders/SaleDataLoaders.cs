@@ -1,6 +1,6 @@
 using GreenDonut;
 using Main.Modules.Sale.Application.Dtos.Sale;
-using Main.Modules.Sale.Application.Handlers.Sales;
+using Main.Modules.Sale.Application.Queries.Sales;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

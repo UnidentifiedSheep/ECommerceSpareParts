@@ -37,6 +37,7 @@
         <ProjectReference Include="..\Modules\Documents\Documents.Application\Documents.Application.csproj"/>
         <ProjectReference Include="..\Modules\Analytics\Analytics.Persistence\Analytics.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Persistence\Balance.Persistence.csproj"/>
+        <ProjectReference Include="..\Modules\Logistics\Logistics.Persistence\Logistics.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Cart\Cart.Persistence\Cart.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Notifications\Notifications.Persistence\Notifications.Persistence.csproj"/>
         <ProjectReference Include="..\Modules\Order\Order.Persistence\Order.Persistence.csproj"/>

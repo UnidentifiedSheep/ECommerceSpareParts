@@ -1,5 +1,5 @@
 using Main.Modules.Product.Abstractions.Events;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Commands.ProductEnrichment;
 using MassTransit;
 using MediatR;
 

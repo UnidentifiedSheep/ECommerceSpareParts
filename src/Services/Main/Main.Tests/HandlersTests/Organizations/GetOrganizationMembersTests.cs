@@ -3,25 +3,22 @@ using FluentAssertions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizationMembers;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Organizations;
 
-public class GetOrganizationMembersTests : IntegrationTest
+public class GetOrganizationMembersTests(
+	ReadScenarioFixture<GetOrganizationMembersTests.OrganizationMembersScenario> fixture)
+	: ReadScenarioTest<GetOrganizationMembersTests.OrganizationMembersScenario>(fixture)
 {
-	public GetOrganizationMembersTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UsersTestContext>();
-
 	[Fact]
 	public async Task GetOrganizationMembers_ReturnsUsersWithOrganizationAndRole()
 	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var organization = await CreateOrganization(users.Select(x => x.Id).ToArray());
+		var users = Scenario.Get<UsersTestContext>().Users.ToArray();
+		var organization = Scenario.Organization;
 
 		var result = await Mediator.Send(CreateQuery(organization.Id), CancellationToken);
 
@@ -35,8 +32,7 @@ public class GetOrganizationMembersTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizationMembers_WithPagination_ReturnsRequestedPage()
 	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var organization = await CreateOrganization(users.Select(x => x.Id).ToArray());
+		var organization = Scenario.Organization;
 
 		var firstPage = await Mediator.Send(
 			CreateQuery(
@@ -77,13 +73,24 @@ public class GetOrganizationMembersTests : IntegrationTest
 		int size = 20)
 		=> new(organizationId, new Pagination(page, size));
 
-	private async Task<Organization> CreateOrganization(Guid[] userIds)
-		=> await new OrganizationBuilder(Faker)
-			.WithOwnerId(userIds[0])
-			.WithName("Members organization")
-			.WithMember(userIds[1], OrganizationRole.Admin)
-			.WithMember(userIds[2])
-			.BuildAndAddToDb(Context);
+	public sealed class OrganizationMembersScenario : ReadScenario
+	{
+		public OrganizationMembersScenario() => RegisterBasicContext<UsersTestContext>();
+
+		public Organization Organization { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			var users = Get<UsersTestContext>().Users.ToArray();
+			Organization = new OrganizationBuilder(Faker)
+				.WithOwnerId(users[0].Id)
+				.WithName("Members organization")
+				.WithMember(users[1].Id, OrganizationRole.Admin)
+				.WithMember(users[2].Id)
+				.Build();
+			return [Organization];
+		}
+	}
 }
 
 public class

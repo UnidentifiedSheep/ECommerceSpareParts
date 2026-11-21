@@ -5,7 +5,7 @@ using FluentValidation.TestHelper;
 using Main.Entities;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Balance.Enums.Balances;
-using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Balance.Application.Queries.Balance.GetTransactions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;
@@ -13,12 +13,10 @@ using Tests.TestContexts.Balance;
 
 namespace Tests.HandlersTests.Balances;
 
-public class GetTransactionsTests : IntegrationTest
+public class GetTransactionsTests(ReadScenarioFixture<GetTransactionsTests.TransactionsScenario> fixture)
+	: ReadScenarioTest<GetTransactionsTests.TransactionsScenario>(fixture)
 {
-	public GetTransactionsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<BalanceTestContext>();
-
-	private BalanceTestContext TestContext => GetContext<BalanceTestContext>();
+	private BalanceTestContext TestContext => Scenario.Get<BalanceTestContext>();
 
 	[Fact]
 	public async Task GetTransactions_BySender_ReturnsTransactions()
@@ -62,6 +60,94 @@ public class GetTransactionsTests : IntegrationTest
 
 		result.Transactions.Should().HaveCount(1);
 	}
+
+	[Fact]
+	public async Task GetTransactions_WithOr_ReturnsTransactionsWhereUserIsSenderOrReceiver()
+	{
+		var userId = TestContext.Users[0].Id;
+
+		var result = await Mediator.Send(
+			GetQuery(
+				userId,
+				userId,
+				logicalOperation: LogicalOperation.Or),
+			CancellationToken);
+
+		result.Transactions.Should().NotBeEmpty();
+		result.Transactions.Should().OnlyContain(x => x.SenderId == userId || x.ReceiverId == userId);
+	}
+
+	[Fact]
+	public async Task GetTransactions_SkipReversedFalse_ReturnsReversedTransactions()
+	{
+		var transaction = TestContext.Transactions[0];
+
+		var result = await Mediator.Send(
+			GetQuery(transaction.SenderId, skipReversed: false),
+			CancellationToken);
+
+		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
+	}
+
+	[Fact]
+	public async Task GetTransactions_SkipReversedTrue_DoesNotReturnReversedTransactions()
+	{
+		var transaction = TestContext.Transactions[0];
+
+		var result = await Mediator.Send(
+			GetQuery(transaction.SenderId, skipReversed: true),
+			CancellationToken);
+
+		result.Transactions.Should().NotContain(x => x.Id == transaction.Id);
+	}
+
+	private static GetTransactionsQuery GetQuery(
+		Guid? senderId = null,
+		Guid? receiverId = null,
+		int? currencyId = null,
+		int size = 20,
+		DateTime? rangeStart = null,
+		DateTime? rangeEnd = null,
+		LogicalOperation logicalOperation = LogicalOperation.And,
+		bool skipReversed = false,
+		Guid? cursorId = null,
+		DateTime? cursorDate = null)
+		=> new(
+			new RangeModel<DateTime>(rangeStart, rangeEnd),
+			currencyId,
+			senderId,
+			receiverId,
+			logicalOperation,
+			new Cursor<(Guid id, DateTime dt)>(
+				(cursorId ?? Guid.Empty, cursorDate ?? DateTime.MinValue),
+				size),
+			skipReversed);
+
+	public sealed class TransactionsScenario : ReadScenario
+	{
+		public TransactionsScenario() => RegisterBasicContext<BalanceTestContext>();
+
+		protected override IEnumerable<object> Seed()
+		{
+			var context = Get<BalanceTestContext>();
+			var transaction = Context.Set<Transaction>().First(x => x.Id == context.Transactions[0].Id);
+			var senderBalance = Context.Set<OrganizationBalance>()
+				.First(x => x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
+			var receiverBalance = Context.Set<OrganizationBalance>()
+				.First(x => x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
+			transaction.Reverse(context.Users[0].Id);
+			transaction.Apply(senderBalance, receiverBalance);
+			return [];
+		}
+	}
+}
+
+public class GetTransactionsMutationTests : IntegrationTest
+{
+	public GetTransactionsMutationTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<BalanceTestContext>();
+
+	private BalanceTestContext TestContext => GetContext<BalanceTestContext>();
 
 	[Fact]
 	public async Task GetTransactions_WithCursor_ReturnsTransactionsByDateDescendingWithoutDuplicates()
@@ -125,46 +211,6 @@ public class GetTransactionsTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetTransactions_WithOr_ReturnsTransactionsWhereUserIsSenderOrReceiver()
-	{
-		var userId = TestContext.Users[0].Id;
-
-		var result = await Mediator.Send(
-			GetQuery(
-				userId,
-				userId,
-				logicalOperation: LogicalOperation.Or),
-			CancellationToken);
-
-		result.Transactions.Should().NotBeEmpty();
-		result.Transactions.Should().OnlyContain(x => x.SenderId == userId || x.ReceiverId == userId);
-	}
-
-	[Fact]
-	public async Task GetTransactions_SkipReversedFalse_ReturnsReversedTransactions()
-	{
-		var transaction = await ReverseSeedTransaction();
-
-		var result = await Mediator.Send(
-			GetQuery(transaction.SenderId, skipReversed: false),
-			CancellationToken);
-
-		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
-	}
-
-	[Fact]
-	public async Task GetTransactions_SkipReversedTrue_DoesNotReturnReversedTransactions()
-	{
-		var transaction = await ReverseSeedTransaction();
-
-		var result = await Mediator.Send(
-			GetQuery(transaction.SenderId, skipReversed: true),
-			CancellationToken);
-
-		result.Transactions.Should().NotContain(x => x.Id == transaction.Id);
-	}
-
-	[Fact]
 	public async Task GetTransactions_SkipReversedTrue_ReturnsCompletionProfileAppliedTransactions()
 	{
 		var transaction = await CreateCompletionProfileAppliedTransaction();
@@ -175,7 +221,6 @@ public class GetTransactionsTests : IntegrationTest
 
 		result.Transactions.Should().Contain(x => x.Id == transaction.Id);
 	}
-
 
 	private GetTransactionsQuery GetQuery(
 		Guid? senderId = null,
@@ -218,25 +263,6 @@ public class GetTransactionsTests : IntegrationTest
 		await Context.AddRangeAsync(transactions);
 		await Context.SaveChangesAsync();
 		return transactions;
-	}
-
-	private async Task<Transaction> ReverseSeedTransaction()
-	{
-		var transaction =
-			await Context.Set<Transaction>().FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
-
-		var senderBalance = await Context.Set<OrganizationBalance>()
-			.FirstAsync(x =>
-				x.OrganizationId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
-		var receiverBalance = await Context.Set<OrganizationBalance>()
-			.FirstAsync(x =>
-				x.OrganizationId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
-
-		transaction.Reverse(TestContext.Users[0].Id);
-		transaction.Apply(senderBalance, receiverBalance);
-		await Context.SaveChangesAsync();
-
-		return transaction;
 	}
 
 	private async Task<Transaction> CreateCompletionProfileAppliedTransaction()

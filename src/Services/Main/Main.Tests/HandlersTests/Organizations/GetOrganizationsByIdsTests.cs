@@ -1,16 +1,13 @@
 using FluentAssertions;
-using Main.Modules.Organization.Application.Handlers.Organizations;
-using Tests.TestContainers.Combined;
+using Main.Modules.Organization.Application.Queries.Organizations;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Organizations;
 
-public class GetOrganizationsByIdsTests : IntegrationTest
+public class GetOrganizationsByIdsTests(ReadScenarioFixture<GetOrganizationsByIdsTests.GetOrganizationsByIdsScenario> fixture)
+	: ReadScenarioTest<GetOrganizationsByIdsTests.GetOrganizationsByIdsScenario>(fixture)
 {
-	public GetOrganizationsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UserRelationsTestContext>();
-
-	private UserRelationsTestContext TestContext => GetContext<UserRelationsTestContext>();
+	private UserRelationsTestContext TestContext => Scenario.Get<UserRelationsTestContext>();
 
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedOrganizationsWithoutDuplicates()
@@ -31,7 +28,7 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 	public async Task HiddenAndSystemOrganizations_AreBothReturned()
 	{
 		var hiddenId = TestContext.HiddenOrganization.Id;
-		var systemId = GetContext<UserContextTestContext>().SystemUser.Id;
+		var systemId = Scenario.Get<UserContextTestContext>().SystemUser.Id;
 
 		var result = await Mediator.Send(
 			new GetOrganizationsByIdsQuery([hiddenId, systemId]),
@@ -66,5 +63,12 @@ public class GetOrganizationsByIdsTests : IntegrationTest
 			CancellationToken);
 
 		result.Organizations.Should().BeEmpty();
+	}
+
+	public sealed class GetOrganizationsByIdsScenario : ReadScenario
+	{
+		public GetOrganizationsByIdsScenario() => RegisterBasicContext<UserRelationsTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

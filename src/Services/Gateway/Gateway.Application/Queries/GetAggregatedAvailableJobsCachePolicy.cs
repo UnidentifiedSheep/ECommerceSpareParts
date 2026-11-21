@@ -1,0 +1,14 @@
+using Application.Common.Interfaces.Cqrs;
+
+namespace Gateway.Application.Queries;
+
+public class GetAggregatedAvailableJobsCachePolicy : ICachePolicy<GetAggregatedAvailableJobsQuery>
+{
+	public TimeSpan TimeToLive => TimeSpan.FromHours(1);
+
+	public IReadOnlyCollection<string>? Tags => null;
+
+	public string? BaseTag => null;
+
+	public string GetCacheKey(GetAggregatedAvailableJobsQuery request) => $"available-jobs:{request.Locale}";
+}

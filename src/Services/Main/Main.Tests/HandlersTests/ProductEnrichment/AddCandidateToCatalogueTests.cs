@@ -2,7 +2,7 @@ using FluentAssertions;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
 using Main.Entities.Product.Product.Enrichment;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment;
+using Main.Modules.Product.Application.Commands.ProductEnrichment;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders;
 using Tests.Extensions;

@@ -8,8 +8,8 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.CatalogueCandidates;
 using Search.Application.Dtos.Products;
-using Search.Application.Handlers.Search.Catalogue;
 using Search.Application.Models.CatalogueSearch;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Enums;
 
 namespace Search.Api.EndPoints.Catalogue;

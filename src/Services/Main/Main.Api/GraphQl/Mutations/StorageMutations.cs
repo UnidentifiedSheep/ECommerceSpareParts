@@ -3,9 +3,9 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Storage;
-using Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
-using Main.Modules.Storage.Application.Handlers.Storages.DeleteStorage;
-using Main.Modules.Storage.Application.Handlers.Storages.EditStorage;
+using Main.Modules.Storage.Application.Commands.Storages.CreateStorage;
+using Main.Modules.Storage.Application.Commands.Storages.DeleteStorage;
+using Main.Modules.Storage.Application.Commands.Storages.EditStorage;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

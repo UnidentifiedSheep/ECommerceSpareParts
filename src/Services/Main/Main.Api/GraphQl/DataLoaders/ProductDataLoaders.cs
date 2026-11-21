@@ -1,11 +1,11 @@
 using GreenDonut;
 using Main.Modules.Product.Application.Dtos.Product;
-using Main.Modules.Product.Application.Handlers.Characteristics;
-using Main.Modules.Product.Application.Products.Queries;
-using Main.Modules.Product.Application.Products.Queries.GetProductsEans;
+using Main.Modules.Product.Application.Queries.Characteristics;
+using Main.Modules.Product.Application.Queries.Products;
+using Main.Modules.Product.Application.Queries.Products.GetProductsEans;
 using Main.Modules.Storage.Application.Dtos.Storage;
-using Main.Modules.Storage.Application.Handlers.StorageContents.GetProductStorageContents;
-using Main.Modules.Storage.Application.Products.Queries;
+using Main.Modules.Storage.Application.Queries.Products;
+using Main.Modules.Storage.Application.Queries.StorageContents.GetProductStorageContents;
 using MediatR;
 
 namespace Main.Api.GraphQl.DataLoaders;

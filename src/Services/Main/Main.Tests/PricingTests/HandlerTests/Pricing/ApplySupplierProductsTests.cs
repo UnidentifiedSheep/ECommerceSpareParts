@@ -3,7 +3,7 @@ using FluentAssertions;
 using Integrations.Supplier.Models;
 using Main.Modules.Product.Abstractions;
 using Moq;
-using Pricing.Application.Handlers.Pricing;
+using Pricing.Application.Commands.Pricing;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Entities.Offers;
 

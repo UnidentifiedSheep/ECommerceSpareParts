@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -19,6 +20,7 @@ public sealed record GqlProductSaleHistoryInput
 	public int? CurrencyId { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Sale.Sale.SaleContent>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("showCrosses")]

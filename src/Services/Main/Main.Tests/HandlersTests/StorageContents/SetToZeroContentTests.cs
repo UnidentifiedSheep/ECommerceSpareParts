@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Entities.Storage.Exceptions;
-using Main.Modules.Storage.Application.Handlers.StorageContents.SetToZeroContent;
+using Main.Modules.Storage.Application.Commands.StorageContents.SetToZeroContent;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
