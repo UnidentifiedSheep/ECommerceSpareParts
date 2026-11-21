@@ -5,8 +5,8 @@ using Integrations.Client.Core;
 using Integrations.Common;
 using Integrations.Tmtr.Enums;
 using Integrations.Tmtr.Responses;
-using Internal.Integration.Core.Models.Common;
 using SchemaGeneration.Abstractions.Enums;
+using SchemaGeneration.Abstractions.Models;
 
 namespace Infrastructure.Tests.Integrations;
 
@@ -86,7 +86,14 @@ public sealed class ClientBaseTests
 
 	private sealed record AvailableJobsResponse
 	{
-		public required IReadOnlyList<InternalJobInfo> Jobs { get; init; }
+		public required IReadOnlyList<AvailableJob> Jobs { get; init; }
+	}
+
+	private sealed record AvailableJob
+	{
+		public required string SystemName { get; init; }
+
+		public required ObjectSchema InitStateSchema { get; init; }
 	}
 
 	private sealed class TestClient(ProjectJsonOptions jsonOptions) : ClientBase(jsonOptions)

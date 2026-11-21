@@ -12,7 +12,8 @@ public static class ServiceCollectionExtensions
 			.AddMutationType<RootMutation>()
 			.AddQueryType<RootQuery>()
 			.AddMainGraphQL()
-			.AddPricingGraphQL();
+			.AddPricingGraphQL()
+			.AddJobsGraphQL();
 
 		return services;
 	}

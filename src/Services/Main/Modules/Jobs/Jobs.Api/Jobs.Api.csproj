@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <AssemblyName>Main.Modules.Jobs.Api</AssemblyName>
+        <RootNamespace>Main.Modules.Jobs.Api</RootNamespace>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\..\..\GraphQL.Common\GraphQL.Common.csproj"/>
+        <ProjectReference Include="..\Jobs.Application\Jobs.Application.csproj"/>
+    </ItemGroup>
+
+</Project>

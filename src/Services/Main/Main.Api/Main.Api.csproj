@@ -42,6 +42,7 @@
         <ProjectReference Include="..\Modules\Suppliers\Suppliers.Module\Suppliers.Module.csproj"/>
         <ProjectReference Include="..\Modules\Uploads\Uploads.Module\Uploads.Module.csproj"/>
         <ProjectReference Include="..\Modules\Jobs\Jobs.Module\Jobs.Module.csproj"/>
+        <ProjectReference Include="..\Modules\Jobs\Jobs.Api\Jobs.Api.csproj"/>
         <ProjectReference Include="..\Modules\Analytics\Analytics.Module\Analytics.Module.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Module\Balance.Module.csproj"/>
         <ProjectReference Include="..\Modules\Logistics\Logistics.Module\Logistics.Module.csproj"/>

@@ -7,7 +7,6 @@ using Application.Common.Backplane;
 using Application.Common.Diagnostics;
 using Cache;
 using Gateway.Application;
-using Gateway.EndPoints;
 using Gateway.EventStreamBrokers;
 using Gateway.Extensions;
 using Gateway.Interceptors;
@@ -189,7 +188,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseWebSockets();
-app.MapJobEndPoints();
 app.MapReverseProxy();
 
 app.MapHealthChecks("/health");

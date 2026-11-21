@@ -1,6 +1,7 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Analytics.Queries;
+using Main.Modules.Jobs.Api.GraphQl.Queries;
 using Pricing.Api.GraphQl.Queries;
 
 namespace Main.Api.GraphQl.Queries;
@@ -69,6 +70,12 @@ public sealed class RootQuery
 
 	[GraphQLName("currencies")]
 	public CurrencyQueries Currencies => new();
+
+	[GraphQLName("jobs")]
+	public JobQueries Jobs => new();
+
+	[GraphQLName("jobSchedules")]
+	public JobScheduleQueries JobSchedules => new();
 
 	[GraphQLName("markupGroups")]
 	public MarkupGroupQueries MarkupGroups => new();
