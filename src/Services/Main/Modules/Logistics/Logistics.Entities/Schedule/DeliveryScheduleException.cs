@@ -1,34 +1,43 @@
 using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
+using Enums;
 
-namespace Logistics.Entities.Schedule;
+namespace Main.Entities.Logistics.Schedule;
 
-public class DeliveryScheduleException : Entity<DeliveryScheduleException, ScheduleExceptionKey>,
+public sealed class DeliveryScheduleException : Entity<DeliveryScheduleException, ScheduleExceptionKey>,
 	ILinqEntity<DeliveryScheduleException, ScheduleExceptionKey>
 {
-	public Guid DeliveryScheduleId { get; private set; }
-	public DateTime Date { get; private set; }
-
-	private DeliveryScheduleException() { }
-
-	internal DeliveryScheduleException(Guid deliveryScheduleId, DateTime exceptionDate)
+	private DeliveryScheduleException()
 	{
-		DeliveryScheduleId = deliveryScheduleId;
-		Date = exceptionDate.Date;
-
-		if (DateTime.Today > Date)
-			throw new InvalidOperationException("The date cannot be in the past.");
 	}
 
-	public override ScheduleExceptionKey GetId() => new(DeliveryScheduleId, Date);
+	private DeliveryScheduleException(Supplier supplier, string storageCode, DateOnly date)
+	{
+		Supplier = supplier;
+		StorageCode = storageCode;
+		Date = date;
+	}
+
+	public Supplier Supplier { get; }
+
+	public string StorageCode { get; } = null!;
+
+	public DateOnly Date { get; }
+
 	public static Expression<Func<DeliveryScheduleException, ScheduleExceptionKey>> GetKeySelector()
-		=> x => new(x.DeliveryScheduleId, x.Date);
+		=> x => new ScheduleExceptionKey(x.Supplier, x.StorageCode, x.Date);
+
 	public static Expression<Func<DeliveryScheduleException, bool>> GetEqualityExpression(ScheduleExceptionKey key)
-		=> x => x.DeliveryScheduleId == key.DeliveryScheduleId && x.Date == key.Date;
+		=> x => x.Supplier == key.Supplier && x.StorageCode == key.StorageCode && x.Date == key.Date;
+
+	internal static DeliveryScheduleException Create(Supplier supplier, string storageCode, DateOnly date)
+		=> new(supplier, storageCode, date);
+
+	public override ScheduleExceptionKey GetId() => new(Supplier, StorageCode, Date);
 }
 
-public readonly record struct ScheduleExceptionKey(Guid DeliveryScheduleId, DateTime Date) : ICompositeKey
+public readonly record struct ScheduleExceptionKey(Supplier Supplier, string StorageCode, DateOnly Date) : ICompositeKey
 {
-	public object[] ToArray() => [DeliveryScheduleId, Date];
+	public object[] ToArray() => [Supplier, StorageCode, Date];
 }

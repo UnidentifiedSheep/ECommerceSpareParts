@@ -1,0 +1,12 @@
+{
+  "culture": "en",
+  "messages": {
+    "delivery.schedule.storage.code.not.empty": "Storage code must be provided.",
+    "delivery.schedule.storage.code.max.length": "Storage code must not exceed 128 characters.",
+    "delivery.schedule.days.not.empty": "At least one delivery day must be selected.",
+    "delivery.schedule.days.unsupported": "Delivery days contain unsupported values.",
+    "delivery.schedule.exception.date.in.past": "A delivery exception cannot be set for a past date.",
+    "delivery.schedule.exception.already.exists": "A delivery exception already exists for this date.",
+    "delivery.schedule.exception.not.found": "There is no delivery exception for this date."
+  }
+}
