@@ -1,4 +1,5 @@
 using Application.Common.Dtos;
+using Application.Common.Interfaces;
 using Enums;
 using GraphQL.Common.Attributes;
 using GraphQL.Common.Extensions;
@@ -20,9 +21,10 @@ public sealed class JobQueries
 	public async Task<IReadOnlyList<GqlJobInfo>> GetAvailableAsync(
 		ISender sender,
 		CancellationToken cancellationToken)
-		=> (await sender.Send(new GetAllAvailableJobsQuery(), cancellationToken)).Jobs
-			.Select(job => new GqlJobInfo(job))
-			.ToArray();
+		=> (await sender.Send(new GetJobInfosQuery(), cancellationToken))
+			.Jobs
+			.Select(x => new GqlJobInfo(x.Value))
+			.ToList();
 
 	[GraphQLName("byId")]
 	[Lookup]

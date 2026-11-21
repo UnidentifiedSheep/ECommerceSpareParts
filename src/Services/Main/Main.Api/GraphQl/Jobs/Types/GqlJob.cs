@@ -5,6 +5,7 @@ using Enums;
 using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Jobs.DataLoaders;
+using Main.Api.GraphQl.Types.User;
 using Main.Modules.Jobs.Application.Queries.Jobs;
 using MediatR;
 
@@ -32,11 +33,11 @@ public sealed class GqlJob
 		CancellationToken cancellationToken)
 		=> (await GetDtoAsync(loader, cancellationToken)).IsStep;
 
-	[GraphQLName("multiStepJobId")]
-	public async Task<Guid?> GetMultiStepJobIdAsync(
+	[GraphQLName("multiStepJob")]
+	public async Task<GqlJob?> GetMultiStepJobAsync(
 		IJobByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> (await GetDtoAsync(loader, cancellationToken)).MultiStepJobId;
+		=> (await GetDtoAsync(loader, cancellationToken)).MultiStepJobId is { } id ? new GqlJob(id) : null;
 
 	[GraphQLName("stepKey")]
 	public async Task<string?> GetStepKeyAsync(
@@ -50,11 +51,16 @@ public sealed class GqlJob
 		CancellationToken cancellationToken)
 		=> (await GetDtoAsync(loader, cancellationToken)).InputInitialized;
 
-	[GraphQLName("systemName")]
-	public async Task<string> GetSystemNameAsync(
+	[GraphQLName("info")]
+	public async Task<GqlJobInfo?> GetInfoAsync(
 		IJobByIdDataLoader loader,
+		IJobInfoBySystemNameDataLoader infoLoader,
 		CancellationToken cancellationToken)
-		=> (await GetDtoAsync(loader, cancellationToken)).SystemName;
+	{
+		var systemName = (await GetDtoAsync(loader, cancellationToken)).SystemName;
+		var info = await infoLoader.LoadAsync(systemName, cancellationToken);
+		return info is null ? null : new GqlJobInfo(info);
+	}
 
 	[GraphQLName("status")]
 	public async Task<JobStatus> GetStatusAsync(
@@ -99,10 +105,10 @@ public sealed class GqlJob
 		=> (await GetDtoAsync(loader, cancellationToken)).UpdatedAt;
 
 	[GraphQLName("createdBy")]
-	public async Task<Guid?> GetCreatedByAsync(
+	public async Task<GqlUser?> GetCreatedByAsync(
 		IJobByIdDataLoader loader,
 		CancellationToken cancellationToken)
-		=> (await GetDtoAsync(loader, cancellationToken)).CreatedBy;
+		=> (await GetDtoAsync(loader, cancellationToken)).CreatedBy is { } id ? new GqlUser(id) : null;
 
 	[GraphQLName("state")]
 	[RequireAllPermissions(PermissionCodes.JOBS_GET)]

@@ -1,4 +1,5 @@
 using HotChocolate;
+using Main.Api.GraphQl.Types;
 using Pricing.Application.Dtos.Price;
 using Pricing.Entities.Enums;
 
@@ -18,7 +19,7 @@ public sealed record GqlPriceOffer([property: GraphQLIgnore]
 	public int CurrencyId => Dto.CurrencyId;
 
 	[GraphQLName("offerForStorage")]
-	public string OfferForStorage => Dto.OfferForStorage;
+	public GqlStorage OfferForStorage => new(Dto.OfferForStorage);
 
 	[GraphQLName("purchasePrice")]
 	public decimal PurchasePrice => Dto.PurchasePrice;

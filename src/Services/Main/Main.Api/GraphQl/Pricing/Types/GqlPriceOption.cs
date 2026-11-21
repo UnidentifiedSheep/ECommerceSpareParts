@@ -1,4 +1,5 @@
 using HotChocolate;
+using Main.Api.GraphQl.Types;
 using Pricing.Application.Dtos.Price;
 
 namespace Main.Api.GraphQl.Pricing.Types;
@@ -7,9 +8,6 @@ namespace Main.Api.GraphQl.Pricing.Types;
 public sealed record GqlPriceOption([property: GraphQLIgnore]
 	PriceOptionDto Dto)
 {
-	[GraphQLName("priceOfferId")]
-	public Guid PriceOfferId => Dto.PriceOfferId;
-
 	[GraphQLName("score")]
 	public decimal Score => Dto.Score;
 
@@ -23,7 +21,7 @@ public sealed record GqlPriceOption([property: GraphQLIgnore]
 	public decimal Markup => Dto.Markup;
 
 	[GraphQLName("forStorage")]
-	public string ForStorage => Dto.ForStorageCode;
+	public GqlStorage ForStorage => new(Dto.ForStorageCode);
 
 	[GraphQLName("deliveryTime")]
 	public TimeSpan DeliveryTime => Dto.DeliveryTime;

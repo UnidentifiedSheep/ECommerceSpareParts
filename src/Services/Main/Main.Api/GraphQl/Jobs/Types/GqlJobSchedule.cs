@@ -33,11 +33,16 @@ public sealed class GqlJobSchedule
 		CancellationToken cancellationToken)
 		=> (await GetDtoAsync(loader, cancellationToken)).Description;
 
-	[GraphQLName("jobSystemName")]
-	public async Task<string> GetJobSystemNameAsync(
+	[GraphQLName("jobInfo")]
+	public async Task<GqlJobInfo?> GetJobInfoAsync(
 		IJobScheduleByIdDataLoader loader,
+		IJobInfoBySystemNameDataLoader infoLoader,
 		CancellationToken cancellationToken)
-		=> (await GetDtoAsync(loader, cancellationToken)).JobSystemName;
+	{
+		var systemName = (await GetDtoAsync(loader, cancellationToken)).JobSystemName;
+		var info = await infoLoader.LoadAsync(systemName, cancellationToken);
+		return info is null ? null : new GqlJobInfo(info);
+	}
 
 	[GraphQLName("inputState")]
 	public async Task<string> GetInputStateAsync(

@@ -9,6 +9,13 @@ namespace Main.Api.GraphQl.Jobs.DataLoaders;
 public static class JobDataLoaders
 {
 	[DataLoader]
+	public static async Task<IReadOnlyDictionary<string, JobInfoDto>> GetJobInfoBySystemNameAsync(
+		IReadOnlyList<string> keys,
+		ISender sender,
+		CancellationToken cancellationToken)
+		=> (await sender.Send(new GetJobInfosQuery(keys), cancellationToken)).Jobs;
+
+	[DataLoader]
 	public static async Task<IReadOnlyDictionary<Guid, JobDto>> GetJobByIdAsync(
 		IReadOnlyList<Guid> keys,
 		ISender sender,

@@ -1,6 +1,8 @@
 using Domain.CommonEnums;
 using HotChocolate;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Jobs.DataLoaders;
+using Main.Api.GraphQl.Jobs.Types;
 using Main.Entities.Documents.Exceptions;
 using Main.Modules.Documents.Application.Dtos.Documents;
 using Main.Modules.Documents.Application.Interfaces;
@@ -21,11 +23,16 @@ public record GqlDocumentGenerationRequest
 	[GraphQLName("requestId")]
 	public Guid RequestId { get; }
 
-	[GraphQLName("jobId")]
-	public async Task<Guid> GetJobIdAsync(
+	[GraphQLName("job")]
+	public async Task<GqlJob?> GetJobAsync(
 		IDocumentGenerationRequestsDataLoader loader,
+		IJobByIdDataLoader jobLoader,
 		CancellationToken cancellationToken)
-		=> (await GetDocumentAsync(loader, cancellationToken)).JobId;
+	{
+		var jobId = (await GetDocumentAsync(loader, cancellationToken)).JobId;
+		var job = await jobLoader.LoadAsync(jobId, cancellationToken);
+		return job is null ? null : new GqlJob(job);
+	}
 
 	[GraphQLName("status")]
 	public async Task<JobStatus> GetStatusAsync(
