@@ -23,7 +23,7 @@ namespace Pricing.Application;
 
 public static class ServiceCollectionExtensions
 {
-	private const int PriceCandidateCalculationMaxParallelPerWorker = 40;
+	private const int PriceCandidateCalculationMaxParallelPerWorker = 20;
 
 	public static IServiceCollection AddPricingApplication(this IServiceCollection services)
 	{
