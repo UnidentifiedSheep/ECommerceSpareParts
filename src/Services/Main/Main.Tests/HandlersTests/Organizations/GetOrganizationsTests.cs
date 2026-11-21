@@ -2,70 +2,51 @@ using Application.Common.Models;
 using Application.Common.Querying;
 using Exceptions;
 using FluentAssertions;
+using Main.Entities.Balance.Balance;
 using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Organization;
+using Main.Entities.User;
 using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizations;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Organizations;
 
-public class GetOrganizationsTests : IntegrationTest
+public class GetOrganizationsTests(ReadScenarioFixture<GetOrganizationsTests.OrganizationsScenario> fixture)
+	: ReadScenarioTest<GetOrganizationsTests.OrganizationsScenario>(fixture)
 {
-	public GetOrganizationsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<UsersTestContext>();
-
 	[Fact]
 	public async Task GetOrganizations_ByName_ReturnsMatchingOrganization()
 	{
-		var expected = await CreateOrganization("Northern Parts", "northern-parts");
-		await CreateOrganization("Southern Logistics", "southern-logistics");
-
 		var result = await Mediator.Send(CreateQuery("nOrThErN"), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
-		result.Organizations[0].Id.Should().Be(expected.Id);
-		result.Organizations[0].Owner.OrganizationId.Should().Be(expected.Id);
+		result.Organizations[0].Id.Should().Be(Scenario.Northern.Id);
+		result.Organizations[0].Owner.OrganizationId.Should().Be(Scenario.Northern.Id);
 		result.Organizations[0].Owner.Role.Should().Be(OrganizationRole.Owner);
-		result.Organizations[0].Owner.UserId.Should().Be(GetContext<UsersTestContext>().Users.First().Id);
+		result.Organizations[0].Owner.UserId.Should().Be(Scenario.Owner.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_BySystemName_ReturnsMatchingOrganization()
 	{
-		var expected = await CreateOrganization("First organization", "unique-supplier-code");
-		await CreateOrganization("Unrelated warehouse", "warehouse-code");
-
 		var result = await Mediator.Send(CreateQuery("UNIQUE-SUPPLIER"), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
-		result.Organizations[0].Id.Should().Be(expected.Id);
+		result.Organizations[0].Id.Should().Be(Scenario.Northern.Id);
 	}
 
 	[Theory]
-	[InlineData(null)]
-	[InlineData("Organization contact")]
-	public async Task GetOrganizations_ByMemberProfile_ReturnsMemberOrganizations(string? description)
+	[InlineData(false)]
+	[InlineData(true)]
+	public async Task GetOrganizations_ByMemberProfile_ReturnsMemberOrganizations(bool withDescription)
 	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var member = users[1];
-		member.SetUserInfo(
-			"Distinctive",
-			"Membername",
-			description);
-
-		var expected = await new OrganizationBuilder(Faker)
-			.WithOwnerId(users[0].Id)
-			.WithName("Member organization")
-			.WithMember(member.Id)
-			.BuildAndAddToDb(Context, CancellationToken);
+		var expected = withDescription ? Scenario.Beta : Scenario.Alpha;
 
 		var result = await Mediator.Send(CreateQuery("Distinctive Membername"), CancellationToken);
 
@@ -78,54 +59,18 @@ public class GetOrganizationsTests : IntegrationTest
 	[InlineData("+7 (999) 123-45-67")]
 	public async Task GetOrganizations_ByMemberContactWithoutProfile_ReturnsMatchingOrganization(string term)
 	{
-		var member = new UserBuilder(Faker).WithUserName("preview-member-login")
-			.WithEmail("organization.contact@contacts.example")
-			.Build();
-		member.AddUserPhone(
-			"+7 (999) 123-45-67",
-			PhoneType.Unknown,
-			false,
-			false);
-		Context.Add(member);
-		var expected = await CreateOrganization("First warehouse", "first-warehouse");
-		expected.AddMember(member.Id, OrganizationRole.Member);
-		await Context.SaveChangesAsync(CancellationToken);
-		var unrelated = await CreateOrganization("Second warehouse", "second-warehouse");
-
 		var result = await Mediator.Send(
-			CreateQuery(term, ids: [expected.Id, unrelated.Id]),
+			CreateQuery(term, ids: [Scenario.Gamma.Id, Scenario.Northern.Id]),
 			CancellationToken);
 
-		result.Organizations.Select(organization => organization.Id).Should().Equal(expected.Id);
+		result.Organizations.Select(organization => organization.Id).Should().Equal(Scenario.Gamma.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_SearchRanksByBestMemberAndPaginatesWithoutDuplicates()
 	{
-		var strongMember = await new UserBuilder(Faker).WithUserName("organization-strong-member")
-			.WithUserInfo(
-				"Космонавтов",
-				"Петров",
-				null)
-			.BuildAndAddToDb(Context);
-		var weakMember = await new UserBuilder(Faker).WithUserName("organization-weak-member")
-			.WithUserInfo(
-				"Николай",
-				"Иванов",
-				"Космонавтов")
-			.BuildAndAddToDb(Context);
-		var first = await CreateOrganization("Alpha warehouse", "alpha-warehouse");
-		var second = await CreateOrganization("Beta warehouse", "beta-warehouse");
-		var weak = await CreateOrganization("Gamma warehouse", "gamma-warehouse");
-		var unrelated = await CreateOrganization("Delta warehouse", "delta-warehouse");
-		first.AddMember(strongMember.Id, OrganizationRole.Member);
-		second.AddMember(strongMember.Id, OrganizationRole.Member);
-		weak.AddMember(weakMember.Id, OrganizationRole.Member);
-		var strongOrganizations = new[] { first, second }.OrderBy(organization => organization.Id).ToArray();
-		strongOrganizations[1].AddMember(weakMember.Id, OrganizationRole.Member);
-		await Context.SaveChangesAsync(CancellationToken);
-
-		var ids = new[] { first.Id, second.Id, weak.Id, unrelated.Id };
+		var ids = new[] { Scenario.Alpha.Id, Scenario.Beta.Id, Scenario.Gamma.Id, Scenario.Northern.Id };
+		var strong = new[] { Scenario.Alpha, Scenario.Beta }.OrderBy(organization => organization.Id).ToArray();
 		var organizations = new List<Guid>();
 		for (var page = 0; page < 3; page++)
 		{
@@ -139,11 +84,7 @@ public class GetOrganizationsTests : IntegrationTest
 			organizations.Add(result.Organizations.Should().ContainSingle().Which.Id);
 		}
 
-		organizations.Should()
-			.Equal(
-				strongOrganizations[0].Id,
-				strongOrganizations[1].Id,
-				weak.Id);
+		organizations.Should().Equal(strong[0].Id, strong[1].Id, Scenario.Gamma.Id);
 		var last = await Mediator.Send(
 			CreateQuery(
 				"космонавтов",
@@ -162,29 +103,21 @@ public class GetOrganizationsTests : IntegrationTest
 		customSort.Organizations
 			.Select(organization => organization.Id)
 			.Should()
-			.Equal(
-				weak.Id,
-				second.Id,
-				first.Id);
+			.Equal(Scenario.Gamma.Id, Scenario.Beta.Id, Scenario.Alpha.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_ByIds_ReturnsOnlyRequestedOrganizations()
 	{
-		var expected = await CreateOrganization("Requested organization", "requested-organization");
-		await CreateOrganization("Skipped organization", "skipped-organization");
-
-		var result = await Mediator.Send(CreateQuery(ids: [expected.Id]), CancellationToken);
+		var result = await Mediator.Send(CreateQuery(ids: [Scenario.Alpha.Id]), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
-		result.Organizations[0].Id.Should().Be(expected.Id);
+		result.Organizations[0].Id.Should().Be(Scenario.Alpha.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_ByType_ReturnsOnlyOrganizationsOfRequestedType()
 	{
-		await CreateOrganization("Business organization", "business-organization");
-
 		var result = await Mediator.Send(CreateQuery(types: [OrganizationType.Business]), CancellationToken);
 
 		result.Organizations.Should().NotBeEmpty();
@@ -194,18 +127,11 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_ByUserId_ReturnsOrganizationsWhereUserIsMember()
 	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var member = users[1];
-		var expected = await CreateOrganization("Member organization", "member-organization");
-		expected.AddMember(member.Id, OrganizationRole.Member);
-		await Context.SaveChangesAsync(CancellationToken);
-		var notExpected = await CreateOrganization("Other organization", "other-organization");
+		var result = await Mediator.Send(CreateQuery(userId: Scenario.Member.Id), CancellationToken);
 
-		var result = await Mediator.Send(CreateQuery(userId: member.Id), CancellationToken);
-
-		result.Organizations.Should().Contain(x => x.Id == expected.Id);
-		result.Organizations.Should().Contain(x => x.Id == member.Id);
-		result.Organizations.Should().NotContain(x => x.Id == notExpected.Id);
+		result.Organizations.Should().Contain(x => x.Id == Scenario.Alpha.Id);
+		result.Organizations.Should().Contain(x => x.Id == Scenario.Member.Id);
+		result.Organizations.Should().NotContain(x => x.Id == Scenario.Northern.Id);
 	}
 
 	[Fact]
@@ -222,9 +148,6 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_WithPagination_ReturnsRequestedPageSize()
 	{
-		await CreateOrganization("First organization", "first-organization");
-		await CreateOrganization("Second organization", "second-organization");
-
 		var result = await Mediator.Send(CreateQuery(size: 1), CancellationToken);
 
 		result.Organizations.Should().ContainSingle();
@@ -233,27 +156,21 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_WithSortBy_ReturnsOrganizationsInRequestedOrder()
 	{
-		var first = await CreateOrganization("Alpha organization", "alpha-organization");
-		var second = await CreateOrganization("Zulu organization", "zulu-organization");
-
 		var result = await Mediator.Send(
-			CreateQuery(ids: [first.Id, second.Id], sortBy: ["name_desc"]),
+			CreateQuery(ids: [Scenario.Alpha.Id, Scenario.Gamma.Id], sortBy: ["name_desc"]),
 			CancellationToken);
 
-		result.Organizations.Select(x => x.Id).Should().Equal(second.Id, first.Id);
+		result.Organizations.Select(x => x.Id).Should().Equal(Scenario.Gamma.Id, Scenario.Alpha.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_WithMultipleSortFields_AppliesThemInOrder()
 	{
-		var first = await CreateOrganization("Same organization", "zulu-organization");
-		var second = await CreateOrganization("Same organization", "alpha-organization");
-
 		var result = await Mediator.Send(
-			CreateQuery(ids: [first.Id, second.Id], sortBy: ["name", "systemName_desc"]),
+			CreateQuery(ids: [Scenario.Beta.Id, Scenario.BetaTwin.Id], sortBy: ["name", "systemName_desc"]),
 			CancellationToken);
 
-		result.Organizations.Select(x => x.Id).Should().Equal(first.Id, second.Id);
+		result.Organizations.Select(x => x.Id).Should().Equal(Scenario.Beta.Id, Scenario.BetaTwin.Id);
 	}
 
 	[Theory]
@@ -263,17 +180,11 @@ public class GetOrganizationsTests : IntegrationTest
 		string sort,
 		bool descending)
 	{
-		var rich = await CreateOrganization("Rich organization", "rich-organization");
-		var indebted = await CreateOrganization("Indebted organization", "indebted-organization");
-		var withoutProfile = await CreateOrganization("No profile organization", "no-profile-organization");
-		await AddFinancialProfile(rich.Id, 50m);
-		await AddFinancialProfile(indebted.Id, -10m);
-
 		var result = await Mediator.Send(
-			CreateQuery(ids: [rich.Id, indebted.Id, withoutProfile.Id], sortBy: [sort]),
+			CreateQuery(ids: [Scenario.Gamma.Id, Scenario.BetaTwin.Id, Scenario.Northern.Id], sortBy: [sort]),
 			CancellationToken);
 
-		Guid[] ascending = [indebted.Id, withoutProfile.Id, rich.Id];
+		Guid[] ascending = [Scenario.BetaTwin.Id, Scenario.Northern.Id, Scenario.Gamma.Id];
 		result.Organizations.Select(x => x.Id)
 			.Should()
 			.Equal(descending ? ascending.Reverse() : ascending);
@@ -282,22 +193,16 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_SortByApproximateBalanceAndName_AppliesBothInOrderWithPagination()
 	{
-		var first = await CreateOrganization("Beta organization", "beta-organization");
-		var second = await CreateOrganization("Alpha organization", "alpha-organization");
-		var third = await CreateOrganization("Gamma organization", "gamma-organization");
-		await AddFinancialProfile(first.Id, 10m);
-		await AddFinancialProfile(second.Id, 10m);
-		await AddFinancialProfile(third.Id, 99m);
 		var query = CreateQuery(
-			ids: [first.Id, second.Id, third.Id],
+			ids: [Scenario.Alpha.Id, Scenario.Beta.Id, Scenario.Gamma.Id],
 			sortBy: ["approximateBalance_desc", "name"],
 			size: 2);
 
 		var firstPage = await Mediator.Send(query, CancellationToken);
 		var secondPage = await Mediator.Send(query with { Pagination = new Pagination(1, 2) }, CancellationToken);
 
-		firstPage.Organizations.Select(x => x.Id).Should().Equal(third.Id, second.Id);
-		secondPage.Organizations.Select(x => x.Id).Should().Equal(first.Id);
+		firstPage.Organizations.Select(x => x.Id).Should().Equal(Scenario.Gamma.Id, Scenario.Alpha.Id);
+		secondPage.Organizations.Select(x => x.Id).Should().Equal(Scenario.Beta.Id);
 	}
 
 	[Theory]
@@ -316,75 +221,48 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_ShowHidden_ReturnsAlsoHiddenOrganizations()
 	{
-		var hiddenOrg = await CreateOrganization(
-			"hidden_org",
-			"hidden_org",
-			true);
+		var result = await Mediator.Send(
+			CreateQuery(ids: [Scenario.Hidden.Id, Scenario.Alpha.Id], showHidden: true),
+			CancellationToken);
 
-		var notHiddenOrg = await CreateOrganization("not_hidden_org", "not_hidden_org");
-
-		var act = async () => await Mediator.Send(CreateQuery(showHidden: true));
-		var result = await act.Should().NotThrowAsync();
-
-		result
-			.Which
-			.Organizations
+		result.Organizations
 			.Should()
-			.Contain(x => x.Id == hiddenOrg.Id)
+			.Contain(x => x.Id == Scenario.Hidden.Id)
 			.Which
 			.IsHidden
 			.Should()
 			.BeTrue();
-
-		result.Which.Organizations.Should().Contain(x => x.Id == notHiddenOrg.Id);
+		result.Organizations.Should().Contain(x => x.Id == Scenario.Alpha.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_ShowHiddenFalse_ReturnsWithOutHiddenOrganizations()
 	{
-		var hiddenOrg = await CreateOrganization(
-			"hidden_org",
-			"hidden_org",
-			true);
+		var result = await Mediator.Send(
+			CreateQuery(ids: [Scenario.Hidden.Id, Scenario.Alpha.Id], showHidden: false),
+			CancellationToken);
 
-		var notHiddenOrg = await CreateOrganization("not_hidden_org", "not_hidden_org");
-
-		var act = async () => await Mediator.Send(CreateQuery(showHidden: false));
-		var result = await act.Should().NotThrowAsync();
-
-		result.Which.Organizations.Should().NotContain(x => x.Id == hiddenOrg.Id);
-		result.Which.Organizations.Should().Contain(x => x.Id == notHiddenOrg.Id);
+		result.Organizations.Should().NotContain(x => x.Id == Scenario.Hidden.Id);
+		result.Organizations.Should().Contain(x => x.Id == Scenario.Alpha.Id);
 	}
 
 	[Fact]
 	public async Task GetOrganizations_ByUserId_AppliesSearchFiltersSortingAndPaginationTogether()
 	{
-		var member = GetContext<UsersTestContext>().Users.ElementAt(1);
-		var first = await CreateOrganization("First organization", "first-organization");
-		var shared = await CreateOrganization("Shared organization", "shared-organization");
-		var other = await CreateOrganization("Other organization", "other-organization");
-		first.AddMember(member.Id, OrganizationRole.Member);
-		shared.AddMember(member.Id, OrganizationRole.Manager);
-		await Context.SaveChangesAsync(CancellationToken);
-
 		var query = CreateQuery(
 			"organization",
-			member.Id,
-			[first.Id, shared.Id, other.Id],
+			Scenario.Member.Id,
+			[Scenario.Alpha.Id, Scenario.Beta.Id, Scenario.Gamma.Id],
 			[OrganizationType.Business],
 			["name_desc"],
 			size: 1);
 
 		var firstPage = await Mediator.Send(query, CancellationToken);
-		var secondPage = await Mediator.Send(
-			query with { Pagination = new Pagination(1, 1) },
-			CancellationToken);
-		var lastPage = await Mediator.Send(
-			query with { Pagination = new Pagination(2, 1) },
-			CancellationToken);
+		var secondPage = await Mediator.Send(query with { Pagination = new Pagination(1, 1) }, CancellationToken);
+		var lastPage = await Mediator.Send(query with { Pagination = new Pagination(2, 1) }, CancellationToken);
 
-		firstPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(shared.Id);
-		secondPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(first.Id);
+		firstPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(Scenario.Beta.Id);
+		secondPage.Organizations.Should().ContainSingle().Which.Id.Should().Be(Scenario.Alpha.Id);
 		lastPage.Organizations.Should().BeEmpty();
 	}
 
@@ -393,27 +271,15 @@ public class GetOrganizationsTests : IntegrationTest
 	[InlineData(true)]
 	public async Task GetOrganizations_ByUserId_ShowHiddenControlsHiddenMemberships(bool showHidden)
 	{
-		var member = GetContext<UsersTestContext>().Users.ElementAt(1);
-		var hidden = await CreateOrganization(
-			"Hidden organization",
-			"hidden-organization",
-			true);
-		var other = await CreateOrganization(
-			"Other hidden organization",
-			"other-hidden-organization",
-			true);
-		hidden.AddMember(member.Id, OrganizationRole.Member);
-		await Context.SaveChangesAsync(CancellationToken);
-
 		var query = CreateQuery(
-			userId: member.Id,
-			ids: [hidden.Id, other.Id],
+			userId: Scenario.Member.Id,
+			ids: [Scenario.Hidden.Id, Scenario.HiddenOther.Id],
 			showHidden: showHidden);
 
 		var result = await Mediator.Send(query, CancellationToken);
 
 		if (showHidden)
-			result.Organizations.Should().ContainSingle().Which.Id.Should().Be(hidden.Id);
+			result.Organizations.Should().ContainSingle().Which.Id.Should().Be(Scenario.Hidden.Id);
 		else
 			result.Organizations.Should().BeEmpty();
 	}
@@ -421,19 +287,17 @@ public class GetOrganizationsTests : IntegrationTest
 	[Fact]
 	public async Task GetOrganizations_ByUserIdAndIndividualType_ReturnsOnlyOwnOrganization()
 	{
-		var users = GetContext<UsersTestContext>().Users.ToArray();
-		var business = await CreateOrganization("Business organization", "business-organization");
 		var query = CreateQuery(
-			userId: users[0].Id,
-			ids: [users[0].Id, users[1].Id, business.Id],
+			userId: Scenario.Owner.Id,
+			ids: [Scenario.Owner.Id, Scenario.Member.Id, Scenario.Alpha.Id],
 			types: [OrganizationType.Individual]);
 
 		var result = await Mediator.Send(query, CancellationToken);
 
-		result.Organizations.Should().ContainSingle().Which.Id.Should().Be(users[0].Id);
+		result.Organizations.Should().ContainSingle().Which.Id.Should().Be(Scenario.Owner.Id);
 	}
 
-	private GetOrganizationsQuery CreateQuery(
+	private static GetOrganizationsQuery CreateQuery(
 		string? searchTerm = null,
 		Guid? userId = null,
 		IReadOnlyCollection<Guid>? ids = null,
@@ -451,28 +315,101 @@ public class GetOrganizationsTests : IntegrationTest
 			types ?? [],
 			showHidden);
 
-	private async Task AddFinancialProfile(Guid organizationId, decimal approximateBalance)
+	public sealed class OrganizationsScenario : ReadScenario
 	{
-		var profile = new OrganizationFinancialProfileBuilder(Faker)
-			.WithOrganizationId(organizationId)
-			.Build();
-		profile.SetApproximateBalance(approximateBalance);
-		await Context.AddAsync(profile, CancellationToken);
-		await Context.SaveChangesAsync(CancellationToken);
-	}
+		public OrganizationsScenario() => RegisterBasicContext<UsersTestContext>();
 
-	private async Task<Organization> CreateOrganization(
-		string name,
-		string systemName,
-		bool isHidden = false)
-	{
-		var owner = GetContext<UsersTestContext>().Users.First();
-		return await new OrganizationBuilder(Faker)
-			.WithOwnerId(owner.Id)
-			.WithName(name)
-			.WithIsHidden(isHidden)
-			.WithSystemName($"{systemName}-{Guid.NewGuid():N}")
-			.BuildAndAddToDb(Context);
+		public User Owner { get; private set; } = null!;
+
+		public User Member { get; private set; } = null!;
+
+		public Organization Northern { get; private set; } = null!;
+
+		public Organization Alpha { get; private set; } = null!;
+
+		public Organization Beta { get; private set; } = null!;
+
+		public Organization BetaTwin { get; private set; } = null!;
+
+		public Organization Gamma { get; private set; } = null!;
+
+		public Organization Hidden { get; private set; } = null!;
+
+		public Organization HiddenOther { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			var users = Get<UsersTestContext>().Users.ToArray();
+			Owner = users[0];
+			Member = users[1];
+
+			var profileMember = new UserBuilder(Faker).WithUserInfo("Distinctive", "Membername", null).Build();
+			var describedMember = new UserBuilder(Faker)
+				.WithUserInfo("Distinctive", "Membername", "Organization contact")
+				.Build();
+			var contact = new UserBuilder(Faker).WithUserName("preview-member-login")
+				.WithEmail("organization.contact@contacts.example")
+				.Build();
+			contact.AddUserPhone(
+				"+7 (999) 123-45-67",
+				PhoneType.Unknown,
+				false,
+				false);
+			var strongMember = new UserBuilder(Faker).WithUserName("organization-strong-member")
+				.WithUserInfo("Космонавтов", "Петров", null)
+				.Build();
+			var weakMember = new UserBuilder(Faker).WithUserName("organization-weak-member")
+				.WithUserInfo("Николай", "Иванов", "Космонавтов")
+				.Build();
+
+			Northern = CreateOrganization("Northern Parts", "unique-supplier-code");
+			Alpha = CreateOrganization("Alpha organization", "alpha-organization");
+			Beta = CreateOrganization("Beta organization", "zulu-organization");
+			BetaTwin = CreateOrganization("Beta organization", "alpha-organization");
+			Gamma = CreateOrganization("Gamma organization", "gamma-organization");
+			Hidden = CreateOrganization("Hidden organization", "hidden-organization", true);
+			HiddenOther = CreateOrganization("Other hidden organization", "other-hidden-organization", true);
+
+			Alpha.AddMember(Member.Id, OrganizationRole.Member);
+			Beta.AddMember(Member.Id, OrganizationRole.Manager);
+			Hidden.AddMember(Member.Id, OrganizationRole.Member);
+			Alpha.AddMember(profileMember.Id, OrganizationRole.Member);
+			Beta.AddMember(describedMember.Id, OrganizationRole.Member);
+			Gamma.AddMember(contact.Id, OrganizationRole.Member);
+			Alpha.AddMember(strongMember.Id, OrganizationRole.Member);
+			Beta.AddMember(strongMember.Id, OrganizationRole.Member);
+			Gamma.AddMember(weakMember.Id, OrganizationRole.Member);
+			new[] { Alpha, Beta }.OrderBy(organization => organization.Id)
+				.Last()
+				.AddMember(weakMember.Id, OrganizationRole.Member);
+
+			return
+			[
+				profileMember, describedMember, contact, strongMember, weakMember,
+				Northern, Alpha, Beta, BetaTwin, Gamma, Hidden, HiddenOther,
+				CreateFinancialProfile(Alpha, 10m),
+				CreateFinancialProfile(Beta, 10m),
+				CreateFinancialProfile(Gamma, 99m),
+				CreateFinancialProfile(BetaTwin, -10m)
+			];
+		}
+
+		private Organization CreateOrganization(string name, string systemName, bool isHidden = false)
+			=> new OrganizationBuilder(Faker)
+				.WithOwnerId(Owner.Id)
+				.WithName(name)
+				.WithIsHidden(isHidden)
+				.WithSystemName($"{systemName}-{Guid.NewGuid():N}")
+				.Build();
+
+		private OrganizationFinancialProfile CreateFinancialProfile(Organization organization, decimal balance)
+		{
+			var profile = new OrganizationFinancialProfileBuilder(Faker)
+				.WithOrganizationId(organization.Id)
+				.Build();
+			profile.SetApproximateBalance(balance);
+			return profile;
+		}
 	}
 }
 

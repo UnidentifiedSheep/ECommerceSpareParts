@@ -7,7 +7,9 @@ namespace Tests.TestContainers.Combined;
 public sealed class CombinedContainerFixture : IAsyncLifetime
 {
 	private const int SlotCount = AssemblyFixture.MaxThreads;
+	private const int ReadScenarioSlotCount = AssemblyFixture.ReadScenarioSlots;
 	private readonly Lazy<Task> _initialization;
+	private readonly Lazy<Task<Channel<TestEnvironmentSlot>>> _readScenarioSlots;
 	private readonly Lazy<PostgresContainerFixture> _postgres = new(() => new PostgresContainerFixture());
 
 	private readonly List<PostgresDatabaseLease> _postgresLeases = [];
@@ -16,7 +18,11 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 
 	private Channel<TestEnvironmentSlot> _slots = null!;
 
-	public CombinedContainerFixture() => _initialization = new Lazy<Task>(InitializeCoreAsync);
+	public CombinedContainerFixture()
+	{
+		_initialization = new Lazy<Task>(InitializeCoreAsync);
+		_readScenarioSlots = new Lazy<Task<Channel<TestEnvironmentSlot>>>(InitializeReadScenarioSlotsAsync);
+	}
 
 	public PostgresContainerFixture Postgres => _postgres.Value;
 
@@ -66,9 +72,43 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 		}
 	}
 
+	private async Task<Channel<TestEnvironmentSlot>> InitializeReadScenarioSlotsAsync()
+	{
+		await _initialization.Value;
+
+		var slots = Channel.CreateBounded<TestEnvironmentSlot>(
+			new BoundedChannelOptions(ReadScenarioSlotCount)
+			{
+				SingleReader = false,
+				SingleWriter = false,
+				FullMode = BoundedChannelFullMode.Wait
+			});
+
+		for (var i = 0; i < ReadScenarioSlotCount; i++)
+		{
+			var postgresLease = await Postgres.AcquireDatabaseAsync();
+			var redisLease = await Redis.AcquireDatabaseAsync();
+
+			lock (_postgresLeases)
+				_postgresLeases.Add(postgresLease);
+			lock (_redisLeases)
+				_redisLeases.Add(redisLease);
+
+			await slots.Writer.WriteAsync(
+				new TestEnvironmentSlot(
+					SlotCount + i,
+					postgresLease.Database.ConnectionString,
+					redisLease.Database.ConnectionString));
+		}
+
+		return slots;
+	}
+
 	private async Task DisposeCoreAsync()
 	{
 		_slots?.Writer.TryComplete();
+		if (_readScenarioSlots.IsValueCreated && _readScenarioSlots.Value.IsCompletedSuccessfully)
+			_readScenarioSlots.Value.Result.Writer.TryComplete();
 
 		foreach (var lease in _redisLeases)
 			await lease.DisposeAsync();
@@ -87,6 +127,15 @@ public sealed class CombinedContainerFixture : IAsyncLifetime
 		var slot = await _slots.Reader.ReadAsync(cancellationToken);
 
 		return new TestEnvironmentLease(slot, ReleaseAsync);
+	}
+
+	public async ValueTask<TestEnvironmentLease> AcquireReadScenarioAsync(CancellationToken cancellationToken = default)
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+		var slots = await _readScenarioSlots.Value.WaitAsync(cancellationToken);
+		var slot = await slots.Reader.ReadAsync(cancellationToken);
+
+		return new TestEnvironmentLease(slot, released => slots.Writer.WriteAsync(released));
 	}
 
 	private ValueTask ReleaseAsync(TestEnvironmentSlot slot) => _slots.Writer.WriteAsync(slot);

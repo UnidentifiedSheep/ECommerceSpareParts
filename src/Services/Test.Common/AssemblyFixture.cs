@@ -11,4 +11,6 @@ namespace Tests;
 public static class AssemblyFixture
 {
 	public const int MaxThreads = 5;
+
+	public const int ReadScenarioSlots = 2;
 }
