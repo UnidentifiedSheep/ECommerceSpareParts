@@ -8,7 +8,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Order;
 using Main.Api.GraphQl.Types.Order;
 using Main.Modules.Order.Application.Orders.Dtos;
-using Main.Modules.Order.Application.Orders.Queries.GetOrders;
+using Main.Modules.Order.Application.Queries.Orders.GetOrders;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Modules.Platform.Application.Handlers.Settings;
+using Main.Modules.Platform.Application.Queries.Settings;
 using MediatR;
 
 namespace Main.Api.Settings;

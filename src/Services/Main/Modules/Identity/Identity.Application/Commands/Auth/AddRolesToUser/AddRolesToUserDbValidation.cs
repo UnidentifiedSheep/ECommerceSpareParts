@@ -1,0 +1,15 @@
+using Application.Common.Abstractions;
+using BulkValidation.Core.Interfaces;
+using Main.Entities;
+
+namespace Main.Modules.Identity.Application.Commands.Auth.AddRolesToUser;
+
+public sealed class AddRolesToUserDbValidation : AbstractDbValidation<AddRolesToUserCommand>
+{
+	public override void Build(IValidationPlan plan, AddRolesToUserCommand request)
+	{
+		plan.ValidateUserExistsId(request.UserId);
+		if (request.RoleNames.Count > 0)
+			plan.ValidateRoleExistsName(request.RoleNames);
+	}
+}

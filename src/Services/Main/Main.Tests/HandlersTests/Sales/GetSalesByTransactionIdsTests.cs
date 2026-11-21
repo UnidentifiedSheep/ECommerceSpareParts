@@ -2,7 +2,7 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Sale.Sale;
-using Main.Modules.Sale.Application.Handlers.Sales;
+using Main.Modules.Sale.Application.Queries.Sales;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
 using Tests.Extensions;

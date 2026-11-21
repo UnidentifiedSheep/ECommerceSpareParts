@@ -4,7 +4,7 @@ using GraphQL.Common.Types;
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Modules.Currency.Application.Dtos;
-using Main.Modules.Currency.Application.Handlers.Currencies.GetCurrencyHistory;
+using Main.Modules.Currency.Application.Queries.Currencies.GetCurrencyHistory;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types;

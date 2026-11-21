@@ -18,6 +18,7 @@
         <ProjectReference Include="..\Modules\Currency\Currency.Entities\Currency.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Identity\Identity.Entities\Identity.Entities.csproj"/>
+        <ProjectReference Include="..\Modules\Logistics\Logistics.Entities\Logistics.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Notifications\Notifications.Entities\Notifications.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Order\Order.Entities\Order.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Organization\Organization.Entities\Organization.Entities.csproj"/>

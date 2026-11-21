@@ -4,7 +4,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Inputs.Upload;
-using Main.Modules.Uploads.Application.Handlers.GetUploads;
+using Main.Modules.Uploads.Application.Queries.GetUploads;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

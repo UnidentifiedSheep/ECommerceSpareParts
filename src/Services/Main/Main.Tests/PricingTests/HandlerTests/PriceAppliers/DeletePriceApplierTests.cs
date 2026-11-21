@@ -3,7 +3,7 @@ using FluentAssertions;
 using FluentValidation.TestHelper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
+using Pricing.Application.Commands.PriceApplier.DeletePriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Lrts.InvalidateStalePriceOptions;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;

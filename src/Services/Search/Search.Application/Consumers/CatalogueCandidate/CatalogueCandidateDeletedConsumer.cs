@@ -1,7 +1,7 @@
 using Contracts.ProductEnrichment;
 using MassTransit;
 using MediatR;
-using Search.Application.Handlers.CatalogueCandidates.DeleteCatalogueCandidates;
+using Search.Application.Commands.CatalogueCandidates.DeleteCatalogueCandidates;
 
 namespace Search.Application.Consumers.CatalogueCandidate;
 

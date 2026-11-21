@@ -5,7 +5,7 @@ using HotChocolate;
 using MediatR;
 using Pricing.Api.GraphQl.DataLoaders;
 using Pricing.Application.Dtos.Markup;
-using Pricing.Application.Handlers.Markup.GetMarkupRanges;
+using Pricing.Application.Queries.Markup.GetMarkupRanges;
 using Pricing.Entities.Exceptions.Markup;
 
 namespace Pricing.Api.GraphQl.Types;

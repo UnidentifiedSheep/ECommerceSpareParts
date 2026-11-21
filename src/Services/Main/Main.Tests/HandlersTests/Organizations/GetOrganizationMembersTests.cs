@@ -3,7 +3,7 @@ using FluentAssertions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizationMembers;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Organization;
 using Tests.Extensions;

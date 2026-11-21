@@ -1,0 +1,36 @@
+using Application.Common.Extensions;
+using Application.Common.Validators;
+using Enums;
+using FluentValidation;
+using Main.Entities;
+
+namespace Main.Modules.Balance.Application.Queries.Balance.GetTransactions;
+
+public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
+{
+	public GetTransactionsValidation()
+	{
+		RuleFor(x => new
+			{
+				x.ReceiverId,
+				x.SenderId,
+				x.LogicalOperation
+			})
+			.Must(x => x.ReceiverId != x.SenderId || x.ReceiverId == null)
+			.When(x => x.LogicalOperation == LogicalOperation.And)
+			.WithLocalizableError(TransactionSenderReceiverMustNotBeSameMessage.Instance);
+
+		RuleFor(x => new
+			{
+				x.ReceiverId, x.SenderId
+			})
+			.Must(x => x.ReceiverId != null || x.SenderId != null)
+			.WithLocalizableError(TransactionSenderOrReceiverRequiredMessage.Instance);
+
+		RuleFor(x => x.DateRange)
+			.Must(x => !x.Min.HasValue || !x.Max.HasValue || x.Min.Value.Date <= x.Max.Value.Date)
+			.WithLocalizableError(TransactionRangeStartBeforeEndMessage.Instance);
+
+		RuleFor(x => x.Cursor).SetValidator(new CursorValidator<(Guid id, DateTime dt)>());
+	}
+}

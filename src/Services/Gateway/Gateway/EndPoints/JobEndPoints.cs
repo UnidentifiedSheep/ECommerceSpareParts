@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Gateway.Application.Dtos;
-using Gateway.Application.Handlers;
+using Gateway.Application.Queries;
 using MediatR;
 
 namespace Gateway.EndPoints;

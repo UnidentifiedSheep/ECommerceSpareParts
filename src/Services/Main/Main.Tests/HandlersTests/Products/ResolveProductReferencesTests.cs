@@ -1,7 +1,7 @@
 using Enums;
 using FluentAssertions;
 using Main.Modules.Product.Application.Dtos.Product.References;
-using Main.Modules.Product.Application.Products.Queries;
+using Main.Modules.Product.Application.Queries.Products;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

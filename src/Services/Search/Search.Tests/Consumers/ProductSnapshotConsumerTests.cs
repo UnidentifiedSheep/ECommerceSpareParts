@@ -6,7 +6,7 @@ using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Search.Application.Consumers.Product;
-using Search.Application.Handlers.Search.Catalogue;
+using Search.Application.Queries.Search.Catalogue;
 using Search.Entities;
 using Search.Enums;
 using Tests.TestContainers.Search;

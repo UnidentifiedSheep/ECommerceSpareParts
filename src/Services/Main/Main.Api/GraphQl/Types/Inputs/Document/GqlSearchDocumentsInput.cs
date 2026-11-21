@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -16,5 +17,6 @@ public sealed record GqlSearchDocumentsInput
 	public required GqlPagination Pagination { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Documents.Documents.DocumentGenerationRequest>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

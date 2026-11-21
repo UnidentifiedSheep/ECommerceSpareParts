@@ -2,7 +2,7 @@ using FluentAssertions;
 using Main.Entities.Enums.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Auth.EmailVerification;
+using Main.Modules.Identity.Application.Commands.Auth.EmailVerification;
 using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
 using Main.Modules.Identity.Application.Models.Auth;
 using Microsoft.EntityFrameworkCore;

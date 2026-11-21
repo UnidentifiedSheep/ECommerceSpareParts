@@ -3,8 +3,8 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using MediatR;
 using Pricing.Api.GraphQl.Types;
-using Pricing.Application.Handlers.PriceApplier;
-using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
+using Pricing.Application.Queries.PriceApplier;
+using Pricing.Application.Queries.PriceApplier.GetPriceAppliers;
 using Pricing.Entities.Enums;
 
 namespace Pricing.Api.GraphQl.Queries;

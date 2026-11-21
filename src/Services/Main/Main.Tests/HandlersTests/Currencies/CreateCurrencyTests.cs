@@ -1,6 +1,6 @@
 using FluentValidation.TestHelper;
 using Main.Entities.Currency;
-using Main.Modules.Currency.Application.Handlers.Currencies.CreateCurrency;
+using Main.Modules.Currency.Application.Commands.Currencies.CreateCurrency;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Currency;

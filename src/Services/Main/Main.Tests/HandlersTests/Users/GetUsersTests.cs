@@ -3,7 +3,7 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Users.GetUsers;
+using Main.Modules.Identity.Application.Queries.Users.GetUsers;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;

@@ -6,9 +6,10 @@ using Application.Common.Interfaces.Services;
 using Carter;
 using Domain.CommonEnums;
 using Enums;
+using Main.Modules.Jobs.Application.Commands.Jobs;
 using Main.Modules.Jobs.Application.Domains;
-using Main.Modules.Jobs.Application.Handlers.Jobs;
-using Main.Modules.Jobs.Application.Handlers.Jobs.GetJobs;
+using Main.Modules.Jobs.Application.Queries.Jobs;
+using Main.Modules.Jobs.Application.Queries.Jobs.GetJobs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

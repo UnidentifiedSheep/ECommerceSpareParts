@@ -4,7 +4,7 @@ using FluentAssertions;
 using FluentValidation.TestHelper;
 using Main.Entities.Enums;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Users.SearchUsers;
+using Main.Modules.Identity.Application.Queries.Users.SearchUsers;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.User;
 using Tests.Extensions;

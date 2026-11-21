@@ -1,0 +1,35 @@
+using Application.Common.Extensions;
+using Application.Common.Services;
+using Application.Common.Validators;
+using FluentValidation;
+using Main.Entities.Sale;
+using Main.Modules.Sale.Application.Commands.Sales.BaseValidators;
+
+namespace Main.Modules.Sale.Application.Commands.Sales.CreateSale;
+
+public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
+{
+	public CreateSaleValidation(IOperationDatePolicy datePolicy)
+	{
+		RuleFor(x => x.SaleDateTime).SetValidator(new RecordDateValidator(datePolicy));
+
+		RuleFor(x => x.Contents).SetValidator(new NewSaleContentValidator());
+
+		RuleFor(x => x.PayedSum)
+			.GreaterThanOrEqualTo(0)
+			.When(x => x.PayedSum != null)
+			.WithLocalizableError(SalePayedSumMinMessage.Instance)
+			.PrecisionScale(
+				18,
+				2,
+				true)
+			.When(x => x.PayedSum != null)
+			.WithLocalizableError(SalePayedSumPrecisionMessage.Instance);
+
+		RuleFor(x => x.UserId).NotEmpty().WithLocalizableError(SaleBuyerIdNotEmptyMessage.Instance);
+
+		RuleFor(x => x.OrganizationId)
+			.NotEmpty()
+			.WithLocalizableError(SaleOrganizationIdNotEmptyMessage.Instance);
+	}
+}

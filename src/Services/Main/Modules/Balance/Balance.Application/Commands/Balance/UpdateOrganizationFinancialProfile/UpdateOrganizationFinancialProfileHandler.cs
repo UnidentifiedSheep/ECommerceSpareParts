@@ -1,0 +1,43 @@
+using System.Data;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Persistence;
+using Application.Common.Interfaces.Repositories;
+using Attributes;
+using Main.Entities.Balance.Balance;
+using Main.Modules.Balance.Application.Dtos.Balances;
+
+namespace Main.Modules.Balance.Application.Commands.Balance.UpdateOrganizationFinancialProfile;
+
+[AutoSave]
+[Transactional(
+	IsolationLevel.ReadCommitted,
+	20,
+	2)]
+public record UpdateOrganizationFinancialProfileCommand(
+	Guid OrganizationId,
+	PatchOrganizationFinancialProfileDto Patch) : ICommand<UpdateOrganizationFinancialProfileResult>;
+
+public record UpdateOrganizationFinancialProfileResult(Guid OrganizationId);
+
+public class UpdateOrganizationFinancialProfileHandler(
+	IRepository<OrganizationFinancialProfile, Guid> repository,
+	IUnitOfWork unitOfWork)
+	: ICommandHandler<UpdateOrganizationFinancialProfileCommand, UpdateOrganizationFinancialProfileResult>
+{
+	public async Task<UpdateOrganizationFinancialProfileResult> Handle(
+		UpdateOrganizationFinancialProfileCommand request,
+		CancellationToken cancellationToken)
+	{
+		var profile = await repository.GetById(request.OrganizationId, cancellationToken);
+
+		if (profile == null)
+		{
+			profile = OrganizationFinancialProfile.Create(request.OrganizationId);
+			await unitOfWork.AddAsync(profile, cancellationToken);
+		}
+
+		request.Patch.MinimalAllowedBalance.Apply(x => profile.SetMinAllowedBalance(x));
+		return new UpdateOrganizationFinancialProfileResult(request.OrganizationId);
+	}
+}

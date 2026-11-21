@@ -3,30 +3,11 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.User;
-using Main.Modules.Analytics.Persistence;
-using Main.Modules.Balance.Persistence;
-using Main.Modules.Cart.Persistence;
-using Main.Modules.Currency.Persistence;
-using Main.Modules.Documents.Persistence;
 using Main.Modules.Identity.Application.Dtos.Users;
 using Main.Modules.Identity.Application.Extensions.QueryExtensions;
-using Main.Modules.Identity.Persistence;
-using Main.Modules.Jobs.Persistence;
-using Main.Modules.Notifications.Persistence;
-using Main.Modules.Order.Persistence;
-using Main.Modules.Organization.Persistence;
-using Main.Modules.Platform.Persistence;
-using Main.Modules.Product.Persistence;
-using Main.Modules.Purchase.Persistence;
-using Main.Modules.Sale.Persistence;
-using Main.Modules.Storage.Persistence;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Common;
-using Persistence.Common.Repositories;
+using Application.Common.Interfaces.Repositories;
 using Persistence.Context;
-using Persistence.Relations;
-using Pricing.Persistence;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
 using Tests.Persistence.Interceptors;
@@ -61,9 +42,10 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 		Context.Add(
 			UserPermission.Create(user.Id, Permission.ToNormalizedPermission(PermissionCodes.USERS_GET)));
 		await Context.SaveChangesAsync(CancellationToken);
-		var counter = new QueryCounter();
-		await using var readContext = CreateReadContext(counter);
-		var repository = new ReadRepository<User, Guid>(readContext);
+		await using var scope = Sp.CreateAsyncScope();
+		var counter = scope.ServiceProvider.GetRequiredService<QueryCounter>();
+		var readContext = scope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		var repository = scope.ServiceProvider.GetRequiredService<IReadRepository<User, Guid>>();
 		var projection = Scope.ServiceProvider.GetRequiredService<IProjectionProvider<User, UserDto>>();
 
 		var authorization = await repository.GetUserAuthorizationAsync(
@@ -106,9 +88,10 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 	[Fact]
 	public async Task EmptyBatch_DoesNotExecuteSqlAndMissingUserReturnsNull()
 	{
-		var counter = new QueryCounter();
-		await using var readContext = CreateReadContext(counter);
-		var repository = new ReadRepository<User, Guid>(readContext);
+		await using var scope = Sp.CreateAsyncScope();
+		var counter = scope.ServiceProvider.GetRequiredService<QueryCounter>();
+		var readContext = scope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		var repository = scope.ServiceProvider.GetRequiredService<IReadRepository<User, Guid>>();
 		var projection = Scope.ServiceProvider.GetRequiredService<IProjectionProvider<User, UserDto>>();
 
 		(await repository.GetUsersRolesAndPermissionsAsync([], CancellationToken)).Should().BeEmpty();
@@ -128,8 +111,8 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 	public async Task UserWithoutProfileOrAssignments_ReturnsEmptyRightsAndNullableProfile()
 	{
 		var user = await new UserBuilder(Faker).BuildAndAddToDb(Context);
-		await using var readContext = CreateReadContext(new QueryCounter());
-		var repository = new ReadRepository<User, Guid>(readContext);
+		await using var scope = Sp.CreateAsyncScope();
+		var repository = scope.ServiceProvider.GetRequiredService<IReadRepository<User, Guid>>();
 		var projection = Scope.ServiceProvider.GetRequiredService<IProjectionProvider<User, UserDto>>();
 
 		var authorization = await repository.GetUserAuthorizationAsync(
@@ -143,21 +126,4 @@ public class UserAuthorizationQueryExtensionsTests(CombinedContainerFixture fixt
 		authorization.Permissions.Should().BeEmpty();
 	}
 
-	private UnifiedDbContext CreateReadContext(QueryCounter counter)
-		=> new(
-			new DbContextOptionsBuilder<UnifiedDbContext>()
-				.UseNpgsql(
-					Context.Database.GetDbConnection(),
-					options =>
-						options.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery))
-				.AddInterceptors(counter)
-				.Options,
-			[
-				new CoreDbContextModule(), new RelationsDbContextModule(), new IdentityDbContextModule(),
-				new PurchaseDbContextModule(), new SaleDbContextModule(), new OrganizationDbContextModule(),
-				new BalanceDbContextModule(), new AnalyticsDbContextModule(), new OrderDbContextModule(),
-				new NotificationsDbContextModule(), new CartDbContextModule(), new DocumentsDbContextModule(),
-				new JobsDbContextModule(), new PlatformDbContextModule(), new CurrencyDbContextModule(),
-				new ProductDbContextModule(), new StorageDbContextModule(), new PricingDbContextModule()
-			]);
 }

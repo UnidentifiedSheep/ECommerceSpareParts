@@ -7,7 +7,9 @@ public static class ServiceCollectionExtensions
 {
 	public static IServiceCollection AddGraphQlServices(this IServiceCollection services, string name)
 	{
-		services.AddCommonGraphQl(name).AddQueryType<Query>();
+		services.AddCommonGraphQl(name)
+			.AddSortTypePrefix("Search")
+			.AddQueryType<Query>();
 
 		return services;
 	}

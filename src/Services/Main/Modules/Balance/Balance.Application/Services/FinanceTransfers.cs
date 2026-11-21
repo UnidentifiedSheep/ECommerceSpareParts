@@ -2,8 +2,8 @@ using Abstractions.Models.Options;
 using Enums;
 using Main.Entities.Balance.Enums.Balances;
 using Main.Modules.Balance.Abstractions;
-using Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
-using Main.Modules.Balance.Application.Handlers.Balance.ReverseTransaction;
+using Main.Modules.Balance.Application.Commands.Balance.CreateTransaction;
+using Main.Modules.Balance.Application.Commands.Balance.ReverseTransaction;
 using MediatR;
 using Microsoft.Extensions.Options;
 

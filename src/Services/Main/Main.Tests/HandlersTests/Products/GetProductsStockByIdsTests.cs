@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Entities.Product.Stock;
-using Main.Modules.Product.Application.Products.Queries;
+using Main.Modules.Product.Application.Queries.Products;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Storage;

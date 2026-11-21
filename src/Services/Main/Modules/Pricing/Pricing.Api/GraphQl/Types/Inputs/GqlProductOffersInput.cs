@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 using Pricing.Entities.Enums;
@@ -20,5 +21,6 @@ public sealed record GqlProductOffersInput
 	public required GqlPagination Pagination { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Pricing.Entities.Offers.ProductPriceOption>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

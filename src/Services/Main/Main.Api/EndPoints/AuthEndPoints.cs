@@ -1,9 +1,10 @@
 using Carter;
-using Main.Modules.Identity.Application.Handlers.Auth;
-using Main.Modules.Identity.Application.Handlers.Auth.ChangePassword;
-using Main.Modules.Identity.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
-using Main.Modules.Identity.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
-using Main.Modules.Identity.Application.Handlers.Auth.Register;
+using Main.Modules.Identity.Application.Commands.Auth;
+using Main.Modules.Identity.Application.Commands.Auth.ChangePassword;
+using Main.Modules.Identity.Application.Commands.Auth.PasswordRecovery.ResetPassword;
+using Main.Modules.Identity.Application.Commands.Auth.PasswordRecovery.SendEmailRecovery;
+using Main.Modules.Identity.Application.Commands.Auth.Register;
+using Main.Modules.Identity.Application.Queries.Auth;
 using MediatR;
 using Security.Core.Interfaces;
 

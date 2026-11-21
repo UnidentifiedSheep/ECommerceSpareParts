@@ -1,0 +1,26 @@
+using FluentValidation;
+using FluentValidation.Results;
+using Security.Core.Interfaces;
+
+namespace Main.Modules.Identity.Application.Commands.BaseValidators;
+
+public class PasswordValidator : AbstractValidator<string>
+{
+	public PasswordValidator(IPasswordManager passwordManager)
+	{
+		RuleFor(x => x)
+			.Custom((password, context) =>
+			{
+				var (valid, errors) = passwordManager.IsPasswordMatchRules(password);
+				if (valid)
+					return;
+
+				foreach (var message in errors)
+					context.AddFailure(
+						new ValidationFailure(context.PropertyPath, "Validation failed")
+						{
+							ErrorCode = message.MessageKey, CustomState = message
+						});
+			});
+	}
+}

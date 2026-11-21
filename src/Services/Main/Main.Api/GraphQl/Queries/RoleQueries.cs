@@ -6,7 +6,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Auth;
 using Main.Api.GraphQl.Types.Inputs.Role;
 using Main.Entities.Auth;
-using Main.Modules.Identity.Application.Handlers.Auth.GetRoles;
+using Main.Modules.Identity.Application.Queries.Auth.GetRoles;
 using MediatR;
 
 namespace Main.Api.GraphQl.Queries;

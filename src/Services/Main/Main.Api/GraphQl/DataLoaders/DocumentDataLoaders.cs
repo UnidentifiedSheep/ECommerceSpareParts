@@ -1,7 +1,7 @@
 using Enums;
 using GreenDonut;
 using Main.Modules.Documents.Application.Dtos.Documents;
-using Main.Modules.Documents.Application.Handlers.Documents;
+using Main.Modules.Documents.Application.Queries.Documents;
 using MediatR;
 using Security.Authorization;
 using Security.Core.Interfaces;

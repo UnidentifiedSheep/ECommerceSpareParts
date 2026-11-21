@@ -7,10 +7,10 @@ using Main.Api.GraphQl.Types.Inputs.Organization;
 using Main.Api.GraphQl.Types.User;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Exceptions;
-using Main.Modules.Balance.Application.Handlers.Balance.GetOrganizationFinancialInfo;
-using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Balance.Application.Queries.Balance.GetOrganizationFinancialInfo;
+using Main.Modules.Balance.Application.Queries.Balance.GetTransactions;
 using Main.Modules.Organization.Application.Dtos.Organizations;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizationMembers;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizationMembers;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types.Organization;

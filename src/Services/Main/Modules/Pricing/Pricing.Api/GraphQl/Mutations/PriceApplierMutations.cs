@@ -4,10 +4,10 @@ using HotChocolate;
 using MediatR;
 using Pricing.Api.GraphQl.Types;
 using Pricing.Api.GraphQl.Types.Inputs;
+using Pricing.Application.Commands.PriceApplier.DeletePriceApplier;
+using Pricing.Application.Commands.PriceApplier.UpsertPriceApplier;
 using Pricing.Application.Dtos.PriceApplier;
-using Pricing.Application.Handlers.PriceApplier;
-using Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
-using Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
+using Pricing.Application.Queries.PriceApplier;
 
 namespace Pricing.Api.GraphQl.Mutations;
 

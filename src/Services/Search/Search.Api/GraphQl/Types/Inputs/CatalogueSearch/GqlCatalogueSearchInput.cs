@@ -1,6 +1,8 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 using Search.Api.GraphQl.Types.Inputs.CatalogueSearch.Criteria;
+using Search.Entities;
 using Search.Enums;
 
 namespace Search.Api.GraphQl.Types.Inputs.CatalogueSearch;
@@ -33,9 +35,11 @@ public record GqlCatalogueSearchInput
 	public required GqlPagination Pagination { get; init; }
 
 	[GraphQLName("productSortBy")]
+	[SortableBy<Product>]
 	public IReadOnlyCollection<GqlSortBy>? ProductSortBy { get; init; }
 
 	[GraphQLName("catalogueCandidateSortBy")]
+	[SortableBy<CatalogueCandidate>]
 	public IReadOnlyCollection<GqlSortBy>? CatalogueCandidateSortBy { get; init; }
 
 	[GraphQLName("productCriteria")]

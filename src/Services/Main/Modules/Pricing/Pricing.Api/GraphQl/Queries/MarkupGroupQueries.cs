@@ -6,7 +6,7 @@ using MediatR;
 using Pricing.Api.GraphQl.DataLoaders;
 using Pricing.Api.GraphQl.Types;
 using Pricing.Api.GraphQl.Types.Inputs;
-using Pricing.Application.Handlers.Markup.GetMarkups;
+using Pricing.Application.Queries.Markup.GetMarkups;
 
 namespace Pricing.Api.GraphQl.Queries;
 

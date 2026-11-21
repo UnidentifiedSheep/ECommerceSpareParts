@@ -6,7 +6,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
 using Main.Entities.User;
-using Main.Modules.Cart.Application.Handlers.Cart.AddToCart;
+using Main.Modules.Cart.Application.Commands.Cart.AddToCart;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using Main.Modules.Product.Application.Dtos.Producer;
-using Main.Modules.Product.Application.Handlers.Producers;
+using Main.Modules.Product.Application.Queries.Producers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

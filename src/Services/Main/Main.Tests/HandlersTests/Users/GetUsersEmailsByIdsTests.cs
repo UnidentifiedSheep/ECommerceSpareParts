@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Modules.Identity.Application.Handlers.Users;
+using Main.Modules.Identity.Application.Queries.Users;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 

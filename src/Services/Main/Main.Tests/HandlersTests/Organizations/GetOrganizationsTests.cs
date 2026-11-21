@@ -6,8 +6,9 @@ using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.Organization.Enums.Organization;
 using Main.Entities.Organization.Organization;
-using Main.Modules.Organization.Application.Handlers.Organizations.GetOrganizations;
+using Main.Modules.Organization.Application.Queries.Organizations.GetOrganizations;
 using Tests.Abstractions.Test;
+using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Organization;
 using Tests.DataBuilders.User;
 using Tests.Extensions;
@@ -256,7 +257,52 @@ public class GetOrganizationsTests : IntegrationTest
 	}
 
 	[Theory]
+	[InlineData("approximateBalance", false)]
+	[InlineData("approximateBalance_desc", true)]
+	public async Task GetOrganizations_SortByApproximateBalance_TreatsMissingProfileAsZero(
+		string sort,
+		bool descending)
+	{
+		var rich = await CreateOrganization("Rich organization", "rich-organization");
+		var indebted = await CreateOrganization("Indebted organization", "indebted-organization");
+		var withoutProfile = await CreateOrganization("No profile organization", "no-profile-organization");
+		await AddFinancialProfile(rich.Id, 50m);
+		await AddFinancialProfile(indebted.Id, -10m);
+
+		var result = await Mediator.Send(
+			CreateQuery(ids: [rich.Id, indebted.Id, withoutProfile.Id], sortBy: [sort]),
+			CancellationToken);
+
+		Guid[] ascending = [indebted.Id, withoutProfile.Id, rich.Id];
+		result.Organizations.Select(x => x.Id)
+			.Should()
+			.Equal(descending ? ascending.Reverse() : ascending);
+	}
+
+	[Fact]
+	public async Task GetOrganizations_SortByApproximateBalanceAndName_AppliesBothInOrderWithPagination()
+	{
+		var first = await CreateOrganization("Beta organization", "beta-organization");
+		var second = await CreateOrganization("Alpha organization", "alpha-organization");
+		var third = await CreateOrganization("Gamma organization", "gamma-organization");
+		await AddFinancialProfile(first.Id, 10m);
+		await AddFinancialProfile(second.Id, 10m);
+		await AddFinancialProfile(third.Id, 99m);
+		var query = CreateQuery(
+			ids: [first.Id, second.Id, third.Id],
+			sortBy: ["approximateBalance_desc", "name"],
+			size: 2);
+
+		var firstPage = await Mediator.Send(query, CancellationToken);
+		var secondPage = await Mediator.Send(query with { Pagination = new Pagination(1, 2) }, CancellationToken);
+
+		firstPage.Organizations.Select(x => x.Id).Should().Equal(third.Id, second.Id);
+		secondPage.Organizations.Select(x => x.Id).Should().Equal(first.Id);
+	}
+
+	[Theory]
 	[InlineData("unknown", null)]
+	[InlineData("approximateBalance", "argument")]
 	[InlineData("name", "unexpected")]
 	public async Task GetOrganizations_WithInvalidSort_ThrowsInvalidInputException(
 		string field,
@@ -404,6 +450,16 @@ public class GetOrganizationsTests : IntegrationTest
 			ids ?? [],
 			types ?? [],
 			showHidden);
+
+	private async Task AddFinancialProfile(Guid organizationId, decimal approximateBalance)
+	{
+		var profile = new OrganizationFinancialProfileBuilder(Faker)
+			.WithOrganizationId(organizationId)
+			.Build();
+		profile.SetApproximateBalance(approximateBalance);
+		await Context.AddAsync(profile, CancellationToken);
+		await Context.SaveChangesAsync(CancellationToken);
+	}
 
 	private async Task<Organization> CreateOrganization(
 		string name,

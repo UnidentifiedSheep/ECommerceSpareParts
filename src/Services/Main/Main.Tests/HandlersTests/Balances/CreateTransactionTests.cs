@@ -8,7 +8,7 @@ using Main.Entities.Balance.Enums.Balances;
 using Main.Entities.Balance.Exceptions;
 using Main.Entities.Currency;
 using Main.Entities.Organization.Exceptions;
-using Main.Modules.Balance.Application.Handlers.Balance.CreateTransaction;
+using Main.Modules.Balance.Application.Commands.Balance.CreateTransaction;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.Stubs;

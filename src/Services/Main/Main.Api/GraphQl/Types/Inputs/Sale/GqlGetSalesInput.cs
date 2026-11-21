@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 using Main.Entities.Sale.Enums;
@@ -29,6 +30,7 @@ public sealed record GqlGetSalesInput
 	public IReadOnlyCollection<SaleState>? States { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Sale.Sale.Sale>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 
 	[GraphQLName("searchTerm")]

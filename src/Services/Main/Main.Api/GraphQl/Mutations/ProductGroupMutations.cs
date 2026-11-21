@@ -3,7 +3,7 @@ using GraphQL.Common.Attributes;
 using HotChocolate;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Product;
-using Main.Modules.Product.Application.Products.Commands.UpsertProductGroup;
+using Main.Modules.Product.Application.Commands.Products.UpsertProductGroup;
 using MediatR;
 
 namespace Main.Api.GraphQl.Mutations;

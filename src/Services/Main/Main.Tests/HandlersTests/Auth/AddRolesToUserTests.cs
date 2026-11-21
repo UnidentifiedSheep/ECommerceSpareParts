@@ -3,7 +3,7 @@ using FluentValidation.TestHelper;
 using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
-using Main.Modules.Identity.Application.Handlers.Auth.AddRolesToUser;
+using Main.Modules.Identity.Application.Commands.Auth.AddRolesToUser;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

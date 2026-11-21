@@ -4,6 +4,7 @@ using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Modules.Analytics.Persistence;
 using Main.Modules.Balance.Persistence;
+using Main.Modules.Logistics.Persistence;
 using Main.Modules.Cart.Persistence;
 using Main.Modules.Currency.Persistence;
 using Main.Modules.Documents.Persistence;
@@ -60,6 +61,7 @@ builder.ConfigureServices((context, services) =>
 	services.AddDbContextModule<SaleDbContextModule>();
 	services.AddDbContextModule<AnalyticsDbContextModule>();
 	services.AddDbContextModule<BalanceDbContextModule>();
+	services.AddDbContextModule<LogisticsDbContextModule>();
 	services.AddDbContextModule<CartDbContextModule>();
 	services.AddDbContextModule<DocumentsDbContextModule>();
 	services.AddDbContextModule<JobsDbContextModule>();

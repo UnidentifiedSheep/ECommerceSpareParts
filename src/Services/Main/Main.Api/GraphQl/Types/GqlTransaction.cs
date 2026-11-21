@@ -9,7 +9,7 @@ using Main.Api.GraphQl.Types.User;
 using Main.Entities.Balance.Enums.Balances;
 using Main.Entities.Balance.Exceptions;
 using Main.Modules.Balance.Application.Dtos.Balances;
-using Main.Modules.Currency.Application.Handlers.Currencies;
+using Main.Modules.Currency.Application.Queries.Currencies;
 using MediatR;
 
 namespace Main.Api.GraphQl.Types;

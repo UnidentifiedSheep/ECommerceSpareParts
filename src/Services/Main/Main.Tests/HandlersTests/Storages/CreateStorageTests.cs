@@ -2,7 +2,7 @@ using FluentValidation.TestHelper;
 using Main.Entities.Storage.Enums;
 using Main.Entities.Storage.Exceptions;
 using Main.Entities.Storage.Storage;
-using Main.Modules.Storage.Application.Handlers.Storages.CreateStorage;
+using Main.Modules.Storage.Application.Commands.Storages.CreateStorage;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.DataBuilders.Storage;

@@ -5,7 +5,7 @@ using Main.Entities.Product.Enums.Products;
 using Main.Entities.Product.Exceptions;
 using Main.Entities.Product.Product;
 using Main.Entities.Product.Product.Enrichment;
-using Main.Modules.Product.Application.Handlers.ProductEnrichment.CreateCandidateCrosses;
+using Main.Modules.Product.Application.Commands.ProductEnrichment.CreateCandidateCrosses;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

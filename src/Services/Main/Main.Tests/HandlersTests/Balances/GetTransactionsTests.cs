@@ -5,7 +5,7 @@ using FluentValidation.TestHelper;
 using Main.Entities;
 using Main.Entities.Balance.Balance;
 using Main.Entities.Balance.Enums.Balances;
-using Main.Modules.Balance.Application.Handlers.Balance.GetTransactions;
+using Main.Modules.Balance.Application.Queries.Balance.GetTransactions;
 using Microsoft.EntityFrameworkCore;
 using Tests.Abstractions.Test;
 using Tests.TestContainers.Combined;

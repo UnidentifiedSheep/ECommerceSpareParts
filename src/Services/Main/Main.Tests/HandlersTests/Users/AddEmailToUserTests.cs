@@ -5,7 +5,7 @@ using Main.Entities;
 using Main.Entities.Enums;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Users.AddEmailToUser;
+using Main.Modules.Identity.Application.Commands.Users.AddEmailToUser;
 using Main.Modules.Identity.Application.Models.Options;
 using Main.Modules.Identity.Application.Validators;
 using Microsoft.EntityFrameworkCore;

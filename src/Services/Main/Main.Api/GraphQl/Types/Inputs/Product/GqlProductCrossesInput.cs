@@ -1,3 +1,4 @@
+using GraphQL.Common.Attributes;
 using GraphQL.Common.Types;
 using HotChocolate;
 
@@ -13,5 +14,6 @@ public sealed record GqlProductCrossesInput
 	public string? SearchTerm { get; init; }
 
 	[GraphQLName("sortBy")]
+	[SortableBy<Main.Entities.Product.Product.Product>]
 	public IReadOnlyCollection<GqlSortBy>? SortBy { get; init; }
 }

@@ -1,0 +1,12 @@
+{
+  "culture": "ru",
+  "messages": {
+    "delivery.schedule.storage.code.not.empty": "Необходимо указать код склада.",
+    "delivery.schedule.storage.code.max.length": "Код склада не должен превышать 128 символов.",
+    "delivery.schedule.days.not.empty": "Нужно выбрать хотя бы один день доставки.",
+    "delivery.schedule.days.unsupported": "Дни доставки содержат недопустимые значения.",
+    "delivery.schedule.exception.date.in.past": "Нельзя задать исключение доставки на прошедшую дату.",
+    "delivery.schedule.exception.already.exists": "Исключение доставки на эту дату уже существует.",
+    "delivery.schedule.exception.not.found": "Исключения доставки на эту дату нет."
+  }
+}

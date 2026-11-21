@@ -5,7 +5,7 @@ using FluentAssertions;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Modules.Identity.Application.Handlers.Auth;
+using Main.Modules.Identity.Application.Commands.Auth;
 using Main.Modules.Identity.Application.Interfaces.Services;
 using Main.Modules.Identity.Application.Notifications;
 using Microsoft.EntityFrameworkCore;

@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Moq;
-using Search.Application.Handlers.CatalogueCandidates.DeleteCatalogueCandidates;
+using Search.Application.Commands.CatalogueCandidates.DeleteCatalogueCandidates;
 using Search.Application.Interfaces.CatalogueCandidate;
 
 namespace Search.Tests.Handlers.CatalogueCandidates;
