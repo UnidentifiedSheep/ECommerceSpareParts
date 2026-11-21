@@ -3,11 +3,11 @@ using FluentAssertions;
 using Main.Entities.Analytics.Exceptions;
 using Main.Modules.Analytics.Application.Charts.SalesProfitOverTime;
 using Main.Modules.Analytics.Application.Queries;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Analytics;
 
-public class QueryChartDataSourceTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class QueryChartDataSourceTests(ReadScenarioFixture<QueryChartDataSourceTests.QueryChartDataSourceScenario> fixture)
+	: ReadScenarioTest<QueryChartDataSourceTests.QueryChartDataSourceScenario>(fixture)
 {
 	[Fact]
 	public async Task QueryChart_RegisteredChart_ExecutesThroughRegistry()
@@ -31,4 +31,9 @@ public class QueryChartDataSourceTests(CombinedContainerFixture fixture) : Integ
 		=> await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(
 			new QueryChartDataSourceQuery(SalesProfitOverTimeChartDataSource.DataSourceSystemName, "{"),
 			CancellationToken));
+
+	public sealed class QueryChartDataSourceScenario : ReadScenario
+	{
+		protected override IEnumerable<object> Seed() => [];
+	}
 }

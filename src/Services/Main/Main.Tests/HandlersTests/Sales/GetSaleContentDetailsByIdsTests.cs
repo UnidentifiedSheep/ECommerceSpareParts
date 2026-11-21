@@ -2,24 +2,19 @@ using FluentAssertions;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Application.Queries.Sales;
 using Tests.DataBuilders.Sale;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;
 
-public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
+public sealed class GetSaleContentDetailsByIdsTests(
+	ReadScenarioFixture<GetSaleContentDetailsByIdsTests.SaleContentDetailsScenario> fixture)
+	: ReadScenarioTest<GetSaleContentDetailsByIdsTests.SaleContentDetailsScenario>(fixture)
 {
-	public GetSaleContentDetailsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<SaleTestContext>();
-
-	private SaleTestContext TestContext => GetContext<SaleTestContext>();
-
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedDetailsGroupedByContentWithoutDuplicates()
 	{
-		var first = TestContext.Sale.Contents[0];
-		var second = await AddContent();
-		await AddContent();
+		var first = Scenario.Get<SaleTestContext>().Sale.Contents[0];
+		var second = Scenario.Second;
 
 		var result = await Mediator.Send(
 			new GetSaleContentDetailsByIdsQuery([first.Id, second.Id, first.Id, int.MaxValue]),
@@ -39,7 +34,7 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task SingleContent_ReturnsItsDetails()
 	{
-		var content = TestContext.Sale.Contents[0];
+		var content = Scenario.Get<SaleTestContext>().Sale.Contents[0];
 
 		var result = await Mediator.Send(new GetSaleContentDetailsByIdsQuery(content.Id), CancellationToken);
 
@@ -70,17 +65,31 @@ public sealed class GetSaleContentDetailsByIdsTests : IntegrationTest
 		result.Details.Should().BeEmpty();
 	}
 
-	private async Task<SaleContent> AddContent()
+	public sealed class SaleContentDetailsScenario : ReadScenario
 	{
-		var content = new SaleContentBuilder(Faker)
-			.WithProductId(TestContext.Product.Id)
-			.WithCurrencyId(TestContext.Sale.CurrencyId)
-			.WithStorageContentIds([TestContext.StorageContent.Id])
-			.WithCount(2)
-			.WithDetailsCount(2)
-			.Build();
-		TestContext.Sale.AddContent(content);
-		await Context.SaveChangesAsync(CancellationToken);
-		return content;
+		public SaleContentDetailsScenario() => RegisterBasicContext<SaleTestContext>();
+
+		public SaleContent Second { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			var context = Get<SaleTestContext>();
+			Second = AddContent(context);
+			AddContent(context);
+			return [];
+		}
+
+		private SaleContent AddContent(SaleTestContext context)
+		{
+			var content = new SaleContentBuilder(Faker)
+				.WithProductId(context.Product.Id)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithStorageContentIds([context.StorageContent.Id])
+				.WithCount(2)
+				.WithDetailsCount(2)
+				.Build();
+			context.Sale.AddContent(content);
+			return content;
+		}
 	}
 }

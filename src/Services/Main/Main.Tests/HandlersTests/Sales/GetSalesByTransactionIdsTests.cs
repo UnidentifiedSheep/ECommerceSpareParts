@@ -5,25 +5,19 @@ using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Application.Queries.Sales;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;
 
-public sealed class GetSalesByTransactionIdsTests : IntegrationTest
+public sealed class GetSalesByTransactionIdsTests(
+	ReadScenarioFixture<GetSalesByTransactionIdsTests.SalesByTransactionIdsScenario> fixture)
+	: ReadScenarioTest<GetSalesByTransactionIdsTests.SalesByTransactionIdsScenario>(fixture)
 {
-	public GetSalesByTransactionIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<SaleTestContext>();
-
-	private SaleTestContext TestContext => GetContext<SaleTestContext>();
-
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedSalesKeyedByTransactionWithoutDuplicates()
 	{
-		var first = TestContext.Sale;
-		var second = await CreateSale();
-		await CreateSale();
+		var first = Scenario.First;
+		var second = Scenario.Second;
 
 		var result = await Mediator.Send(
 			new GetSalesByTransactionIdsQuery(
@@ -38,10 +32,8 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 	[Fact]
 	public async Task TransactionWithoutSale_IsOmitted()
 	{
-		var transaction = await CreateTransaction(TransactionSourceType.Manual);
-
 		var result = await Mediator.Send(
-			new GetSalesByTransactionIdsQuery(transaction.Id),
+			new GetSalesByTransactionIdsQuery(Scenario.ManualTransaction.Id),
 			CancellationToken);
 
 		result.Sales.Should().BeEmpty();
@@ -60,26 +52,20 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 	[Fact]
 	public async Task ReplacedTransaction_IsOmittedAndCurrentTransactionReturnsSale()
 	{
-		var sale = TestContext.Sale;
-		var oldTransactionId = sale.TransactionId;
-		var transaction = await CreateTransaction(TransactionSourceType.Sale);
-		sale.SetTransactionId(transaction.Id);
-		await Context.SaveChangesAsync(CancellationToken);
+		var sale = Scenario.Replaced;
 
 		var result = await Mediator.Send(
-			new GetSalesByTransactionIdsQuery([oldTransactionId, transaction.Id]),
+			new GetSalesByTransactionIdsQuery([Scenario.OldTransactionId, sale.TransactionId]),
 			CancellationToken);
 
-		result.Sales.Keys.Should().Equal(transaction.Id);
-		result.Sales[transaction.Id].Id.Should().Be(sale.Id);
+		result.Sales.Keys.Should().Equal(sale.TransactionId);
+		result.Sales[sale.TransactionId].Id.Should().Be(sale.Id);
 	}
 
 	[Fact]
 	public async Task DeletedSale_RemainsLinkedToItsTransaction()
 	{
-		var sale = TestContext.Sale;
-		sale.Delete();
-		await Context.SaveChangesAsync(CancellationToken);
+		var sale = Scenario.Deleted;
 
 		var result = await Mediator.Send(
 			new GetSalesByTransactionIdsQuery(sale.TransactionId),
@@ -89,26 +75,67 @@ public sealed class GetSalesByTransactionIdsTests : IntegrationTest
 		result.Sales[sale.TransactionId].Id.Should().Be(sale.Id);
 	}
 
-	private async Task<Sale> CreateSale()
+	public sealed class SalesByTransactionIdsScenario : ReadScenario
 	{
-		var transaction = await CreateTransaction(TransactionSourceType.Sale);
-		var seed = TestContext.Sale;
-		return await new SaleBuilder(Faker)
-			.WithUserId(TestContext.Buyer.Id)
-			.WithOrganizationId(seed.OrganizationId)
-			.WithTransactionId(transaction.Id)
-			.WithCurrencyId(seed.CurrencyId)
-			.WithStorageCode(seed.StorageCode)
-			.WithSaleDate(DateTime.UtcNow)
-			.BuildAndAddToDb(Context);
-	}
+		private Transaction[] _saleTransactions = [];
 
-	private Task<Transaction> CreateTransaction(TransactionSourceType sourceType)
-		=> new TransactionBuilder(Faker)
-			.WithSenderId(TestContext.Transaction.SenderId)
-			.WithReceiverId(TestContext.Transaction.ReceiverId)
-			.WithCurrencyId(TestContext.Sale.CurrencyId)
-			.WithSourceType(sourceType)
-			.WithAmount(20m)
-			.BuildAndAddToDb(Context);
+		public SalesByTransactionIdsScenario() => RegisterBasicContext<SaleTestContext>();
+
+		public Sale First { get; private set; } = null!;
+
+		public Sale Second { get; private set; } = null!;
+
+		public Sale Replaced { get; private set; } = null!;
+
+		public Sale Deleted { get; private set; } = null!;
+
+		public Guid OldTransactionId { get; private set; }
+
+		public Transaction ManualTransaction { get; private set; } = null!;
+
+		protected override async Task PrepareAsync()
+		{
+			var context = Get<SaleTestContext>();
+			_saleTransactions = Enumerable.Range(0, 4)
+				.Select(_ => CreateTransaction(context, TransactionSourceType.Sale))
+				.ToArray();
+			ManualTransaction = CreateTransaction(context, TransactionSourceType.Manual);
+			Context.AddRange(_saleTransactions);
+			Context.Add(ManualTransaction);
+			await Context.SaveChangesAsync(CancellationToken);
+		}
+
+		protected override IEnumerable<object> Seed()
+		{
+			var context = Get<SaleTestContext>();
+			First = context.Sale;
+			Second = CreateSale(context, _saleTransactions[0]);
+			var other = CreateSale(context, _saleTransactions[1]);
+			Replaced = CreateSale(context, _saleTransactions[2]);
+			OldTransactionId = Replaced.TransactionId;
+			Replaced.SetTransactionId(_saleTransactions[3].Id);
+			Deleted = context.Sale;
+			Deleted.Delete();
+			return [Second, other, Replaced];
+		}
+
+		private Sale CreateSale(SaleTestContext context, Transaction transaction)
+			=> new SaleBuilder(Faker)
+				.WithUserId(context.Buyer.Id)
+				.WithOrganizationId(context.Sale.OrganizationId)
+				.WithTransactionId(transaction.Id)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithStorageCode(context.Sale.StorageCode)
+				.WithSaleDate(DateTime.UtcNow)
+				.Build();
+
+		private Transaction CreateTransaction(SaleTestContext context, TransactionSourceType sourceType)
+			=> new TransactionBuilder(Faker)
+				.WithSenderId(context.Transaction.SenderId)
+				.WithReceiverId(context.Transaction.ReceiverId)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithSourceType(sourceType)
+				.WithAmount(20m)
+				.Build();
+	}
 }

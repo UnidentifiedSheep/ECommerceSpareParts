@@ -1,30 +1,26 @@
 using Enums;
 using FluentAssertions;
+using Main.Entities.Balance.Balance;
 using Main.Entities.Purchase.Purchase;
+using Main.Entities.Storage.Storage;
 using Main.Modules.Purchase.Application.Queries.Purchases;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
 using Tests.DataBuilders.Storage;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Purchase;
 
 namespace Tests.HandlersTests.Purchases;
 
-public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
+public sealed class GetPurchasesContentsByIdsTests(
+	ReadScenarioFixture<GetPurchasesContentsByIdsTests.PurchasesContentsByIdsScenario> fixture)
+	: ReadScenarioTest<GetPurchasesContentsByIdsTests.PurchasesContentsByIdsScenario>(fixture)
 {
-	public GetPurchasesContentsByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<PurchaseTestContext>();
-
-	private PurchaseTestContext TestContext => GetContext<PurchaseTestContext>();
-
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedContentsGroupedByPurchaseWithoutDuplicates()
 	{
-		var first = TestContext.Purchase;
-		var second = await CreatePurchase(true);
-		await CreatePurchase(true);
+		var first = Scenario.Get<PurchaseTestContext>().Purchase;
+		var second = Scenario.Second;
 
 		var result = await Mediator.Send(
 			new GetPurchasesContentsByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
@@ -44,9 +40,7 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 	[Fact]
 	public async Task EmptyPurchase_ReturnsEmptyDictionary()
 	{
-		var purchase = await CreatePurchase(false);
-
-		var result = await Mediator.Send(new GetPurchasesContentsByIdsQuery(purchase.Id), CancellationToken);
+		var result = await Mediator.Send(new GetPurchasesContentsByIdsQuery(Scenario.Empty.Id), CancellationToken);
 
 		result.Contents.Should().BeEmpty();
 	}
@@ -71,48 +65,79 @@ public sealed class GetPurchasesContentsByIdsTests : IntegrationTest
 		result.Contents.Should().BeEmpty();
 	}
 
-	private async Task<Purchase> CreatePurchase(bool withContents)
+	public sealed class PurchasesContentsByIdsScenario : ReadScenario
 	{
-		var seed = TestContext.Purchase;
-		var transaction = await new TransactionBuilder(Faker)
-			.WithSenderId(TestContext.Purchase.SupplierOrganizationId)
-			.WithReceiverId(GetContext<UserContextTestContext>().SystemUser.Id)
-			.WithCurrencyId(seed.CurrencyId)
-			.WithAmount(20m)
-			.WithSourceType(TransactionSourceType.Purchase)
-			.BuildAndAddToDb(Context);
+		private Transaction[] _transactions = [];
 
-		var contents = new List<PurchaseContent>();
-		if (withContents)
-			for (var index = 0; index < 2; index++)
-			{
-				var storageContent = await new StorageContentBuilder(Faker)
-					.WithStorageCode(seed.Storage)
-					.WithProductIds(TestContext.Product.Id)
-					.WithCurrencyId(seed.CurrencyId)
+		private StorageContent[] _storageContents = [];
+
+		public PurchasesContentsByIdsScenario() => RegisterBasicContext<PurchaseTestContext>();
+
+		public Purchase Second { get; private set; } = null!;
+
+		public Purchase Empty { get; private set; } = null!;
+
+		protected override async Task PrepareAsync()
+		{
+			var context = Get<PurchaseTestContext>();
+			_transactions = [CreateTransaction(), CreateTransaction(), CreateTransaction()];
+			_storageContents = Enumerable.Range(0, 4)
+				.Select(_ => new StorageContentBuilder(Faker)
+					.WithStorageCode(context.Purchase.Storage)
+					.WithProductIds(context.Product.Id)
+					.WithCurrencyId(context.Purchase.CurrencyId)
 					.WithCount(1)
 					.WithBuyPrice(10m)
-					.BuildAndAddToDb(Context);
-				contents.Add(
-					new PurchaseContentBuilder(Faker)
-						.WithProductId(TestContext.Product.Id)
-						.WithStorageContentId(storageContent.Id)
-						.WithCount(1)
-						.WithPrice(10m)
-						.Build());
-			}
+					.Build())
+				.ToArray();
+			Context.AddRange(_transactions);
+			Context.AddRange(_storageContents);
+			await Context.SaveChangesAsync(CancellationToken);
+		}
 
-		var builder = new PurchaseBuilder(Faker)
-			.WithSupplierUserId(TestContext.Supplier.Id)
-			.WithSupplierOrganizationId(seed.SupplierOrganizationId)
-			.WithTransactionId(transaction.Id)
-			.WithCurrencyId(seed.CurrencyId)
-			.WithStorage(seed.Storage)
-			.WithPurchaseDateTime(DateTime.UtcNow);
+		protected override IEnumerable<object> Seed()
+		{
+			Second = CreatePurchase(_transactions[0], CreateContents(_storageContents[..2]));
+			var other = CreatePurchase(_transactions[1], CreateContents(_storageContents[2..]));
+			Empty = CreatePurchase(_transactions[2]);
+			return [Second, other, Empty];
+		}
 
-		foreach (var content in contents)
-			builder.WithContent(content);
+		private PurchaseContent[] CreateContents(IEnumerable<StorageContent> storageContents)
+			=> storageContents
+				.Select(storageContent => new PurchaseContentBuilder(Faker)
+					.WithProductId(Get<PurchaseTestContext>().Product.Id)
+					.WithStorageContentId(storageContent.Id)
+					.WithCount(1)
+					.WithPrice(10m)
+					.Build())
+				.ToArray();
 
-		return await builder.BuildAndAddToDb(Context);
+		private Transaction CreateTransaction(TransactionSourceType sourceType = TransactionSourceType.Purchase)
+		{
+			var context = Get<PurchaseTestContext>();
+			return new TransactionBuilder(Faker)
+				.WithSenderId(context.Purchase.SupplierOrganizationId)
+				.WithReceiverId(Get<UserContextTestContext>().SystemUser.Id)
+				.WithCurrencyId(context.Purchase.CurrencyId)
+				.WithAmount(20m)
+				.WithSourceType(sourceType)
+				.Build();
+		}
+
+		private Purchase CreatePurchase(Transaction transaction, IEnumerable<PurchaseContent>? contents = null)
+		{
+			var context = Get<PurchaseTestContext>();
+			var builder = new PurchaseBuilder(Faker)
+				.WithSupplierUserId(context.Supplier.Id)
+				.WithSupplierOrganizationId(context.Purchase.SupplierOrganizationId)
+				.WithTransactionId(transaction.Id)
+				.WithCurrencyId(context.Purchase.CurrencyId)
+				.WithStorage(context.Purchase.Storage)
+				.WithPurchaseDateTime(DateTime.UtcNow);
+			foreach (var content in contents ?? [])
+				builder.WithContent(content);
+			return builder.Build();
+		}
 	}
 }

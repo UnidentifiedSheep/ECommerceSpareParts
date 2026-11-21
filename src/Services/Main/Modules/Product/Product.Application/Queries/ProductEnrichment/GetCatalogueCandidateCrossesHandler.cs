@@ -109,6 +109,7 @@ public class GetCatalogueCandidateCrossesHandler(
 		{
 			var mapped = new List<CatalogueCandidateReviewDto>();
 			var notMapped = new List<SupplierProductDto>();
+			var mappedIds = new HashSet<Guid>();
 
 			foreach (var supplierProductId in candidateCrosses.SupplierProductIds)
 			{
@@ -116,7 +117,10 @@ public class GetCatalogueCandidateCrossesHandler(
 					continue;
 
 				if (crossProduct.Candidate != null)
-					mapped.Add(crossProduct.Candidate);
+				{
+					if (mappedIds.Add(crossProduct.Candidate.Id))
+						mapped.Add(crossProduct.Candidate);
+				}
 				else
 					notMapped.Add(crossProduct.SupplierProduct!);
 			}

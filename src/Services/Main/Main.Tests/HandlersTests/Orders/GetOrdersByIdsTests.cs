@@ -6,17 +6,14 @@ using Main.Modules.Order.Application.Queries.Orders;
 using Microsoft.Extensions.DependencyInjection;
 using Security.Core.Interfaces;
 using Tests.Stubs;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.Order;
 
 namespace Tests.HandlersTests.Orders;
 
-public sealed class GetOrdersByIdsTests : IntegrationTest
+public sealed class GetOrdersByIdsTests(ReadScenarioFixture<GetOrdersByIdsTests.GetOrdersByIdsScenario> fixture)
+	: ReadScenarioTest<GetOrdersByIdsTests.GetOrdersByIdsScenario>(fixture)
 {
-	public GetOrdersByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<OrderTestContext>();
-
-	private OrderTestContext TestContext => GetContext<OrderTestContext>();
+	private OrderTestContext TestContext => Scenario.Get<OrderTestContext>();
 
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedOrdersWithoutDuplicates()
@@ -84,7 +81,7 @@ public sealed class GetOrdersByIdsTests : IntegrationTest
 	[InlineData(false)]
 	public async Task MissingPermissionOrAuthentication_DeniesAccess(bool authenticated)
 	{
-		var user = (UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>();
+		var user = (UserContextMock)Services.GetRequiredService<IUserContext>();
 		user.SetIsAuthenticated(authenticated);
 
 		await Assert.ThrowsAsync<OrderReadAccessDeniedException>(() => Send(
@@ -97,8 +94,15 @@ public sealed class GetOrdersByIdsTests : IntegrationTest
 		PermissionCodes? permission = PermissionCodes.ORDERS_GET)
 	{
 		if (permission.HasValue)
-			((UserContextMock)Scope.ServiceProvider.GetRequiredService<IUserContext>())
+			((UserContextMock)Services.GetRequiredService<IUserContext>())
 				.SetPermissions([Permission.ToNormalizedPermission(permission.Value)]);
 		return Mediator.Send(query, CancellationToken);
+	}
+
+	public sealed class GetOrdersByIdsScenario : ReadScenario
+	{
+		public GetOrdersByIdsScenario() => RegisterBasicContext<OrderTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
 	}
 }

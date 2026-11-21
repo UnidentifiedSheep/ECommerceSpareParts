@@ -1,27 +1,22 @@
 using Enums;
 using FluentAssertions;
+using Main.Entities.Balance.Balance;
 using Main.Entities.Sale.Sale;
 using Main.Modules.Sale.Application.Queries.Sales;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;
 
-public sealed class GetSalesByIdsTests : IntegrationTest
+public sealed class GetSalesByIdsTests(ReadScenarioFixture<GetSalesByIdsTests.SalesByIdsScenario> fixture)
+	: ReadScenarioTest<GetSalesByIdsTests.SalesByIdsScenario>(fixture)
 {
-	public GetSalesByIdsTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<SaleTestContext>();
-
-	private SaleTestContext TestContext => GetContext<SaleTestContext>();
-
 	[Fact]
 	public async Task Batch_ReturnsOnlyRequestedSalesWithoutDuplicates()
 	{
-		var first = await CreateSale();
-		var second = await CreateSale();
+		var first = Scenario.First;
+		var second = Scenario.Second;
 
 		var result = await Mediator.Send(
 			new GetSalesByIdsQuery([first.Id, second.Id, first.Id, Guid.NewGuid()]),
@@ -33,7 +28,7 @@ public sealed class GetSalesByIdsTests : IntegrationTest
 	[Fact]
 	public async Task SingleSale_IsReturnedById()
 	{
-		var id = TestContext.Sale.Id;
+		var id = Scenario.First.Id;
 
 		var result = await Mediator.Send(new GetSalesByIdsQuery(id), CancellationToken);
 
@@ -59,33 +54,64 @@ public sealed class GetSalesByIdsTests : IntegrationTest
 	[Fact]
 	public async Task DeletedSale_IsReturnedById()
 	{
-		var sale = TestContext.Sale;
-		sale.Delete();
-		await Context.SaveChangesAsync(CancellationToken);
+		var id = Scenario.Deleted.Id;
 
-		var result = await Mediator.Send(new GetSalesByIdsQuery(sale.Id), CancellationToken);
+		var result = await Mediator.Send(new GetSalesByIdsQuery(id), CancellationToken);
 
-		result.Sales.Keys.Should().Equal(sale.Id);
+		result.Sales.Keys.Should().Equal(id);
 	}
 
-	private async Task<Sale> CreateSale()
+	public sealed class SalesByIdsScenario : ReadScenario
 	{
-		var seed = TestContext.Sale;
-		var transaction = await new TransactionBuilder(Faker)
-			.WithSenderId(TestContext.Transaction.SenderId)
-			.WithReceiverId(TestContext.Transaction.ReceiverId)
-			.WithCurrencyId(seed.CurrencyId)
-			.WithAmount(20m)
-			.WithSourceType(TransactionSourceType.Sale)
-			.BuildAndAddToDb(Context);
+		public SalesByIdsScenario() => RegisterBasicContext<SaleTestContext>();
 
-		return await new SaleBuilder(Faker)
-			.WithUserId(TestContext.Buyer.Id)
-			.WithOrganizationId(seed.OrganizationId)
-			.WithTransactionId(transaction.Id)
-			.WithCurrencyId(seed.CurrencyId)
-			.WithStorageCode(seed.StorageCode)
-			.WithSaleDate(DateTime.UtcNow)
-			.BuildAndAddToDb(Context);
+		public Sale First { get; private set; } = null!;
+
+		public Sale Second { get; private set; } = null!;
+
+		public Sale Deleted { get; private set; } = null!;
+
+		private Transaction[] _transactions = [];
+
+		protected override async Task PrepareAsync()
+		{
+			var context = Get<SaleTestContext>();
+			_transactions =
+			[
+				CreateTransaction(context),
+				CreateTransaction(context)
+			];
+			Context.AddRange(_transactions);
+			await Context.SaveChangesAsync(CancellationToken);
+		}
+
+		protected override IEnumerable<object> Seed()
+		{
+			var context = Get<SaleTestContext>();
+			Deleted = context.Sale;
+			Deleted.Delete();
+			First = CreateSale(context, _transactions[0]);
+			Second = CreateSale(context, _transactions[1]);
+			return [First, Second];
+		}
+
+		private Transaction CreateTransaction(SaleTestContext context)
+			=> new TransactionBuilder(Faker)
+				.WithSenderId(context.Transaction.SenderId)
+				.WithReceiverId(context.Transaction.ReceiverId)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithAmount(20m)
+				.WithSourceType(TransactionSourceType.Sale)
+				.Build();
+
+		private Sale CreateSale(SaleTestContext context, Transaction transaction)
+			=> new SaleBuilder(Faker)
+				.WithUserId(context.Buyer.Id)
+				.WithOrganizationId(context.Sale.OrganizationId)
+				.WithTransactionId(transaction.Id)
+				.WithCurrencyId(context.Sale.CurrencyId)
+				.WithStorageCode(context.Sale.StorageCode)
+				.WithSaleDate(DateTime.UtcNow)
+				.Build();
 	}
 }

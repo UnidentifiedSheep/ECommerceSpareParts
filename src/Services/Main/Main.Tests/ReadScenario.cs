@@ -7,9 +7,11 @@ using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Persistence.Context;
 using Persistence.Interfaces;
+using Security.Core.Interfaces;
 using StackExchange.Redis;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
+using Tests.Stubs;
 using Tests.TestContainers.Combined;
 using ITestContext = Tests.Interfaces.ITestContext;
 
@@ -39,6 +41,8 @@ public abstract class ReadScenario : TestBase
 
 	public T Get<T>() where T : class, ITestContext => GetContext<T>();
 
+	protected virtual Task PrepareAsync() => Task.CompletedTask;
+
 	protected abstract IEnumerable<object> Seed();
 
 	public override async ValueTask InitializeAsync()
@@ -63,6 +67,7 @@ public abstract class ReadScenario : TestBase
 			.ExecuteWithTransaction(new TransactionalAttribute(), InitializeBasicContexts);
 		DiscardPendingDomainEvents();
 
+		await PrepareAsync();
 		Context.AddRange(Seed());
 		await Context.SaveChangesAsync(CancellationToken);
 		DiscardPendingDomainEvents();
@@ -70,10 +75,22 @@ public abstract class ReadScenario : TestBase
 
 		_readProvider = new ServiceProviderBuilder().Build(
 			arguments with { PgsqlConnectionString = ToReadOnly(arguments.PgsqlConnectionString) });
+		_readProvider.GetRequiredService<TestSystemOptionsAccessor>().SystemId =
+			_sp.GetRequiredService<TestSystemOptionsAccessor>().SystemId;
 		await LoadLocalesAsync(_readProvider);
 	}
 
-	internal IServiceScope CreateReadScope() => _readProvider.CreateScope();
+	internal IServiceScope CreateReadScope()
+	{
+		var scope = _readProvider.CreateScope();
+		if (_scope.ServiceProvider.GetService<IUserContext>() is UserContextMock source &&
+			scope.ServiceProvider.GetService<IUserContext>() is UserContextMock target)
+			target.SetIsAuthenticated(source.IsAuthenticated)
+				.SetUserId(source.UserId)
+				.SetRoles(source.Roles)
+				.SetPermissions(source.Permissions);
+		return scope;
+	}
 
 	public override async ValueTask DisposeAsync()
 	{

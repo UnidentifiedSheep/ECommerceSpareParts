@@ -10,12 +10,11 @@ using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.Products;
 
-public class GetAvailableProductsStockTests : IntegrationTest
+public class GetAvailableProductsStockTests(
+	ReadScenarioFixture<GetAvailableProductsStockTests.AvailableProductsStockScenario> fixture)
+	: ReadScenarioTest<GetAvailableProductsStockTests.AvailableProductsStockScenario>(fixture)
 {
-	public GetAvailableProductsStockTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<StorageContentTestContext>();
-
-	private StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
+	private StorageContentTestContext TestContext => Scenario.Get<StorageContentTestContext>();
 
 	[Fact]
 	public async Task GetAvailableProductsStock_WithSingleItem_ReturnsStock()
@@ -81,6 +80,22 @@ public class GetAvailableProductsStockTests : IntegrationTest
 		result.Stocks.Should().ContainSingle();
 		result.Stocks.Should().ContainKey(item);
 	}
+
+	public sealed class AvailableProductsStockScenario : ReadScenario
+	{
+		public AvailableProductsStockScenario() => RegisterBasicContext<StorageContentTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
+	}
+}
+
+public class GetAvailableProductsStockMutationTests : IntegrationTest
+{
+	public GetAvailableProductsStockMutationTests(CombinedContainerFixture fixture) : base(fixture)
+		=> RegisterBasicContext<StorageContentTestContext>();
+
+	private StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
+
 	[Fact]
 	public async Task GetAvailableProductsStock_OverlockedPartyDoesNotReduceOtherPartiesAvailability()
 	{

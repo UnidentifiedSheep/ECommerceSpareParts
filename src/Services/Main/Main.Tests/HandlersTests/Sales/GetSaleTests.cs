@@ -4,17 +4,14 @@ using Main.Entities.Sale;
 using Main.Entities.Sale.Exceptions;
 using Main.Modules.Sale.Application.Queries.Sales.GetSale;
 using Tests.Abstractions.Test;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;
 
-public class GetSaleTests : IntegrationTest
+public class GetSaleTests(ReadScenarioFixture<GetSaleTests.GetSaleScenario> fixture)
+	: ReadScenarioTest<GetSaleTests.GetSaleScenario>(fixture)
 {
-	public GetSaleTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<SaleTestContext>();
-
-	private SaleTestContext SaleContext => GetContext<SaleTestContext>();
+	private SaleTestContext SaleContext => Scenario.Get<SaleTestContext>();
 
 	[Fact]
 	public async Task GetSale_BySaleId_ReturnsSale()
@@ -54,6 +51,13 @@ public class GetSaleTests : IntegrationTest
 		=> await Assert.ThrowsAsync<SaleNotFoundException>(() => Mediator.Send(
 			new GetSaleQuery(null, Guid.NewGuid()),
 			CancellationToken));
+
+	public sealed class GetSaleScenario : ReadScenario
+	{
+		public GetSaleScenario() => RegisterBasicContext<SaleTestContext>();
+
+		protected override IEnumerable<object> Seed() => [];
+	}
 }
 
 public class GetSaleValidationTests : ValidationTest<GetSaleValidation, GetSaleQuery>

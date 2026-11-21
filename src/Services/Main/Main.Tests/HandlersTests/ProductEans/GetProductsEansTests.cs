@@ -3,25 +3,19 @@ using FluentValidation.TestHelper;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Queries.Products.GetProductsEans;
 using Tests.Abstractions.Test;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.ProductEans;
 
-public class GetProductsEansTests : IntegrationTest
+public class GetProductsEansTests(ReadScenarioFixture<GetProductsEansTests.ProductsEansScenario> fixture)
+	: ReadScenarioTest<GetProductsEansTests.ProductsEansScenario>(fixture)
 {
-	public GetProductsEansTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<ProductEanTestContext>();
-
-	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
+	private ProductEanTestContext TestContext => Scenario.Get<ProductEanTestContext>();
 
 	[Fact]
 	public async Task GetProductsEans_GroupsAndOrdersEansByProduct()
 	{
 		var productIds = TestContext.ProductTestContext.Products.Take(4).Select(x => x.Id).ToArray();
-		const string extraEan = "9999999999999";
-		Context.Set<ProductEan>().Add(ProductEan.Create(productIds[0], extraEan));
-		await Context.SaveChangesAsync(CancellationToken);
 
 		var result = await Mediator.Send(
 			new GetProductsEansQuery([productIds[0], productIds[1], productIds[3], productIds[0]]),
@@ -35,7 +29,7 @@ public class GetProductsEansTests : IntegrationTest
 				TestContext.ProductEans
 					.Where(x => x.ProductId == productIds[0])
 					.Select(x => x.Ean)
-					.Append(extraEan)
+					.Append(ProductsEansScenario.ExtraEan)
 					.Order());
 		result.Eans[productIds[1]]
 			.Should()
@@ -60,6 +54,16 @@ public class GetProductsEansTests : IntegrationTest
 		var result = await Mediator.Send(new GetProductsEansQuery([int.MaxValue]), CancellationToken);
 
 		result.Eans.Should().BeEmpty();
+	}
+
+	public sealed class ProductsEansScenario : ReadScenario
+	{
+		public const string ExtraEan = "9999999999999";
+
+		public ProductsEansScenario() => RegisterBasicContext<ProductEanTestContext>();
+
+		protected override IEnumerable<object> Seed()
+			=> [ProductEan.Create(Get<ProductEanTestContext>().ProductTestContext.Products.First().Id, ExtraEan)];
 	}
 }
 

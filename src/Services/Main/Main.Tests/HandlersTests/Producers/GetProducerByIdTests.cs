@@ -1,21 +1,18 @@
 using FluentAssertions;
 using Main.Entities.Product.Exceptions;
+using Main.Entities.Product.Producer;
 using Main.Modules.Product.Application.Queries.Producers;
 using Tests.DataBuilders;
-using Tests.Extensions;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Producers;
 
-public class GetProducerByIdTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class GetProducerByIdTests(ReadScenarioFixture<GetProducerByIdTests.ProducerByIdScenario> fixture)
+	: ReadScenarioTest<GetProducerByIdTests.ProducerByIdScenario>(fixture)
 {
 	[Fact]
 	public async Task GetProducerById_ExistingProducer_ReturnsProducer()
 	{
-		var producer = await new ProducerBuilder(Faker)
-			.WithName("Requested producer")
-			.WithDescription("Requested description")
-			.BuildAndAddToDb(Context, CancellationToken);
+		var producer = Scenario.Producer;
 
 		var result = await Mediator.Send(new GetProducersByIdsQuery(producer.Id), CancellationToken);
 
@@ -27,8 +24,22 @@ public class GetProducerByIdTests(CombinedContainerFixture fixture) : Integratio
 	[Fact]
 	public async Task GetProducerById_MissingProducer_ThrowsProducerNotFoundException()
 	{
-		var act = () => Mediator.Send(new GetProducersByIdsQuery(int.MaxValue));
+		var act = () => Mediator.Send(new GetProducersByIdsQuery(int.MaxValue), CancellationToken);
 
 		await act.Should().ThrowAsync<ProducerNotFoundException>();
+	}
+
+	public sealed class ProducerByIdScenario : ReadScenario
+	{
+		public Producer Producer { get; private set; } = null!;
+
+		protected override IEnumerable<object> Seed()
+		{
+			Producer = new ProducerBuilder(Faker)
+				.WithName("Requested producer")
+				.WithDescription("Requested description")
+				.Build();
+			return [Producer];
+		}
 	}
 }

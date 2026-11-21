@@ -4,36 +4,27 @@ using FluentValidation.TestHelper;
 using Main.Entities.Product.Product;
 using Main.Modules.Product.Application.Queries.Products.GetProductsByEan;
 using Tests.Abstractions.Test;
-using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.ProductEans;
 
-public class GetProductsByEanTests : IntegrationTest
+public class GetProductsByEanTests(ReadScenarioFixture<GetProductsByEanTests.ProductsByEanScenario> fixture)
+	: ReadScenarioTest<GetProductsByEanTests.ProductsByEanScenario>(fixture)
 {
-	public GetProductsByEanTests(CombinedContainerFixture fixture) : base(fixture)
-		=> RegisterBasicContext<ProductEanTestContext>();
-
-	private ProductEanTestContext TestContext => GetContext<ProductEanTestContext>();
-
 	[Fact]
 	public async Task GetProductsByEan_ReturnsMatchingProductsInPages()
 	{
-		var existing = TestContext.ProductEans.First();
-		var otherProducts = TestContext.ProductTestContext.Products.Skip(3).Take(2).ToArray();
-		Context.Set<ProductEan>().AddRange(otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean)));
-		await Context.SaveChangesAsync(CancellationToken);
+		var ean = Scenario.SharedEan;
 
-		var expectedIds = otherProducts.Select(x => x.Id).Append(existing.ProductId).Order().ToArray();
 		var firstPage = await Mediator.Send(
-			new GetProductsByEanQuery($" {existing.Ean} ", new Pagination(0, 2)),
+			new GetProductsByEanQuery($" {ean} ", new Pagination(0, 2)),
 			CancellationToken);
 		var secondPage = await Mediator.Send(
-			new GetProductsByEanQuery(existing.Ean, new Pagination(1, 2)),
+			new GetProductsByEanQuery(ean, new Pagination(1, 2)),
 			CancellationToken);
 
-		firstPage.Products.Select(x => x.Id).Should().Equal(expectedIds.Take(2));
-		secondPage.Products.Select(x => x.Id).Should().Equal(expectedIds.Skip(2));
+		firstPage.Products.Select(x => x.Id).Should().Equal(Scenario.SharedProductIds.Take(2));
+		secondPage.Products.Select(x => x.Id).Should().Equal(Scenario.SharedProductIds.Skip(2));
 	}
 
 	[Fact]
@@ -44,6 +35,25 @@ public class GetProductsByEanTests : IntegrationTest
 			CancellationToken);
 
 		result.Products.Should().BeEmpty();
+	}
+
+	public sealed class ProductsByEanScenario : ReadScenario
+	{
+		public ProductsByEanScenario() => RegisterBasicContext<ProductEanTestContext>();
+
+		public string SharedEan { get; private set; } = null!;
+
+		public int[] SharedProductIds { get; private set; } = [];
+
+		protected override IEnumerable<object> Seed()
+		{
+			var context = Get<ProductEanTestContext>();
+			var existing = context.ProductEans.First();
+			var otherProducts = context.ProductTestContext.Products.Skip(3).Take(2).ToArray();
+			SharedEan = existing.Ean;
+			SharedProductIds = otherProducts.Select(x => x.Id).Append(existing.ProductId).Order().ToArray();
+			return otherProducts.Select(x => ProductEan.Create(x.Id, existing.Ean));
+		}
 	}
 }
 
