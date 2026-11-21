@@ -8,11 +8,10 @@ using Main.Modules.Analytics.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions.Models;
-using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Analytics;
 
-public class GetAnalysesTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class GetAnalysesTests : ServiceTest
 {
 	[Fact]
 	public async Task GetAnalyses_ReturnsAbcXyzWithLocalizedNameLrtAndSchemas()
@@ -110,7 +109,7 @@ public class GetAnalysesTests(CombinedContainerFixture fixture) : IntegrationTes
 	[Fact]
 	public void AnalysisGroup_IsRegisteredWithSystemNameAsRunAnalysisType()
 	{
-		var registry = Scope.ServiceProvider.GetRequiredService<INamedObjectRegistry<AnalysisNamedObject>>();
+		var registry = Services.GetRequiredService<INamedObjectRegistry<AnalysisNamedObject>>();
 
 		registry.TryGetBySystemName(AbcXyzRunFactory.AnalysisType).Should().NotBeNull();
 	}
