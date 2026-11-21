@@ -1261,6 +1261,78 @@ namespace Main.Migrator.Migrations
                     b.ToTable("document_generation_requests", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Logistics.Schedule.DeliverySchedule", b =>
+                {
+                    b.Property<string>("Supplier")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("supplier");
+
+                    b.Property<string>("StorageCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("Days")
+                        .HasColumnType("integer")
+                        .HasColumnName("days");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Supplier", "StorageCode")
+                        .HasName("delivery_schedules_pk");
+
+                    b.HasIndex("StorageCode")
+                        .HasDatabaseName("delivery_schedules_storage_code_index");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("delivery_schedules_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("delivery_schedules_who_updated_idx");
+
+                    b.ToTable("delivery_schedules", "logistics");
+                });
+
+            modelBuilder.Entity("Main.Entities.Logistics.Schedule.DeliveryScheduleException", b =>
+                {
+                    b.Property<string>("Supplier")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("supplier");
+
+                    b.Property<string>("StorageCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_code");
+
+                    b.Property<DateOnly>("Date")
+                        .HasColumnType("date")
+                        .HasColumnName("date");
+
+                    b.HasKey("Supplier", "StorageCode", "Date")
+                        .HasName("delivery_schedule_exceptions_pk");
+
+                    b.HasIndex("Date")
+                        .HasDatabaseName("delivery_schedule_exceptions_date_index");
+
+                    b.ToTable("delivery_schedule_exceptions", "logistics");
+                });
+
             modelBuilder.Entity("Main.Entities.Notification.InAppNotification", b =>
                 {
                     b.Property<int>("Id")
@@ -4024,7 +4096,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Balance.Balance.OrganizationFinancialProfile", b =>
                 {
                     b.HasOne("Main.Entities.Organization.Organization.Organization", null)
-                        .WithOne()
+                        .WithOne("FinancialProfile")
                         .HasForeignKey("Main.Entities.Balance.Balance.OrganizationFinancialProfile", "OrganizationId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -4113,6 +4185,26 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("document_generation_requests_requester_fk");
 
                     b.Navigation("Job");
+                });
+
+            modelBuilder.Entity("Main.Entities.Logistics.Schedule.DeliverySchedule", b =>
+                {
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
+                        .WithMany()
+                        .HasForeignKey("StorageCode")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("delivery_schedules_storage_code_fk");
+                });
+
+            modelBuilder.Entity("Main.Entities.Logistics.Schedule.DeliveryScheduleException", b =>
+                {
+                    b.HasOne("Main.Entities.Logistics.Schedule.DeliverySchedule", null)
+                        .WithMany("Exceptions")
+                        .HasForeignKey("Supplier", "StorageCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("delivery_schedule_exceptions_delivery_schedules_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Notification.NotificationDelivery", b =>
@@ -4752,6 +4844,11 @@ namespace Main.Migrator.Migrations
                     b.Navigation("RatesTo");
                 });
 
+            modelBuilder.Entity("Main.Entities.Logistics.Schedule.DeliverySchedule", b =>
+                {
+                    b.Navigation("Exceptions");
+                });
+
             modelBuilder.Entity("Main.Entities.Notification.Notification", b =>
                 {
                     b.Navigation("Deliveries");
@@ -4764,6 +4861,8 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Organization.Organization.Organization", b =>
                 {
+                    b.Navigation("FinancialProfile");
+
                     b.Navigation("Members");
                 });
 

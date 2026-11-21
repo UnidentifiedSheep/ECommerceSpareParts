@@ -8,30 +8,11 @@ using FluentAssertions;
 using Main.Entities.Product.DomainEvents.Product;
 using Main.Entities.Product.Enums;
 using Main.Entities.Product.Product;
-using Main.Modules.Analytics.Persistence;
-using Main.Modules.Balance.Persistence;
-using Main.Modules.Cart.Persistence;
-using Main.Modules.Currency.Persistence;
-using Main.Modules.Documents.Persistence;
-using Main.Modules.Identity.Persistence;
-using Main.Modules.Jobs.Persistence;
-using Main.Modules.Notifications.Persistence;
-using Main.Modules.Order.Persistence;
-using Main.Modules.Organization.Persistence;
-using Main.Modules.Platform.Persistence;
 using Main.Modules.Product.Application.Products.Interfaces;
 using Main.Modules.Product.Application.Products.Services;
-using Main.Modules.Product.Persistence;
-using Main.Modules.Purchase.Persistence;
-using Main.Modules.Sale.Persistence;
-using Main.Modules.Storage.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Common;
-using Persistence.Common.Repositories;
 using Persistence.Context;
-using Persistence.Relations;
-using Pricing.Persistence;
 using Tests.DataBuilders;
 using Tests.Extensions;
 using Tests.Persistence.Interceptors;
@@ -233,24 +214,10 @@ public class ProductSearchEventTests : IntegrationTest
 				CancellationToken);
 		await Context.SaveChangesAsync(CancellationToken);
 
-		var counter = new QueryCounter();
-		var options = new DbContextOptionsBuilder<UnifiedDbContext>()
-			.UseNpgsql(Context.Database.GetDbConnection())
-			.AddInterceptors(counter)
-			.Options;
-		await using var queryContext = new UnifiedDbContext(
-			options,
-			[
-				new CoreDbContextModule(), new RelationsDbContextModule(), new IdentityDbContextModule(),
-				new PurchaseDbContextModule(), new SaleDbContextModule(), new OrganizationDbContextModule(),
-				new BalanceDbContextModule(), new AnalyticsDbContextModule(), new OrderDbContextModule(),
-				new NotificationsDbContextModule(), new CartDbContextModule(), new DocumentsDbContextModule(),
-				new JobsDbContextModule(), new PlatformDbContextModule(), new CurrencyDbContextModule(),
-				new ProductDbContextModule(), new StorageDbContextModule(), new PricingDbContextModule()
-			]);
-		var provider = new ProductEventProvider(
-			new ReadRepository<Product, int>(queryContext),
-			Scope.ServiceProvider.GetServices<IProductEventPartProvider>());
+		await using var scope = Sp.CreateAsyncScope();
+		var counter = scope.ServiceProvider.GetRequiredService<QueryCounter>();
+		var queryContext = scope.ServiceProvider.GetRequiredService<UnifiedDbContext>();
+		var provider = scope.ServiceProvider.GetRequiredService<IProductEventProvider>();
 
 		var events = await provider.GetEventsAsync(
 			[product.Id],
