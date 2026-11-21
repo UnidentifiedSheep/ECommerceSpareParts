@@ -4,13 +4,13 @@ using GraphQL.Common.Extensions;
 using HotChocolate;
 using HotChocolate.Types;
 using Main.Api.GraphQl.DataLoaders;
+using Main.Api.GraphQl.Pricing.DataLoaders;
+using Main.Api.GraphQl.Pricing.Types;
+using Main.Api.GraphQl.Pricing.Types.Inputs;
 using Main.Api.GraphQl.Types;
 using Main.Api.GraphQl.Types.Product;
 using Main.Entities.Currency;
 using MediatR;
-using Pricing.Api.GraphQl.DataLoaders;
-using Pricing.Api.GraphQl.Types;
-using Pricing.Api.GraphQl.Types.Inputs;
 using Pricing.Application.Queries.Pricing;
 using Pricing.Application.Queries.Pricing.GetRecommendedPrice;
 

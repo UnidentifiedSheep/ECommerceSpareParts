@@ -1,7 +1,7 @@
 using HotChocolate;
 using Main.Api.GraphQl.Analytics.Mutations;
-using Main.Modules.Jobs.Api.GraphQl.Mutations;
-using Pricing.Api.GraphQl.Mutations;
+using Main.Api.GraphQl.Jobs.Mutations;
+using Main.Api.GraphQl.Pricing.Mutations;
 
 namespace Main.Api.GraphQl.Mutations;
 

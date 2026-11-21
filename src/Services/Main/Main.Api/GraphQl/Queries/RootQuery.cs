@@ -1,8 +1,8 @@
 using HotChocolate;
 using HotChocolate.Types.Composite;
 using Main.Api.GraphQl.Analytics.Queries;
-using Main.Modules.Jobs.Api.GraphQl.Queries;
-using Pricing.Api.GraphQl.Queries;
+using Main.Api.GraphQl.Jobs.Queries;
+using Main.Api.GraphQl.Pricing.Queries;
 
 namespace Main.Api.GraphQl.Queries;
 
