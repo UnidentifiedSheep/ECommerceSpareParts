@@ -9,9 +9,13 @@ public interface IJobLeaseService
 		TimeSpan leaseDuration,
 		CancellationToken ct);
 
-	Task<Job?> TryAcquireJobAsync(
-		Guid holderId,
+	Task<IReadOnlyList<Job>> AcquireJobsAsync(
+		IReadOnlyCollection<string> systemNames,
+		IReadOnlyList<Guid> holderIds,
 		TimeSpan leaseDuration,
+		CancellationToken ct);
+
+	Task<IReadOnlyList<string>> GetAcquirableSystemNamesAsync(
 		IReadOnlyCollection<string> systemNames,
 		CancellationToken ct);
 

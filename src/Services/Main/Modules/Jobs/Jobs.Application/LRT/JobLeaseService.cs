@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Persistence;
@@ -5,31 +6,54 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities.Job;
 using Domain.CommonEnums;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Modules.Jobs.Application.LRT;
 
-public class JobLeaseService(IApplicationTransaction transactionService) : IJobLeaseService
+public class JobLeaseService(
+	IApplicationTransaction transactionService,
+	IReadRepository<Job, Guid> readRepository) : IJobLeaseService
 {
-	public Task<Job?> TryAcquireJobAsync(
+	public async Task<Job?> TryAcquireJobAsync(
 		Guid holderId,
 		TimeSpan leaseDuration,
 		CancellationToken ct)
-		=> AcquireAsync(
-			holderId,
-			leaseDuration,
-			null,
-			ct);
+		=> (await AcquireAsync(
+				null,
+				[holderId],
+				leaseDuration,
+				ct))
+			.SingleOrDefault();
 
-	public Task<Job?> TryAcquireJobAsync(
-		Guid holderId,
+	public async Task<IReadOnlyList<Job>> AcquireJobsAsync(
+		IReadOnlyCollection<string> systemNames,
+		IReadOnlyList<Guid> holderIds,
 		TimeSpan leaseDuration,
+		CancellationToken ct)
+	{
+		if (systemNames.Count == 0 || holderIds.Count == 0)
+			return [];
+
+		return await AcquireAsync(
+			systemNames,
+			holderIds,
+			leaseDuration,
+			ct);
+	}
+
+	public async Task<IReadOnlyList<string>> GetAcquirableSystemNamesAsync(
 		IReadOnlyCollection<string> systemNames,
 		CancellationToken ct)
-		=> AcquireAsync(
-			holderId,
-			leaseDuration,
-			systemNames,
-			ct);
+	{
+		if (systemNames.Count == 0)
+			return [];
+
+		return await readRepository.Query
+			.Where(IsAcquirable(DateTime.UtcNow, systemNames.ToArray()))
+			.Select(x => x.SystemName)
+			.Distinct()
+			.ToListAsync(ct);
+	}
 
 	public async Task<List<Job>> FailExpiredJobsWithoutAttempts(int maxBatchSize, CancellationToken ct)
 		=> await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
@@ -77,38 +101,39 @@ public class JobLeaseService(IApplicationTransaction transactionService) : IJobL
 				},
 				ct);
 
-	private async Task<Job?> AcquireAsync(
-		Guid holderId,
-		TimeSpan leaseDuration,
+	private async Task<List<Job>> AcquireAsync(
 		IReadOnlyCollection<string>? systemNames,
+		IReadOnlyList<Guid> holderIds,
+		TimeSpan leaseDuration,
 		CancellationToken ct)
 		=> await transactionService.WithSettingsIfIdle(TransactionalAttribute.ReadCommitted(30, 3))
 			.ExecuteAsync(
 				async (context, cancellationToken) =>
 				{
 					var repository = context.Repositories.Get<Job, Guid>();
-					var now = DateTime.UtcNow;
-					var names = systemNames?.ToArray();
-					var criteria = GetCriteriaBase(1)
-						.Where(x =>
-							(x.Status == JobStatus.Pending ||
-								(x.Status == JobStatus.Locked || x.Status == JobStatus.Processing) &&
-								x.LeaseExpiresAt != null && x.LeaseExpiresAt <= now &&
-								x.Attempts < x.MaxAttempts) &&
-							(names == null || names.Contains(x.SystemName)))
+					var criteria = GetCriteriaBase(holderIds.Count)
+						.Where(IsAcquirable(DateTime.UtcNow, systemNames?.ToArray()))
 						.Build();
 
-					var job = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+					var jobs = await repository.ListAsync(criteria, cancellationToken);
+					if (jobs.Count == 0)
+						return jobs;
 
-					if (job == null)
-						return null;
-
-					job.AcquireLease(holderId, leaseDuration);
+					for (var i = 0; i < jobs.Count; i++)
+						jobs[i].AcquireLease(holderIds[i], leaseDuration);
 
 					await context.UnitOfWork.SaveChangesAsync(cancellationToken);
-					return job;
+					return jobs;
 				},
 				ct);
+
+	private static Expression<Func<Job, bool>> IsAcquirable(DateTime now, IEnumerable<string>? names)
+		=> x =>
+			(x.Status == JobStatus.Pending ||
+				(x.Status == JobStatus.Locked || x.Status == JobStatus.Processing) &&
+				x.LeaseExpiresAt != null && x.LeaseExpiresAt <= now &&
+				x.Attempts < x.MaxAttempts) &&
+			(names == null || names.Contains(x.SystemName));
 
 	private static CriteriaBuilder<Job> GetCriteriaBase(int maxBatchSize)
 		=> Criteria<Job>
