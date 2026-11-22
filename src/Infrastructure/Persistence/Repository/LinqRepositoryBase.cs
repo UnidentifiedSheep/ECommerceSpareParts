@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
@@ -18,37 +17,13 @@ public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(
 		IEnumerable<TKey> ids,
 		Criteria<TEntity>? criteria = null,
 		CancellationToken ct = default)
-	{
-		var keys = ids.ToList();
-		var keySelector = TEntity.GetKeySelector();
-		var containsExpression = BuildContainsExpression(keys, keySelector);
-
-		return QueryableExtensions
+		=> QueryableExtensions
 			.Apply(DbSet.AsQueryable(), criteria)
-			.Where(containsExpression)
-			.ToDictionaryAsync(keySelector.Compile(), ct);
-	}
+			.Where(LinqKeyExpressions.BuildKeysPredicate<TEntity, TKey>(ids))
+			.ToDictionaryAsync(TEntity.GetKeySelector().Compile(), ct);
 
 	public override Task DeleteManyAsync(IEnumerable<TKey> ids, CancellationToken cancellationToken = default)
-	{
-		var keys = ids.ToList();
-		var keySelector = TEntity.GetKeySelector();
-		var containsExpression = BuildContainsExpression(keys, keySelector);
-
-		return DbSet.AsQueryable().Where(containsExpression).ExecuteDeleteAsync(cancellationToken);
-	}
-
-	private static Expression<Func<TEntity, bool>> BuildContainsExpression(
-		IReadOnlyCollection<TKey> keys,
-		Expression<Func<TEntity, TKey>> keySelector)
-	{
-		var contains = Expression.Call(
-			typeof(Enumerable),
-			nameof(Enumerable.Contains),
-			[typeof(TKey)],
-			Expression.Constant(keys),
-			keySelector.Body);
-
-		return Expression.Lambda<Func<TEntity, bool>>(contains, keySelector.Parameters);
-	}
+		=> DbSet.AsQueryable()
+			.Where(LinqKeyExpressions.BuildKeysPredicate<TEntity, TKey>(ids))
+			.ExecuteDeleteAsync(cancellationToken);
 }

@@ -9,6 +9,8 @@ public interface IReadRepository<TEntity, TKey> : IReadRepository
 {
 	IQueryable<TEntity> Query { get; }
 
+	IQueryable<TEntity> QueryByIds(IEnumerable<TKey> ids);
+
 	Task<IEnumerable<T>> QuerySqlAsync<T>(
 		string sql,
 		object param,
