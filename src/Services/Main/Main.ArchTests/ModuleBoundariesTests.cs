@@ -40,7 +40,8 @@ public class ModuleBoundariesTests
 		["Notifications"] = ["Identity"],
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],
 		["Purchase"] = ["Balance", "Currency", "Identity", "Organization", "Product", "Storage"],
-		["Sale"] = ["Balance", "Currency", "Documents", "Identity", "Organization", "Product", "Storage"]
+		["Sale"] = ["Balance", "Currency", "Documents", "Identity", "Organization", "Product", "Storage"],
+		["Logistics"] = ["Storage"]
 	};
 
 	[Fact]

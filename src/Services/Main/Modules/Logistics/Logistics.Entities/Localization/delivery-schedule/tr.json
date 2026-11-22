@@ -7,6 +7,8 @@
     "delivery.schedule.days.unsupported": "Teslimat günleri desteklenmeyen değerler içeriyor.",
     "delivery.schedule.exception.date.in.past": "Geçmiş bir tarih için teslimat istisnası belirlenemez.",
     "delivery.schedule.exception.already.exists": "Bu tarih için zaten bir teslimat istisnası var.",
-    "delivery.schedule.exception.not.found": "Bu tarih için teslimat istisnası yok."
+    "delivery.schedule.exception.not.found": "Bu tarih için teslimat istisnası yok.",
+    "delivery.schedule.not.found": "Teslimat programı bulunamadı.",
+    "delivery.schedule.already.exists": "Bu tedarikçi ve depo için zaten bir teslimat programı var."
   }
 }

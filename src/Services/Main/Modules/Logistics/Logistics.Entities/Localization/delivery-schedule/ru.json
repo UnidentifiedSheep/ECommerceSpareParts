@@ -7,6 +7,8 @@
     "delivery.schedule.days.unsupported": "Дни доставки содержат недопустимые значения.",
     "delivery.schedule.exception.date.in.past": "Нельзя задать исключение доставки на прошедшую дату.",
     "delivery.schedule.exception.already.exists": "Исключение доставки на эту дату уже существует.",
-    "delivery.schedule.exception.not.found": "Исключения доставки на эту дату нет."
+    "delivery.schedule.exception.not.found": "Исключения доставки на эту дату нет.",
+    "delivery.schedule.not.found": "Расписание доставки не найдено.",
+    "delivery.schedule.already.exists": "Расписание доставки для этого поставщика и склада уже существует."
   }
 }

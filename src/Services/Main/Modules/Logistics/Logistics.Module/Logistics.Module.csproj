@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Logistics.Application\Logistics.Application.csproj"/>
         <ProjectReference Include="..\Logistics.Persistence\Logistics.Persistence.csproj"/>
         <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
