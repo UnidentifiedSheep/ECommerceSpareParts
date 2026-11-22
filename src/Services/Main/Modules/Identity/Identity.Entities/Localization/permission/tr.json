@@ -212,6 +212,10 @@
     "permissions.orders.cancel.name": "Siparişleri iptal etme",
     "permissions.orders.cancel.description": "Siparişleri iptal etme izni.",
     "permissions.options.edit.name": "Ayarları düzenle",
-    "permissions.options.edit.description": "Ayarları değiştirme izni."
+    "permissions.options.edit.description": "Ayarları değiştirme izni.",
+    "permissions.delivery.schedules.get.name": "Teslimat programlarını görüntüleme",
+    "permissions.delivery.schedules.get.description": "Tedarikçi teslimat programlarını görüntüleme izni.",
+    "permissions.delivery.schedules.edit.name": "Teslimat programlarını düzenleme",
+    "permissions.delivery.schedules.edit.description": "Tedarikçi teslimat programlarını oluşturma, güncelleme ve silme izni."
   }
 }

@@ -212,6 +212,10 @@
     "permissions.orders.cancel.name": "Cancel orders",
     "permissions.orders.cancel.description": "Permission to cancel orders.",
     "permissions.options.edit.name": "Edit settings",
-    "permissions.options.edit.description": "Permission to modify settings."
+    "permissions.options.edit.description": "Permission to modify settings.",
+    "permissions.delivery.schedules.get.name": "View delivery schedules",
+    "permissions.delivery.schedules.get.description": "Permission to view supplier delivery schedules.",
+    "permissions.delivery.schedules.edit.name": "Edit delivery schedules",
+    "permissions.delivery.schedules.edit.description": "Permission to create, update and delete supplier delivery schedules."
   }
 }

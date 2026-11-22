@@ -12,6 +12,9 @@ public abstract class ReadRepositoryBase<TContext, TEntity, TKey>(TContext ctx)
 {
 	public IQueryable<TEntity> Query => ctx.Set<TEntity>().AsQueryable().AsNoTracking();
 
+	public virtual IQueryable<TEntity> QueryByIds(IEnumerable<TKey> ids)
+		=> throw new InvalidOperationException("Query by ids is not implemented in ReadRepository.");
+
 	public async Task<IEnumerable<T>> QuerySqlAsync<T>(
 		string sql,
 		object param,

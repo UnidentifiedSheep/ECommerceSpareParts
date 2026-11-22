@@ -212,6 +212,10 @@
     "permissions.orders.cancel.name": "Отмена заказов",
     "permissions.orders.cancel.description": "Право на отмену заказов.",
     "permissions.options.edit.name": "Изменение настроек",
-    "permissions.options.edit.description": "Право на изменение настроек."
+    "permissions.options.edit.description": "Право на изменение настроек.",
+    "permissions.delivery.schedules.get.name": "Просмотр графиков поставок",
+    "permissions.delivery.schedules.get.description": "Право на просмотр графиков поставок от поставщиков.",
+    "permissions.delivery.schedules.edit.name": "Изменение графиков поставок",
+    "permissions.delivery.schedules.edit.description": "Право на создание, изменение и удаление графиков поставок от поставщиков."
   }
 }

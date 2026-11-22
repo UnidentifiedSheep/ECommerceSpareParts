@@ -16,7 +16,8 @@ public static class PersistenceCoreExtensions
 			services.GetValidationErrorsRegistry().Apply,
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
-			typeof(ReadRepository<,>));
+			typeof(ReadRepository<,>),
+			typeof(LinqReadRepository<,>));
 
 		return services;
 	}
@@ -35,6 +36,7 @@ public static class PersistenceCoreExtensions
 			typeof(BasicEfRepository<,>),
 			typeof(BasicLinqRepository<,>),
 			typeof(ReadRepository<,>),
+			typeof(LinqReadRepository<,>),
 			fresh);
 
 		return services;
