@@ -1,4 +1,5 @@
 using System.Text.Json;
+using ClosedXML.Excel;
 using Enums;
 using FluentAssertions;
 using Main.Application.Document.Interfaces.Document;
@@ -49,6 +50,64 @@ public sealed class DocumentTemplatePreviewTests : ServiceTest
 
 		output.Length.Should().BePositive();
 		await SavePreviewAsync(systemName, culture, output);
+	}
+
+	[Theory]
+	[MemberData(nameof(Samples))]
+	public async Task Template_ShowsOnlyFilledItemComments(string systemName, string culture)
+	{
+		var definition = CreateDefinition(systemName);
+		var schema = await ReadSampleAsync(systemName, definition.SchemaType);
+		var itemComments = await ReadItemCommentsAsync(systemName);
+
+		using var output = new MemoryStream();
+		await definition.RenderAsync(schema, DocumentType.Excel, culture, output, CancellationToken);
+
+		output.Position = 0;
+		using var workbook = new XLWorkbook(output);
+		var worksheet = workbook.Worksheet(1);
+		var hiddenRows = worksheet.RowsUsed(XLCellsUsedOptions.All).Where(row => row.IsHidden).ToList();
+		var visibleTexts = worksheet.CellsUsed()
+			.Where(cell => !cell.WorksheetRow().IsHidden)
+			.Select(cell => cell.GetString())
+			.ToList();
+
+		worksheet.CellsUsed().Should().NotContain(cell => cell.GetString() == ExcelDocumentTemplate.HiddenRowMarker);
+		hiddenRows.Should().HaveCount(itemComments.Count(comment => string.IsNullOrWhiteSpace(comment)));
+		foreach (var comment in itemComments.Where(comment => !string.IsNullOrWhiteSpace(comment)))
+			visibleTexts.Should().Contain(text => text.EndsWith(": " + comment));
+	}
+
+	private async Task<IReadOnlyList<string?>> ReadItemCommentsAsync(string systemName)
+	{
+		await using var stream = File.OpenRead(Path.Combine(SamplesDirectory, $"{systemName}.json"));
+		using var document = await JsonDocument.ParseAsync(stream, cancellationToken: CancellationToken);
+		var comments = new List<string?>();
+		CollectItemComments(document.RootElement, comments);
+		return comments;
+	}
+
+	private static void CollectItemComments(JsonElement element, List<string?> comments)
+	{
+		if (element.ValueKind == JsonValueKind.Array)
+		{
+			foreach (var child in element.EnumerateArray())
+				CollectItemComments(child, comments);
+			return;
+		}
+
+		if (element.ValueKind != JsonValueKind.Object)
+			return;
+
+		foreach (var property in element.EnumerateObject())
+			if (property is { Name: "Items", Value.ValueKind: JsonValueKind.Array })
+				foreach (var item in property.Value.EnumerateArray())
+				{
+					comments.Add(item.TryGetProperty("Comment", out var comment) ? comment.GetString() : null);
+					CollectItemComments(item, comments);
+				}
+			else
+				CollectItemComments(property.Value, comments);
 	}
 
 	private IDocumentDefinition CreateDefinition(string systemName)
