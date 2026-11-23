@@ -13,14 +13,24 @@ using Pricing.Entities.Offers;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Storage;
 
 namespace Tests.PricingTests.HandlerTests.Pricing;
 
-public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class CalculateCandidatesHandlerTests : IntegrationTest
 {
-	private const int ProductId = 100;
+	public CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+		RegisterBasicContext<StorageTestContext>();
+	}
 
-	private const string StorageCode = "main";
+	private int ProductId => GetContext<ProductTestContext>().Products[0].Id;
+
+	private string StorageCode => GetContext<StorageTestContext>().Storages.First().Code;
 
 	[Fact]
 	public async Task Handle_WithCalculatedCandidate_PersistsAllConfigurationVersions()
@@ -133,6 +143,7 @@ public class CalculateCandidatesHandlerTests(CombinedContainerFixture fixture) :
 		=> new PriceOfferDataBuilder(Faker)
 			.WithProductId(ProductId)
 			.WithStorageCode(StorageCode)
+			.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
 			.BuildAndAddToDb(Context);
 
 	private static ProductPriceCalculationResult Result(

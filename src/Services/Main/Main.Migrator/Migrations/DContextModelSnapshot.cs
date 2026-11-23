@@ -3662,6 +3662,74 @@ namespace Main.Migrator.Migrations
                     b.ToTable("price_offers", "public");
                 });
 
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<int>("DeliveryProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_probability");
+
+                    b.Property<TimeSpan>("DeliveryTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("delivery_time");
+
+                    b.Property<DateTime>("FirstSeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("first_seen_at");
+
+                    b.Property<string>("ForStorage")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("for_storage");
+
+                    b.Property<bool>("IsOpen")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_open");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_seen_at");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.HasKey("Id")
+                        .HasName("price_offer_history_pk");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "price_offer_history_currency_id_index");
+
+                    b.HasIndex(new[] { "ForStorage" }, "price_offer_history_for_storage_index");
+
+                    b.HasIndex(new[] { "ProductId", "Source", "ForStorage" }, "price_offer_history_open_index")
+                        .HasFilter("is_open = true");
+
+                    b.HasIndex(new[] { "ProductId", "ForStorage", "FirstSeenAt" }, "price_offer_history_product_index");
+
+                    b.ToTable("price_offer_histories", "public");
+                });
+
             modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferRefreshState", b =>
                 {
                     b.Property<int>("ProductId")
@@ -4798,6 +4866,54 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("markup_ranges_markup_group_id_fk");
 
                     b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOffer", b =>
+                {
+                    b.HasOne("Main.Entities.Currency.Currency", null)
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_currency_id_fk");
+
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
+                        .WithMany()
+                        .HasForeignKey("OfferForStorage")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_offer_for_storage_fk");
+
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_product_id_fk");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferHistory", b =>
+                {
+                    b.HasOne("Main.Entities.Currency.Currency", null)
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_history_currency_id_fk");
+
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
+                        .WithMany()
+                        .HasForeignKey("ForStorage")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_history_for_storage_fk");
+
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("price_offer_history_product_id_fk");
                 });
 
             modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>

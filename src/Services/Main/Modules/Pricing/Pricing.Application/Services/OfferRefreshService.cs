@@ -20,6 +20,7 @@ public class OfferRefreshService(
 	IIntegrationEventScope integrationEventScope,
 	IPriceOfferRefreshStateRepository stateRepository,
 	ISupplierOfferRequestMarkerService markerService,
+	IPriceOfferHistoryWriter historyWriter,
 	ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
 	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
@@ -141,6 +142,14 @@ public class OfferRefreshService(
 		if (offers.Count != 0)
 			await offerRepository.UpsertOffersAsync(offers, token);
 
+		await historyWriter.TrackAsync(
+			storageCode,
+			source,
+			refreshed,
+			offers,
+			dataExtractionTime,
+			token);
+
 		await markerService.MarkAsOkAsync(
 			refreshed,
 			supplier,
@@ -208,6 +217,15 @@ public class OfferRefreshService(
 			storageCode,
 			sourcesToRemove,
 			token);
+
+		foreach (var source in sourcesToRemove)
+			await historyWriter.TrackAsync(
+				storageCode,
+				source,
+				[productId],
+				offers,
+				dataExtractionTime,
+				token);
 
 		if (offers.Count == 0)
 			return [];

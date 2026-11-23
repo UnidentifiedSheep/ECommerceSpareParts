@@ -55,6 +55,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
 		services.AddScoped<ISupplierOfferConverterService, SupplierOfferConverterService>();
 		services.AddScoped<IOfferRefreshService, OfferRefreshService>();
+		services.AddScoped<IPriceOfferHistoryWriter, PriceOfferHistoryWriter>();
 
 		services
 			.AddScoped<IOfferScorer, OfferScorerByEffectiveCost>()

@@ -7,12 +7,21 @@ using Pricing.Entities.Offers;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Storage;
 
 namespace Tests.LrtsTests;
 
-public sealed class ResyncOurWarehouseOffersLrtTests(CombinedContainerFixture fixture)
-	: LrtIntegrationTest<ResyncOurWarehouseOffersLrt>(fixture)
+public sealed class ResyncOurWarehouseOffersLrtTests : LrtIntegrationTest<ResyncOurWarehouseOffersLrt>
 {
+	public ResyncOurWarehouseOffersLrtTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+		RegisterBasicContext<StorageTestContext>();
+	}
+
 	[Fact]
 	public async Task Execute_RemovesEmptyOurWarehouseOffersAndKeepsSupplierOnes()
 	{
@@ -32,6 +41,9 @@ public sealed class ResyncOurWarehouseOffersLrtTests(CombinedContainerFixture fi
 
 	private Task<PriceOffer> AddOfferAsync(PriceOfferSource source, int quantity)
 		=> new PriceOfferDataBuilder(Faker)
+			.WithProductId(GetContext<ProductTestContext>().Products[0].Id)
+			.WithStorageCode(GetContext<StorageTestContext>().Storages.First().Code)
+			.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
 			.WithSource(source)
 			.WithAvailableQuantity(quantity)
 			.BuildAndAddToDb(Context, CancellationToken);

@@ -11,12 +11,21 @@ using Pricing.Entities.Settings;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Storage;
 
 namespace Tests.LrtsTests;
 
-public sealed class InvalidateStalePriceOptionsLrtTests(CombinedContainerFixture fixture)
-	: LrtIntegrationTest<InvalidateStalePriceOptionsLrt>(fixture)
+public sealed class InvalidateStalePriceOptionsLrtTests : LrtIntegrationTest<InvalidateStalePriceOptionsLrt>
 {
+	public InvalidateStalePriceOptionsLrtTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+		RegisterBasicContext<StorageTestContext>();
+	}
+
 	[Fact]
 	public async Task Execute_RemovesStaleAndOutOfStockOptionsAndKeepsActual()
 	{
@@ -48,6 +57,9 @@ public sealed class InvalidateStalePriceOptionsLrtTests(CombinedContainerFixture
 		Guid settingsVersion)
 	{
 		var offer = await new PriceOfferDataBuilder(Faker)
+			.WithProductId(GetContext<ProductTestContext>().Products[0].Id)
+			.WithStorageCode(GetContext<StorageTestContext>().Storages.First().Code)
+			.WithCurrencyId(GetContext<CurrencyTestContext>().Currencies[0].Id)
 			.WithAvailableQuantity(quantity)
 			.BuildAndAddToDb(Context, CancellationToken);
 		return await new ProductPriceOptionDataBuilder(Faker)
