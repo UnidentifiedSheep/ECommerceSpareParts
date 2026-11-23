@@ -156,7 +156,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 			Options.Create(
 				new SecretEncryptionOptions
 				{
-					Secret = "some secret"
+					Secret = "bWFpbi10ZXN0cy1zZWNyZXQta2V5LTMyLWJ5dGVzISE="
 				}));
 		services.AddSingleton(
 			Options.Create(
@@ -173,6 +173,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
 		services
 			.AddJsonSigner()
+			.AddSecretEncryptor()
 			.AddCacheLayer("test")
 			.AddOneTimeTokens()
 			.AddFullSecurityLayer(passwordRules)
