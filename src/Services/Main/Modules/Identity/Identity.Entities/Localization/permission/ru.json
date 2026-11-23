@@ -191,6 +191,8 @@
     "permissions.metrics.get.description": "Право на получение метрик.",
     "permissions.charts.get.name": "Просмотр графиков",
     "permissions.charts.get.description": "Право на просмотр аналитических графиков.",
+    "permissions.analytics.runs.edit.name": "Редактирование запусков аналитики",
+    "permissions.analytics.runs.edit.description": "Право на редактирование запусков аналитики, в том числе закрепление.",
     "permissions.notifications.me.name": "Взаимодействие со своими уведомлениями",
     "permissions.notifications.me.description": "Право на взаимодействие со своими уведомлениями.",
     "permissions.notifications.all.name": "Взаимодействие со всеми уведомлениями",

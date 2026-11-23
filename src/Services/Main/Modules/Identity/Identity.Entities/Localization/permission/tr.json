@@ -191,6 +191,8 @@
     "permissions.metrics.get.description": "Metrikleri görüntüleme izni.",
     "permissions.charts.get.name": "Grafikleri görüntüleme",
     "permissions.charts.get.description": "Analitik grafikleri görüntüleme izni.",
+    "permissions.analytics.runs.edit.name": "Analiz çalıştırmalarını düzenleme",
+    "permissions.analytics.runs.edit.description": "Analiz çalıştırmalarını düzenleme (sabitleme dahil) izni.",
     "permissions.notifications.me.name": "Kendi bildirimleriyle etkileşim",
     "permissions.notifications.me.description": "Kendi bildirimleriyle etkileşim kurma izni.",
     "permissions.notifications.all.name": "Tüm bildirimlerle etkileşim",
