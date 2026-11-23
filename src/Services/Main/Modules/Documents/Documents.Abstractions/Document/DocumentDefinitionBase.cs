@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Enums;
 using Locan.Core.Interfaces;
 using Main.Application.Document.Interfaces.Document;
+using Main.Application.Document.Models;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
 using S3.Core.Options;
@@ -44,9 +45,7 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 		TRequest request,
 		CancellationToken token = default)
 	{
-		using var template = await GetTemplateAsync(request, token);
 		var data = await GetSchemaDataAsync(request, token);
-		AddAllFields(template, data);
 
 		await using var output = new FileStream(
 			Path.Combine(Path.GetTempPath(), Path.GetRandomFileName()),
@@ -58,19 +57,19 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 				Options = FileOptions.DeleteOnClose
 			});
 
-		await template.RenderAsync(output, token);
+		var renderedType = await RenderCoreAsync(data, request.DocumentType, request.Culture, output, token);
 		output.Position = 0;
 
 		var uploadStartedAtUtc = DateTime.UtcNow;
 		var key = $"Generated/{DocumentGroup}/{SystemName}/" +
 			$"{uploadStartedAtUtc:yyyy/MM/dd}/{Guid.NewGuid():N}" +
-			template.Type.GetFileExtension();
+			renderedType.GetFileExtension();
 		var bucket = options.Value.Documents;
 		var uploadedKey = await s3Service.UploadFileAsync(
 			bucket.Name,
 			output,
 			key,
-			template.Type.GetContentType());
+			renderedType.GetContentType());
 
 		return new DocumentResponse
 		{
@@ -93,45 +92,73 @@ public abstract class DocumentDefinitionBase<TRequest, TSchema>(
 		return await GenerateAsync(request, token);
 	}
 
-	protected virtual DocumentType GetTemplateType(TRequest request)
+	public async Task RenderAsync(
+		object schemaData,
+		DocumentType documentType,
+		string culture,
+		Stream output,
+		CancellationToken token = default)
+	{
+		ArgumentNullException.ThrowIfNull(schemaData);
+
+		if (schemaData is not TSchema schema)
+			throw new ArgumentException(
+				$"Expected '{typeof(TSchema).FullName}', " +
+				$"got '{schemaData.GetType().FullName}'.");
+
+		await RenderCoreAsync(schema, documentType, culture, output, token);
+	}
+
+	private async Task<DocumentType> RenderCoreAsync(
+		TSchema schemaData,
+		DocumentType documentType,
+		string culture,
+		Stream output,
+		CancellationToken token)
+	{
+		using var template = await GetTemplateAsync(documentType, culture, token);
+		AddAllFields(template, schemaData);
+		await template.RenderAsync(output, token);
+		return template.Type;
+	}
+
+	protected virtual DocumentType GetTemplateType(DocumentType documentType)
 	{
 		foreach (var (outputDocumentType, inputTemplateType) in SupportedTypePairs)
-			if (outputDocumentType == request.DocumentType)
+			if (outputDocumentType == documentType)
 				return inputTemplateType;
 
 		throw new NotSupportedException(
-			$"Document type '{request.DocumentType}' is not supported for '{SystemName}'.");
+			$"Document type '{documentType}' is not supported for '{SystemName}'.");
 	}
 
 	protected async Task<IDocumentTemplate> GetTemplateAsync(
-		TRequest request,
+		DocumentType documentType,
+		string cultureName,
 		CancellationToken token = default)
 	{
-		var templateType = GetTemplateType(request);
-		var culture = DocumentCulture.GetRequired(request.Culture);
-		var baseKey = $"{DocumentGroup}/{SystemName}";
-		var extension = templateType.GetFileExtension();
+		var templateType = GetTemplateType(documentType);
+		var culture = DocumentCulture.GetRequired(cultureName);
 
-		foreach (var cultureName in GetTemplateCultureNames(culture))
+		foreach (var templateCultureName in GetTemplateCultureNames(culture))
 		{
-			var key = $"{baseKey}.{cultureName}{extension}";
 			var template = await templateResolver.TryResolveAsync(
-				key,
-				request.DocumentType,
-				templateType,
+				CreateTemplateKey(templateCultureName, templateType),
+				documentType,
 				token);
 			if (template is not null) return template;
 		}
 
-		var fallbackKey = $"{baseKey}{extension}";
 		return await templateResolver.TryResolveAsync(
-				fallbackKey,
-				request.DocumentType,
-				templateType,
+				CreateTemplateKey(null, templateType),
+				documentType,
 				token)
 			?? throw new InvalidOperationException(
 				$"Unable to find template for '{SystemName}' and culture '{culture.Name}'.");
 	}
+
+	private DocumentTemplateKey CreateTemplateKey(string? cultureName, DocumentType templateType)
+		=> new(GetType(), DocumentGroup, SystemName, cultureName, templateType);
 
 	private static IEnumerable<string> GetTemplateCultureNames(CultureInfo culture)
 	{

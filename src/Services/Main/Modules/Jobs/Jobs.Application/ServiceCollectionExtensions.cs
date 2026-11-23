@@ -45,8 +45,8 @@ public static class ServiceCollectionExtensions
 		services.AddSingleton<LrtQuotaRegistry>();
 		services.AddSingleton<INamedObjectRegistry<ILrtQuotaManager>>(provider
 			=> provider.GetRequiredService<LrtQuotaRegistry>());
-		services.AddSingleton<LrtQuotaCatalog>();
-		services.AddScoped<LrtJobAcquirer>();
+		services.AddSingleton<ILrtQuotaCatalog, LrtQuotaCatalog>();
+		services.AddScoped<ILrtJobAcquirer, LrtJobAcquirer>();
 
 		return services;
 	}

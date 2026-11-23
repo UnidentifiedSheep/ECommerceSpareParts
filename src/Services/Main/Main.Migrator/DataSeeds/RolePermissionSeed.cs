@@ -190,7 +190,9 @@ public class RolePermissionSeed : ISeed<UnifiedDbContext>
 				PermissionCodes.ORDERS_GET_OWN,
 				PermissionCodes.ORDERS_EDIT,
 				PermissionCodes.ORDERS_CONFIRM,
-				PermissionCodes.ORDERS_CANCEL
+				PermissionCodes.ORDERS_CANCEL,
+				PermissionCodes.DELIVERY_SCHEDULES_GET,
+				PermissionCodes.DELIVERY_SCHEDULES_EDIT
 			],
 			[Role.Worker] =
 			[
@@ -387,7 +389,9 @@ public class RolePermissionSeed : ISeed<UnifiedDbContext>
 				PermissionCodes.ORDERS_GET_OWN,
 				PermissionCodes.ORDERS_EDIT,
 				PermissionCodes.ORDERS_CONFIRM,
-				PermissionCodes.ORDERS_CANCEL
+				PermissionCodes.ORDERS_CANCEL,
+				PermissionCodes.DELIVERY_SCHEDULES_GET,
+				PermissionCodes.DELIVERY_SCHEDULES_EDIT
 			]
 		};
 

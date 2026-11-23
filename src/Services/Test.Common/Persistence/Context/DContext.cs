@@ -39,6 +39,9 @@ internal sealed class DContext(DbContextOptions<DContext> options) : DbContext(o
 			.ToTable("before_save_entities")
 			.HasKey(entity => entity.Id);
 		modelBuilder.Entity<BeforeSaveTestEntity>().Ignore(entity => entity.CreatedCalls);
+		modelBuilder.Entity<CompositeKeyTestEntity>()
+			.ToTable("composite_key_entities")
+			.HasKey(entity => new { entity.Code, entity.Number });
 		modelBuilder.ApplyMetadataConfigurations();
 		modelBuilder.AddFieldsForAuditableEntities();
 		modelBuilder.AllDateTimesToUtc().AllEnumsToString();

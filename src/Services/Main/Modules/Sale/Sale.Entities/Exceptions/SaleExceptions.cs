@@ -22,3 +22,14 @@ public class SaleContentProductMismatchException(int id) : LocalizedBadRequestEx
 	{
 		Id = id
 	});
+
+public class SalesDocumentInvalidDateRangeException() : LocalizedBadRequestException(
+	SaleRangeStartBeforeEndMessage.Instance);
+
+public class SalesDocumentTooManyItemsException(int count, int limit) : LocalizedBadRequestException(
+	SaleDocumentListTooManyItemsMessage.Instance,
+	new
+	{
+		Count = count,
+		Limit = limit
+	});

@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
@@ -28,8 +29,10 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 		SetDays(days);
 	}
 
+	[ValidateTuple("PK")]
 	public Supplier Supplier { get; }
 
+	[ValidateTuple("PK")]
 	public string StorageCode { get; } = null!;
 
 	public DeliveryDays Days { get; private set; }

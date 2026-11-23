@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<ISaleBuyCostCalculator, SaleBuyCostCalculator>();
 		services.AddScoped<ISaleSnapshots, SaleSnapshots>();
 		services.AddScoped<ISaleContentSource, SaleContentSource>();
+		services.AddScoped<ISalesFilterApplier, SalesFilterApplier>();
 		services.AddScoped<IProductDeletionRule, SaleContentProductDeletionRule>();
 
 		return services;

@@ -39,7 +39,6 @@ public sealed class DeliveryScheduleConfiguration : IEntityTypeConfiguration<Del
 
 		builder
 			.Navigation(schedule => schedule.Exceptions)
-			.UsePropertyAccessMode(PropertyAccessMode.Field)
-			.AutoInclude();
+			.UsePropertyAccessMode(PropertyAccessMode.Field);
 	}
 }

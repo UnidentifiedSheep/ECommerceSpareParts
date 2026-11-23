@@ -9,7 +9,7 @@ public class GetSalesValidation : AbstractValidator<GetSalesQuery>
 {
 	public GetSalesValidation()
 	{
-		RuleFor(query => query.DateRange)
+		RuleFor(query => query.Filter.DateRange)
 			.Must(x => !x.Min.HasValue || !x.Max.HasValue || x.Min.Value.Date <= x.Max.Value.Date)
 			.WithLocalizableError(SaleRangeStartBeforeEndMessage.Instance);
 

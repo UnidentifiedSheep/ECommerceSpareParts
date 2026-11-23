@@ -52,7 +52,6 @@
         <ProjectReference Include="..\Modules\Organization\Organization.Module\Organization.Module.csproj"/>
         <ProjectReference Include="..\Modules\Storage\Storage.Module\Storage.Module.csproj"/>
         <ProjectReference Include="..\Modules\Pricing\Pricing.Module\Pricing.Module.csproj"/>
-        <ProjectReference Include="..\Modules\Pricing\Pricing.Api\Pricing.Api.csproj"/>
         <ProjectReference Include="..\Persistence.Relations\Persistence.Relations.csproj"/>
         <ProjectReference Include="..\Modules\Balance\Balance.Entities\Balance.Entities.csproj"/>
         <ProjectReference Include="..\Modules\Documents\Documents.Entities\Documents.Entities.csproj"/>

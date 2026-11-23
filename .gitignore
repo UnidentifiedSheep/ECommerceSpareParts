@@ -10,3 +10,5 @@ riderModule.iml
 **/.obsidian/
 .arcane-initial-password
 scripts/deploy/**/__pycache__/
+
+.document-preview/

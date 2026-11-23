@@ -2,20 +2,18 @@ using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Host;
 using Cache;
 using Cache.OneTimeTokens;
 using Carter;
-using Contracts.Job;
 using Contracts.Settings;
 using GraphQL.Common.Extensions;
 using Integrations.ExchangeRate.Di;
 using Main.Api;
 using Main.Api.EndPoints;
+using Main.Api.EndPoints.Internal;
 using Main.Api.GraphQl;
-using Main.Api.Jobs;
 using Main.Modules.Analytics;
 using Main.Modules.Balance;
 using Main.Modules.Logistics;
@@ -78,7 +76,6 @@ builder
 
 builder.Services.AddCommonApiInfrastructure(ServicesDefinitions.Main);
 builder.Services.AddPostgresHealthCheck().AddRedisHealthCheck();
-builder.Services.AddSignalR();
 
 builder.Services.AddModule<CurrencyModule>(builder.Configuration);
 builder.Services.AddModule<ProductModule>(builder.Configuration);
@@ -109,7 +106,6 @@ builder.Services.AddMassTransit(x =>
 		.. builder.Services.GetModuleCatalog().ConsumerAssemblies
 	]);
 	x.AddConsumer<BackplaneConsumer>();
-	x.AddConsumer<JobStatusUpdatedConsumer>();
 	x.AddConsumer<SettingUpdatedConsumer>();
 
 	x.AddEntityFrameworkOutbox<UnifiedDbContext>(o =>
@@ -137,15 +133,12 @@ builder.Services.AddMassTransit(x =>
 				ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 				ep.ConfigureConsumer<PricingCurrencyRatesChangedConsumer>(context);
 				ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
-				ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
 				ep.Bind<BackplaneMessage>();
 				ep.Bind<ProducerLookupChangedEvent>();
 				ep.Bind<CurrencyRateChangedEvent>();
 				ep.Bind<MarkupRangesRefreshRequestedEvent>();
-				ep
-					.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
-					.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
+				ep.BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
 			});
 	});
 });
@@ -168,7 +161,7 @@ builder
 builder.Services.AddCarter(
 	new DependencyContextAssemblyCatalog(
 		typeof(AuthEndPoints).Assembly,
-		typeof(JobEndPoints).Assembly),
+		typeof(InternalEndPoints).Assembly),
 	c => c.WithEmptyValidators());
 
 builder.Services.AddGraphQlServices(serviceName);
@@ -179,7 +172,6 @@ var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
-app.MapHub<JobHub>("/hubs/jobs");
 app.MapCommonGraphQl();
 
 await app.RunWithGraphQLCommandsAsync(args);

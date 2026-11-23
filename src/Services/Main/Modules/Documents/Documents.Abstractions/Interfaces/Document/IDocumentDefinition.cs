@@ -27,4 +27,11 @@ public interface IDocumentDefinition : INamedObject
 	Task<IDocumentResponse> GenerateAsync(
 		IDocumentRequest data,
 		CancellationToken token = default);
+
+	Task RenderAsync(
+		object schemaData,
+		DocumentType documentType,
+		string culture,
+		Stream output,
+		CancellationToken token = default);
 }

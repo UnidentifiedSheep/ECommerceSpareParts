@@ -14,6 +14,7 @@ using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.Interfaces.ServiceProvider;
 using Tests.Persistence.Context;
+using Tests.Persistence.Entities;
 using Tests.Persistence.Repositories;
 using Tests.Stubs;
 using Tests.TestContexts;
@@ -51,6 +52,10 @@ internal sealed class ServiceProviderBuilder : IServiceProviderBuilder<ServicePr
 		services.AddLocan();
 		services.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
 		services.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
+		services.AddScoped<IRepository<CompositeKeyTestEntity, CompositeKeyTestKey>,
+			LinqRepository<CompositeKeyTestEntity, CompositeKeyTestKey>>();
+		services.AddScoped<IReadRepository<CompositeKeyTestEntity, CompositeKeyTestKey>,
+			LinqReadRepository<CompositeKeyTestEntity, CompositeKeyTestKey>>();
 		services.AddUnitOfWork<DContext>();
 		services.AddScoped<IUserContext, UserContextMock>();
 		services.AddScoped<MessageBrokerStub>();

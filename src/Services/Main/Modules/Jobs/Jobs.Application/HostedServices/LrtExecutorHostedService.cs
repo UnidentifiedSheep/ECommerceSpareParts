@@ -10,7 +10,7 @@ namespace Main.Modules.Jobs.Application.HostedServices;
 
 public class LrtExecutorHostedService(
 	IServiceScopeFactory scopeFactory,
-	LrtQuotaCatalog quotaCatalog,
+	ILrtQuotaCatalog quotaCatalog,
 	IJobSignal jobSignal,
 	ILogger<LrtExecutorHostedService> logger) : BackgroundService
 {
@@ -34,21 +34,18 @@ public class LrtExecutorHostedService(
 		try
 		{
 			await using var scope = scopeFactory.CreateAsyncScope();
-			var acquirer = scope.ServiceProvider.GetRequiredService<LrtJobAcquirer>();
+			var acquirer = scope.ServiceProvider.GetRequiredService<ILrtJobAcquirer>();
 
-			var acquired = await acquirer.TryAcquireAsync(
-				Guid.NewGuid(),
-				InitialLeaseDuration,
-				ct);
-			if (acquired is null)
-				return false;
+			var acquired = await acquirer.AcquireAsync(InitialLeaseDuration, ct);
 
-			_ = RunJobAndReleaseQuota(
-				acquired.Job.Id,
-				acquired.Job.SystemName,
-				acquired.Lease,
-				ct);
-			return true;
+			foreach (var item in acquired)
+				_ = RunJobAndReleaseQuota(
+					item.Job.Id,
+					item.Job.SystemName,
+					item.Lease,
+					ct);
+
+			return acquired.Count > 0;
 		}
 		catch (OperationCanceledException) when (ct.IsCancellationRequested)
 		{

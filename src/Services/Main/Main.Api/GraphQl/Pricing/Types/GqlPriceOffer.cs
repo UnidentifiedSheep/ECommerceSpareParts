@@ -1,0 +1,56 @@
+using HotChocolate;
+using Main.Api.GraphQl.Types;
+using Pricing.Application.Dtos.Price;
+using Pricing.Entities.Enums;
+
+namespace Main.Api.GraphQl.Pricing.Types;
+
+[GraphQLName("PriceOffer")]
+public sealed record GqlPriceOffer([property: GraphQLIgnore]
+	PriceOfferDto Dto)
+{
+	[GraphQLName("id")]
+	public Guid Id => Dto.Id;
+
+	[GraphQLIgnore]
+	public int ProductId => Dto.ProductId;
+
+	[GraphQLIgnore]
+	public int CurrencyId => Dto.CurrencyId;
+
+	[GraphQLName("offerForStorage")]
+	public GqlStorage OfferForStorage => new(Dto.OfferForStorage);
+
+	[GraphQLName("purchasePrice")]
+	public decimal PurchasePrice => Dto.PurchasePrice;
+
+	[GraphQLName("source")]
+	public PriceOfferSource Source => Dto.Source;
+
+	[GraphQLName("availableQuantity")]
+	public int AvailableQuantity => Dto.AvailableQuantity;
+
+	[GraphQLName("minimumPurchaseQuantity")]
+	public int MinimumPurchaseQuantity => Dto.MinimumPurchaseQuantity;
+
+	[GraphQLName("quantityCoefficient")]
+	public int QuantityCoefficient => Dto.QuantityCoefficient;
+
+	[GraphQLName("daysToRefund")]
+	public int DaysToRefund => Dto.DaysToRefund;
+
+	[GraphQLName("deliveryDate")]
+	public DateTime? DeliveryDate => Dto.DeliveryDate;
+
+	[GraphQLName("guaranteedDeliveryDate")]
+	public DateTime? GuaranteedDeliveryDate => Dto.GuaranteedDeliveryDate;
+
+	[GraphQLName("deliveryProbability")]
+	public int DeliveryProbability => Dto.DeliveryProbability;
+
+	[GraphQLName("orderTill")]
+	public DateTime? OrderTill => Dto.OrderTill;
+
+	[GraphQLName("expiresAt")]
+	public DateTime ExpiresAt => Dto.ExpiresAt;
+}

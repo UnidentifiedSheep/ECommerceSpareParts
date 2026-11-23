@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using Enums;
 using Main.Application.Document.Interfaces.Document;
+using Main.Application.Document.Models;
 
 namespace Main.Modules.Documents.Application.Services.Document;
 
@@ -17,21 +18,17 @@ public sealed class DocumentTemplateResolver(
 	private readonly IDocumentTemplateSource[] _sources = ValidateSources(sources);
 
 	public async Task<IDocumentTemplate?> TryResolveAsync(
-		string templateName,
+		DocumentTemplateKey key,
 		DocumentType documentType,
-		DocumentType templateType,
 		CancellationToken token = default)
 	{
-		if (!_providers.TryGetValue((documentType, templateType), out var provider))
+		if (!_providers.TryGetValue((documentType, key.TemplateType), out var provider))
 			throw new NotSupportedException(
-				$"Document type '{documentType}' with template type '{templateType}' is not supported.");
+				$"Document type '{documentType}' with template type '{key.TemplateType}' is not supported.");
 
 		foreach (var source in _sources)
 		{
-			var bytes = await source.TryGetBytesAsync(
-				templateName,
-				templateType,
-				token);
+			var bytes = await source.TryGetBytesAsync(key, token);
 			if (bytes is not null)
 				return provider.CreateDocument(bytes);
 		}

@@ -1,12 +1,12 @@
 using Enums;
+using Main.Application.Document.Models;
 
 namespace Main.Application.Document.Interfaces.Document;
 
 public interface IDocumentTemplateResolver
 {
 	Task<IDocumentTemplate?> TryResolveAsync(
-		string templateName,
+		DocumentTemplateKey key,
 		DocumentType documentType,
-		DocumentType templateType,
 		CancellationToken token = default);
 }

@@ -1,17 +1,17 @@
-using Application.Common.Interfaces.Repositories;
-using Main.Modules.Currency.Abstractions.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using Application.Common.Interfaces;
+using Main.Modules.Currency.Abstractions.Models;
+using Main.Modules.Currency.Application.Interfaces;
 
 namespace Main.Modules.Currency.Application.Services;
 
-public sealed class CurrencyDisplay(IReadRepository<Entities.Currency.Currency, int> currencies)
-	: ICurrencyDisplay
+public sealed class CurrencyDisplay(ICurrencyCacheRepository currencies) : IDisplay<int, CurrencyDisplayInfo>
 {
-	public async Task<CurrencyDisplayInfo?> GetAsync(
-		int currencyId,
+	public async Task<IReadOnlyDictionary<int, CurrencyDisplayInfo>> GetAsync(
+		IReadOnlyCollection<int> ids,
 		CancellationToken cancellationToken = default)
-		=> await currencies.Query
-			.Where(currency => currency.Id == currencyId)
-			.Select(currency => new CurrencyDisplayInfo(currency.Code, currency.CurrencySign))
-			.FirstOrDefaultAsync(cancellationToken);
+		=> (await currencies.GetAllCurrencies(cancellationToken))
+			.Where(currency => ids.Contains(currency.Id))
+			.ToDictionary(
+				currency => currency.Id,
+				currency => new CurrencyDisplayInfo(currency.Code, currency.CurrencySign));
 }

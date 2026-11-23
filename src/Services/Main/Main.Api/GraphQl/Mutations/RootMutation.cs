@@ -1,6 +1,8 @@
 using HotChocolate;
 using Main.Api.GraphQl.Analytics.Mutations;
-using Pricing.Api.GraphQl.Mutations;
+using Main.Api.GraphQl.Jobs.Mutations;
+using Main.Api.GraphQl.Logistics.Mutations;
+using Main.Api.GraphQl.Pricing.Mutations;
 
 namespace Main.Api.GraphQl.Mutations;
 
@@ -67,9 +69,18 @@ public sealed class RootMutation
 	[GraphQLName("productEans")]
 	public ProductEanMutation ProductEans => new();
 
+	[GraphQLName("jobs")]
+	public JobMutations Jobs => new();
+
+	[GraphQLName("jobSchedules")]
+	public JobScheduleMutations JobSchedules => new();
+
 	[GraphQLName("markupGroups")]
 	public MarkupGroupMutations MarkupGroups => new();
 
 	[GraphQLName("priceAppliers")]
 	public PriceApplierMutations PriceAppliers => new();
+
+	[GraphQLName("deliverySchedules")]
+	public DeliveryScheduleMutations DeliverySchedules => new();
 }

@@ -1,14 +1,10 @@
 using Application.Common.Interfaces.Lrt;
-using Domain.CommonEntities.Job;
 
 namespace Main.Modules.Jobs.Application.LRT;
 
-public sealed record AcquiredJob(Job Job, ILrtQuotaLease Lease);
-
-public sealed class LrtJobAcquirer(LrtQuotaCatalog catalog, IJobLeaseService leaseService)
+public sealed class LrtJobAcquirer(ILrtQuotaCatalog catalog, IJobLeaseService leaseService) : ILrtJobAcquirer
 {
-	public async Task<AcquiredJob?> TryAcquireAsync(
-		Guid holderId,
+	public async Task<IReadOnlyList<AcquiredJob>> AcquireAsync(
 		TimeSpan leaseDuration,
 		CancellationToken cancellationToken)
 	{
@@ -19,20 +15,53 @@ public sealed class LrtJobAcquirer(LrtQuotaCatalog catalog, IJobLeaseService lea
 			.ToArray();
 
 		if (allowed.Length == 0)
-			return null;
+			return [];
 
-		var job = await leaseService.TryAcquireJobAsync(
-			holderId,
-			leaseDuration,
-			allowed,
-			cancellationToken);
-		if (job is null)
-			return null;
+		var pending = await leaseService.GetAcquirableSystemNamesAsync(allowed, cancellationToken);
+		if (pending.Count == 0)
+			return [];
 
-		if (!managers[job.SystemName].TryUseQuota(holderId, out var lease))
-			throw new InvalidOperationException(
-				$"No quota available for leased job '{job.Id}' ({job.SystemName}).");
+		var acquired = new List<AcquiredJob>();
+		var reserved = new Dictionary<Guid, ILrtQuotaLease>();
+		try
+		{
+			foreach (var quota in pending.GroupBy(name => managers[name]))
+			{
+				while (quota.Key.TryUseQuota(Guid.NewGuid(), out var lease))
+					reserved.Add(lease.HolderId, lease);
 
-		return new AcquiredJob(job, lease);
+				if (reserved.Count == 0)
+					continue;
+
+				var jobs = await leaseService.AcquireJobsAsync(
+					quota.ToArray(),
+					reserved.Keys.ToArray(),
+					leaseDuration,
+					cancellationToken);
+
+				foreach (var job in jobs)
+				{
+					reserved.Remove(job.LeaseHolderId!.Value, out var lease);
+					acquired.Add(new AcquiredJob(job, lease!));
+				}
+
+				ReleaseAll(reserved.Values);
+				reserved.Clear();
+			}
+		}
+		catch
+		{
+			ReleaseAll(reserved.Values);
+			ReleaseAll(acquired.Select(x => x.Lease));
+			throw;
+		}
+
+		return acquired;
+	}
+
+	private static void ReleaseAll(IEnumerable<ILrtQuotaLease> leases)
+	{
+		foreach (var lease in leases)
+			lease.Dispose();
 	}
 }

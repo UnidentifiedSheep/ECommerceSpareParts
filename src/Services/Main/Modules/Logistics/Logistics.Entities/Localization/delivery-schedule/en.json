@@ -7,6 +7,8 @@
     "delivery.schedule.days.unsupported": "Delivery days contain unsupported values.",
     "delivery.schedule.exception.date.in.past": "A delivery exception cannot be set for a past date.",
     "delivery.schedule.exception.already.exists": "A delivery exception already exists for this date.",
-    "delivery.schedule.exception.not.found": "There is no delivery exception for this date."
+    "delivery.schedule.exception.not.found": "There is no delivery exception for this date.",
+    "delivery.schedule.not.found": "Delivery schedule was not found.",
+    "delivery.schedule.already.exists": "A delivery schedule already exists for this supplier and storage."
   }
 }

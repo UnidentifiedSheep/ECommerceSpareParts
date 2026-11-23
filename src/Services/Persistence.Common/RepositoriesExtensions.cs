@@ -24,12 +24,14 @@ public static class RepositoriesExtensions
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
+		Type linqReadRepositoryType,
 		params Assembly[] entitiesAssemblies) where TContext : DbContext
 		=> services.AddPersistenceBase<TContext>(
 			_ => { },
 			repositoryType,
 			linqRepositoryType,
 			readRepositoryType,
+			linqReadRepositoryType,
 			entitiesAssemblies);
 
 	public static IServiceCollection AddPersistenceBase<TContext>(
@@ -38,6 +40,7 @@ public static class RepositoriesExtensions
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
+		Type linqReadRepositoryType,
 		params Assembly[] entitiesAssemblies) where TContext : DbContext
 	{
 		if (!services.Any(descriptor => descriptor.ServiceType == typeof(DbContextOptions<TContext>)))
@@ -85,6 +88,7 @@ public static class RepositoriesExtensions
 			repositoryType,
 			linqRepositoryType,
 			readRepositoryType,
+			linqReadRepositoryType,
 			entitiesAssemblies);
 
 
@@ -104,6 +108,7 @@ public static class RepositoriesExtensions
 		Type repositoryType,
 		Type linqRepositoryType,
 		Type readRepositoryType,
+		Type linqReadRepositoryType,
 		Assembly[] entitiesAssemblies)
 	{
 		var registered = new HashSet<(Type EntityType, Type KeyType)>();
@@ -134,9 +139,13 @@ public static class RepositoriesExtensions
 			var implementationType = repositoryDefinition.MakeGenericType(entityType, keyType);
 
 			services.AddScoped(serviceType, implementationType);
+			var readRepositoryDefinition = linqEntityType.IsAssignableFrom(entityType)
+				? linqReadRepositoryType
+				: readRepositoryType;
+
 			services.AddScoped(
 				typeof(IReadRepository<,>).MakeGenericType(entityType, keyType),
-				readRepositoryType.MakeGenericType(entityType, keyType));
+				readRepositoryDefinition.MakeGenericType(entityType, keyType));
 		}
 	}
 

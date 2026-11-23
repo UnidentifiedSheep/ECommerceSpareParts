@@ -1,4 +1,6 @@
+using Abstractions;
 using Contracts;
+using Contracts.Job;
 
 namespace Gateway.EventStreamBrokers;
 
@@ -42,6 +44,12 @@ public class EventRegistry : EventRegistryBase
 			"onPurchaseDeleted",
 			@event => new { purchaseId = @event.Id },
 			_ => EventAudience.Global);
+
+		Add<JobStatusUpdatedEvent>(
+			"onJobUpdated",
+			@event => new { job = new { id = @event.JobId } },
+			_ => EventAudience.Global,
+			ServicesDefinitions.Main);
 
 		CompleteRegistration();
 	}

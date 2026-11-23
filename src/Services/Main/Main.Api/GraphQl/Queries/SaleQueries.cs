@@ -8,6 +8,7 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Sale;
 using Main.Api.GraphQl.Types.Sale;
 using Main.Modules.Sale.Application.Queries.Sales.GetSale;
+using Main.Modules.Sale.Application.Models;
 using Main.Modules.Sale.Application.Queries.Sales.GetSales;
 using MediatR;
 
@@ -47,14 +48,17 @@ public sealed class SaleQueries
 	{
 		var result = await sender.Send(
 			new GetSalesQuery(
-				new RangeModel<DateTime>(input.RangeStartDate, input.RangeEndDate),
-				input.Pagination,
-				input.OrganizationIds ?? [],
-				input.CurrencyIds ?? [],
-				input.ProductIds ?? [],
-				input.States ?? [],
-				input.SortBy.ToSortExpressions(),
-				input.SearchTerm),
+				new SalesFilter
+				{
+					DateRange = new RangeModel<DateTime>(input.RangeStartDate, input.RangeEndDate),
+					OrganizationIds = input.OrganizationIds ?? [],
+					CurrencyIds = input.CurrencyIds ?? [],
+					ProductIds = input.ProductIds ?? [],
+					States = input.States ?? [],
+					SortBy = input.SortBy.ToSortExpressions(),
+					SearchTerm = input.SearchTerm
+				},
+				input.Pagination),
 			cancellationToken);
 
 		return result.Sales.Select(sale => new GqlSale(sale)).ToArray();

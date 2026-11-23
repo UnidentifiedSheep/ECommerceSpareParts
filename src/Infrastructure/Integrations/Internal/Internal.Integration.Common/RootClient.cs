@@ -13,13 +13,6 @@ public class RootClient(
 	HttpClient httpClient,
 	ProjectJsonOptions jsonOptions) : ICommonClient
 {
-	public IJobNode JobNode { get; } = new JobNode(
-		httpClient,
-		authClient,
-		serviceOptions,
-		credentialsMonitor,
-		jsonOptions);
-
 	public ISettingNode SettingNode { get; } = new SettingNode(
 		httpClient,
 		authClient,

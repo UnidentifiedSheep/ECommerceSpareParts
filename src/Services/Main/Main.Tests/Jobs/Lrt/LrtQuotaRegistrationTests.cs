@@ -41,7 +41,7 @@ public class LrtQuotaRegistrationTests : ServiceTest
 	[Fact]
 	public void EveryRegisteredLrt_ReferencesAnExistingQuota()
 	{
-		var catalog = Services.GetRequiredService<LrtQuotaCatalog>();
+		var catalog = Services.GetRequiredService<ILrtQuotaCatalog>();
 
 		var act = catalog.Validate;
 

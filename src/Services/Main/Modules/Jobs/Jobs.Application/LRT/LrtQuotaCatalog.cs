@@ -7,18 +7,16 @@ namespace Main.Modules.Jobs.Application.LRT;
 
 public sealed class LrtQuotaCatalog(
 	IServiceScopeFactory scopeFactory,
-	INamedObjectRegistry<ILrtQuotaManager> quotas)
+	INamedObjectRegistry<ILrtQuotaManager> quotas) : ILrtQuotaCatalog
 {
 	private readonly Lock _sync = new();
-
-	private IReadOnlyDictionary<string, ILrtQuotaManager>? _managers;
 
 	public IReadOnlyDictionary<string, ILrtQuotaManager> ManagersByLrt
 	{
 		get
 		{
 			lock (_sync)
-				return _managers ??= Build();
+				return field ??= Build();
 		}
 	}
 

@@ -1,5 +1,7 @@
 using Application.Common.Host;
+using Application.Common.Interfaces;
 using Main.Modules.Organization.Abstractions;
+using Main.Modules.Organization.Abstractions.Models;
 using Main.Modules.Organization.Application.Configs;
 using Main.Modules.Organization.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +20,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IOrganizationChecks, OrganizationChecks>();
 		services.AddScoped<IOrganizationLocks, OrganizationLocks>();
 		services.AddScoped<IOrganizationSearch, OrganizationSearch>();
-		services.AddScoped<IOrganizationNames, OrganizationNames>();
+		services.AddScoped<IDisplay<Guid, OrganizationDisplayInfo>, OrganizationDisplay>();
 
 		return services;
 	}

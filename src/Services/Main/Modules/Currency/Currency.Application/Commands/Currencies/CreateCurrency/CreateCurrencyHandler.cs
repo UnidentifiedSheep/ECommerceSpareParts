@@ -27,6 +27,7 @@ public class CreateCurrencyHandler(IUnitOfWork unitOfWork)
 			request.CurrencySign,
 			request.Code);
 		await unitOfWork.AddAsync(model, cancellationToken);
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 
 		return new CreateCurrencyResult(model.Id);
 	}
