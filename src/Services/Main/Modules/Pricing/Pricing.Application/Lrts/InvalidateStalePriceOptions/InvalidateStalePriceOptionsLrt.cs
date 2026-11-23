@@ -59,7 +59,8 @@ public class InvalidateStalePriceOptionsLrt(
 						.Where(x =>
 							x.MarkupVersion != currentVersion ||
 							x.AppliersVersion != currentAppliersVersion ||
-							x.PricingSettingsVersion != currentPricingSettingsVersion)
+							x.PricingSettingsVersion != currentPricingSettingsVersion ||
+							x.PriceOffer.AvailableQuantity <= 0)
 						.Take(batchSize)
 						.Select(x => new
 						{

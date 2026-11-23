@@ -2,6 +2,7 @@ using Enums;
 using FluentAssertions;
 using Main.Entities.Storage.Storage;
 using Main.Modules.Storage.Application.Commands.StorageContents.AddContent;
+using Main.Modules.Storage.Application.Commands.StorageContents.SetToZeroContent;
 using Main.Modules.Storage.Application.Dtos.Storage;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Entities.Enums;
@@ -57,6 +58,35 @@ public sealed class StorageContentChangedTests : IntegrationTest
 			offer.PurchasePrice.Should().Be(content.BuyPrice);
 			offer.CurrencyId.Should().Be(content.CurrencyId);
 		}
+	}
+
+	[Fact]
+	public async Task SettingStorageContentToZero_RemovesOurWarehouseOffer()
+	{
+		var storage = GetContext<StorageTestContext>().Storages.First();
+
+		await Mediator.Send(
+			new AddContentCommand(
+				NewContents(storage.Code, 2),
+				storage.Code,
+				StorageMovementType.StorageContentAddition),
+			CancellationToken);
+
+		var storageContents = await Context.Set<StorageContent>()
+			.AsNoTracking()
+			.Where(x => x.StorageCode == storage.Code)
+			.OrderBy(x => x.Id)
+			.ToListAsync(CancellationToken);
+		var emptied = storageContents[0];
+
+		await Mediator.Send(new SetToZeroContentCommand(emptied.Id, emptied.RowVersion), CancellationToken);
+
+		var offerKeys = await Context.Set<PriceOffer>()
+			.AsNoTracking()
+			.Where(x => x.Source == PriceOfferSource.OurWarehouse && x.OfferForStorage == storage.Code)
+			.Select(x => x.SourceKey)
+			.ToListAsync(CancellationToken);
+		offerKeys.Should().BeEquivalentTo(storageContents.Skip(1).Select(x => x.Id.ToString()));
 	}
 
 	private List<NewStorageContentDto> NewContents(string storageCode, int count)

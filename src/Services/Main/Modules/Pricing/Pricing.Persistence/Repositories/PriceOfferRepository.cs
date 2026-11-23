@@ -69,4 +69,23 @@ public class PriceOfferRepository(UnifiedDbContext context,
 			.Where(x => x.OfferForStorage == storageCode)
 			.Where(x => sources.Contains(x.Source))
 			.ExecuteDeleteAsync(cancellationToken);
+
+	public Task DeleteOurWarehouseOffersAsync(
+		IEnumerable<string> sourceKeys,
+		CancellationToken cancellationToken = default)
+	{
+		var keys = sourceKeys.ToList();
+		return Context
+			.Set<PriceOffer>()
+			.Where(x => x.Source == PriceOfferSource.OurWarehouse)
+			.Where(x => keys.Contains(x.SourceKey))
+			.ExecuteDeleteAsync(cancellationToken);
+	}
+
+	public Task DeleteEmptyOurWarehouseOffersAsync(CancellationToken cancellationToken = default)
+		=> Context
+			.Set<PriceOffer>()
+			.Where(x => x.Source == PriceOfferSource.OurWarehouse)
+			.Where(x => x.AvailableQuantity <= 0)
+			.ExecuteDeleteAsync(cancellationToken);
 }
