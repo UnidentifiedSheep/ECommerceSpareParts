@@ -8,13 +8,13 @@ using Pricing.Application.Events;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
+using Pricing.Application.Models;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Services;
 
 public class OfferRefreshService(
-	ISupplierOfferExtractorService extractorService,
 	ISupplierOfferConverterService converterService,
 	IPriceOfferRepository offerRepository,
 	IIntegrationEventScope integrationEventScope,
@@ -23,25 +23,20 @@ public class OfferRefreshService(
 	IPriceOfferHistoryWriter historyWriter,
 	ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
-	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+	public async Task<IReadOnlyList<PriceOffer>> ApplyExtractedOffersAsync(
+		DateTime extractedAt,
 		int productId,
 		string storageCode,
+		IReadOnlyList<SupplierOfferExtractionResult> extracted,
 		CancellationToken token = default)
 	{
-		var extracted = await extractorService.ExtractOffers(
-			storageCode,
-			productId,
-			token);
-
-		var now = DateTime.UtcNow;
-
 		var successful = extracted.Where(x => x is { IsSuccess: true, Offer: not null }).ToList();
 
 		var events = successful
 			.Select(x => new SupplierProductsRequestedEvent
 			{
 				Supplier = x.Supplier,
-				OccurredAt = now,
+				OccurredAt = extractedAt,
 				RequestedStorageCode = storageCode,
 				Products = [x.Offer!.ToContract()]
 			})
@@ -54,7 +49,7 @@ public class OfferRefreshService(
 				IReadOnlyList<SupplierPosition> (x) => x.SelectMany(r => r.Offer!.Positions).ToList());
 
 		var offers = await RefreshOffersAsync(
-			now,
+			extractedAt,
 			productId,
 			storageCode,
 			supplierPositions,

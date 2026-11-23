@@ -1,4 +1,5 @@
 using Application.Common.Interfaces.Cqrs;
+using Attributes;
 using Enums;
 using Integrations.Supplier.Models;
 using Main.Modules.Product.Abstractions;
@@ -7,6 +8,7 @@ using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Commands.Pricing;
 
+[Transactional]
 public record ApplySupplierProductsCommand(
 	DateTime DataExtractionTime,
 	Supplier Supplier,
