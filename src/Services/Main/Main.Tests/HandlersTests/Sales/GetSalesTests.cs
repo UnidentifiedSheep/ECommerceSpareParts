@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using FluentAssertions;
+using Main.Modules.Sale.Application.Models;
 using Main.Modules.Sale.Application.Queries.Sales.GetSales;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
@@ -109,7 +110,8 @@ public sealed class GetSalesTests : IntegrationTest
 	{
 		TestContext.Sale.SetComment("SearchFilterMarker");
 		await Context.SaveChangesAsync(CancellationToken);
-		var query = Query("searchfiltermarker") with { OrganizationIds = [Guid.NewGuid()] };
+		var query = Query("searchfiltermarker");
+		query = query with { Filter = query.Filter with { OrganizationIds = [Guid.NewGuid()] } };
 
 		var result = await Mediator.Send(query, CancellationToken);
 
@@ -119,13 +121,5 @@ public sealed class GetSalesTests : IntegrationTest
 	private Task<GetSalesResult> Search(string? term) => Mediator.Send(Query(term), CancellationToken);
 
 	private static GetSalesQuery Query(string? term)
-		=> new(
-			new RangeModel<DateTime>(),
-			new Pagination(0, 25),
-			[],
-			[],
-			[],
-			[],
-			[],
-			term);
+		=> new(new SalesFilter { SearchTerm = term }, new Pagination(0, 25));
 }

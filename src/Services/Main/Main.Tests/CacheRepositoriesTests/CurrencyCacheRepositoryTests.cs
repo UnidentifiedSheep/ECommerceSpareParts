@@ -1,7 +1,6 @@
-using Application.Common.Interfaces.Cache;
 using FluentAssertions;
 using Main.Entities.Currency;
-using Main.Modules.Currency.Application;
+using Main.Modules.Currency.Application.Commands.Currencies.CreateCurrency;
 using Main.Modules.Currency.Application.Dtos;
 using Main.Modules.Currency.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -19,44 +18,23 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 	private CurrencyTestContext TestContext => GetContext<CurrencyTestContext>();
 
 	[Fact]
-	public async Task GetCurrency_WhenCurrencyExists_ReturnsCurrencyFromDbAndCaches()
+	public async Task GetCurrency_WhenCurrencyExists_ReturnsCurrency()
 	{
 		var currency = TestContext.Currencies[0];
 		var repository = GetRepository();
-
-		await RemoveCachedCurrency(currency.Id);
+		await repository.InvalidateAllCurrencies(CancellationToken);
 
 		var result = await repository.GetCurrency(currency.Id, CancellationToken);
 
 		result.Should().NotBeNull();
 		AssertCurrency(result!, currency);
-
-		var cached = await GetCache().GetAsync<CurrencyDto>(CurrencyCacheKeys.Currency(currency.Id));
-		cached.Should().BeEquivalentTo(result);
-	}
-
-	[Fact]
-	public async Task GetCurrency_WhenCurrencyAlreadyCached_ReturnsCachedCurrency()
-	{
-		var currency = TestContext.Currencies[0];
-		var repository = GetRepository();
-
-		await RemoveCachedCurrency(currency.Id);
-
-		var cached = await repository.GetCurrency(currency.Id, CancellationToken);
-
-		await UpdateCurrencyName(currency.Id, "Updated currency name");
-
-		var result = await repository.GetCurrency(currency.Id, CancellationToken);
-
-		result.Should().BeEquivalentTo(cached);
-		result!.Name.Should().NotBe("Updated currency name");
 	}
 
 	[Fact]
 	public async Task GetCurrency_WhenCurrencyDoesNotExist_ReturnsNull()
 	{
 		var repository = GetRepository();
+		await repository.InvalidateAllCurrencies(CancellationToken);
 
 		var result = await repository.GetCurrency(int.MaxValue, CancellationToken);
 
@@ -64,56 +42,46 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task GetAllCurrencies_WhenCurrenciesSetNotCached_ReturnsCurrenciesFromDbAndCachesSet()
+	public async Task GetAllCurrencies_ReturnsEveryCurrency()
 	{
 		var currencies = TestContext.Currencies;
 		var repository = GetRepository();
-
-		await RemoveAllCachedCurrencies(currencies.Select(x => x.Id));
+		await repository.InvalidateAllCurrencies(CancellationToken);
 
 		var result = await repository.GetAllCurrencies(CancellationToken);
 
-		result.Should().HaveCount(currencies.Count);
+		result.Select(x => x.Id).Should().BeEquivalentTo(currencies.Select(x => x.Id));
 		foreach (var currency in currencies)
 			AssertCurrency(result.Single(x => x.Id == currency.Id), currency);
-
-		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
-		cachedIds.Select(int.Parse).Should().BeEquivalentTo(currencies.Select(x => x.Id));
 	}
 
 	[Fact]
-	public async Task GetAllCurrencies_WhenCurrencySetCached_ReturnsCachedAndMissingCurrencies()
-	{
-		var cachedCurrency = TestContext.Currencies[0];
-		var dbCurrency = TestContext.Currencies[1];
-		var repository = GetRepository();
-
-		await RemoveAllCachedCurrencies(TestContext.Currencies.Select(x => x.Id));
-
-		await repository.GetAllCurrencies(CancellationToken);
-		var cachedBeforeUpdate = await repository.GetCurrency(cachedCurrency.Id, CancellationToken);
-
-		await UpdateCurrencyName(cachedCurrency.Id, "Cached updated name");
-		await UpdateCurrencyName(dbCurrency.Id, "Db updated name");
-
-		var result = await repository.GetAllCurrencies(CancellationToken);
-
-		result.Single(x => x.Id == cachedCurrency.Id).Should().BeEquivalentTo(cachedBeforeUpdate);
-		result.Single(x => x.Id == cachedCurrency.Id).Name.Should().NotBe("Cached updated name");
-		result.Single(x => x.Id == dbCurrency.Id).Name.Should().Be("Db updated name");
-	}
-
-	[Fact]
-	public async Task InvalidateCurrency_WhenCurrencyCached_RemovesCurrencyCache()
+	public async Task SecondRead_IsServedFromCache()
 	{
 		var currency = TestContext.Currencies[0];
 		var repository = GetRepository();
+		await repository.InvalidateAllCurrencies(CancellationToken);
 
-		await RemoveCachedCurrency(currency.Id);
-		await repository.GetCurrency(currency.Id, CancellationToken);
+		var cached = await repository.GetCurrency(currency.Id, CancellationToken);
+		await UpdateCurrencyName(currency.Id, "Updated currency name");
 
-		await repository.InvalidateCurrency(currency.Id, CancellationToken);
+		var single = await repository.GetCurrency(currency.Id, CancellationToken);
+		var all = await repository.GetAllCurrencies(CancellationToken);
+
+		single.Should().BeEquivalentTo(cached);
+		all.Single(x => x.Id == currency.Id).Name.Should().Be(cached!.Name);
+	}
+
+	[Fact]
+	public async Task InvalidateAllCurrencies_ReloadsCurrenciesFromDb()
+	{
+		var currency = TestContext.Currencies[0];
+		var repository = GetRepository();
+		await repository.InvalidateAllCurrencies(CancellationToken);
+		await repository.GetAllCurrencies(CancellationToken);
+
 		await UpdateCurrencyName(currency.Id, "Invalidated currency");
+		await repository.InvalidateAllCurrencies(CancellationToken);
 
 		var result = await repository.GetCurrency(currency.Id, CancellationToken);
 
@@ -121,39 +89,24 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task InvalidateAllCurrencies_WhenCurrenciesCached_RemovesSetAndCurrencyCaches()
+	public async Task CreatedCurrency_IsVisibleThroughCache()
 	{
-		var currencies = TestContext.Currencies;
-		var currency = currencies[0];
 		var repository = GetRepository();
-
-		await RemoveAllCachedCurrencies(currencies.Select(x => x.Id));
-		await repository.GetAllCurrencies(CancellationToken);
-		await repository.GetCurrency(currency.Id, CancellationToken);
-
 		await repository.InvalidateAllCurrencies(CancellationToken);
-		await UpdateCurrencyName(currency.Id, "Invalidated all currency");
+		await repository.GetAllCurrencies(CancellationToken);
 
-		var result = await repository.GetCurrency(currency.Id, CancellationToken);
-		var cachedIds = await GetCache().GetFromSetAsync(CurrencyCacheKeys.AllCurrencies());
+		var created = await Mediator.Send(
+			new CreateCurrencyCommand("CCH", "Cache currency", "C", "CACHE"),
+			CancellationToken);
 
-		result!.Name.Should().Be("Invalidated all currency");
-		cachedIds.Should().BeEmpty();
+		var result = await repository.GetCurrency(created.Id, CancellationToken);
+
+		result.Should().NotBeNull();
+		result!.Code.Should().Be("CACHE");
 	}
 
 	private ICurrencyCacheRepository GetRepository()
 		=> Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
-
-	private ICache GetCache() => Scope.ServiceProvider.GetRequiredService<ICache>();
-
-	private async Task RemoveAllCachedCurrencies(IEnumerable<int> currencyIds)
-	{
-		await GetCache().RemoveKeyAsync(CurrencyCacheKeys.AllCurrencies());
-		await Task.WhenAll(currencyIds.Select(RemoveCachedCurrency));
-	}
-
-	private async Task RemoveCachedCurrency(int currencyId)
-		=> await GetCache().RemoveKeyAsync(CurrencyCacheKeys.Currency(currencyId));
 
 	private async Task UpdateCurrencyName(int currencyId, string name)
 	{

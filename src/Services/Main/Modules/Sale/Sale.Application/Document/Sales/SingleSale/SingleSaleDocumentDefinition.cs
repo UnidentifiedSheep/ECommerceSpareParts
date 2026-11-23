@@ -1,3 +1,5 @@
+using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Enums;
 using Locan.Core.Interfaces;
@@ -7,10 +9,12 @@ using Main.Application.Document.Interfaces.Document;
 using Main.Entities.Sale;
 using Main.Entities.Sale.Enums;
 using Main.Entities.Sale.Exceptions;
-using Main.Modules.Currency.Abstractions.Interfaces;
-using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Currency.Abstractions.Models;
+using Main.Modules.Identity.Abstractions.Models;
 using Main.Modules.Organization.Abstractions;
+using Main.Modules.Organization.Abstractions.Models;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -22,10 +26,10 @@ public class SingleSaleDocumentDefinition(
 	IDocumentTemplateResolver templateResolver,
 	IS3Service s3Service,
 	IReadRepository<Entities.Sale.Sale.Sale, Guid> repository,
-	IUserNames userNames,
-	ICurrencyDisplay currencyDisplay,
-	IOrganizationNames organizationNames,
-	IProductNames productNames,
+	IDisplay<Guid, UserDisplayInfo> userDisplay,
+	IDisplay<int, CurrencyDisplayInfo> currencyDisplay,
+	IDisplay<Guid, OrganizationDisplayInfo> organizationDisplay,
+	IDisplay<int, ProductDisplayInfo> productDisplay,
 	ILocalizer localizer,
 	IOptions<S3BucketsOptions> options
 ) : DocumentDefinitionBase<
@@ -66,22 +70,21 @@ public class SingleSaleDocumentDefinition(
 				.FirstOrDefaultAsync(x => x.Id == saleId, token)
 			?? throw new SaleNotFoundException(saleId);
 
-		var buyer = (await userNames.GetFullNamesAsync([sale.UserId], token)).GetValueOrDefault(sale.UserId);
+		var buyer = await userDisplay.GetAsync(sale.UserId, token);
 		var currency = await currencyDisplay.GetAsync(sale.CurrencyId, token);
-		var organization = (await organizationNames.GetAsync([sale.OrganizationId], token))
-			.GetValueOrDefault(sale.OrganizationId);
-		var products = await productNames.GetAsync(
+		var organization = await organizationDisplay.GetAsync(sale.OrganizationId, token);
+		var products = await productDisplay.GetAsync(
 			sale.Contents.Select(content => content.ProductId).Distinct().ToArray(),
 			token);
 
 		return new SingleSaleDocumentSchema
 		{
 			Id = sale.Id,
-			BuyerName = buyer ?? "—",
+			BuyerName = buyer?.FullName ?? "—",
 			Comment = sale.Comment,
 			CurrencyCode = currency?.Code!,
 			CurrencySign = currency?.Sign!,
-			OrganizationName = organization!,
+			OrganizationName = organization?.Name!,
 			SaleDatetime = sale.SaleDatetime,
 			State = sale.State == SaleState.Draft ? draft :
 				sale.State == SaleState.Completed ? completed :

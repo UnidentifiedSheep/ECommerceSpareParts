@@ -1,5 +1,5 @@
-using Enums;
 using Main.Application.Document.Interfaces.Document;
+using Main.Application.Document.Models;
 using Main.Entities.Documents.Enums.Documents;
 
 namespace Main.Modules.Documents.Application.Services.Document.Sources;
@@ -11,25 +11,21 @@ public sealed class CachedDocumentTemplateSource(
 	public DocumentSourceType SourceType => source.SourceType;
 
 	public async Task<byte[]?> TryGetBytesAsync(
-		string templateName,
-		DocumentType templateType,
+		DocumentTemplateKey key,
 		CancellationToken token = default)
 	{
 		if (cache.TryGetTemplate(
-				templateName,
-				templateType,
+				key.ObjectKey,
+				key.TemplateType,
 				SourceType,
 				out var bytes))
 			return bytes;
 
-		bytes = await source.TryGetBytesAsync(
-			templateName,
-			templateType,
-			token);
+		bytes = await source.TryGetBytesAsync(key, token);
 		if (bytes is not null)
 			cache.TryAddTemplate(
-				templateName,
-				templateType,
+				key.ObjectKey,
+				key.TemplateType,
 				SourceType,
 				bytes);
 		return bytes;

@@ -1,6 +1,7 @@
 using Application.Common.Host;
 using Application.Common.Interfaces;
 using Main.Modules.Identity.Abstractions.Interfaces;
+using Main.Modules.Identity.Abstractions.Models;
 using Main.Modules.Identity.Application.Configs;
 using Main.Modules.Identity.Application.Interfaces.Services;
 using Main.Modules.Identity.Application.Interfaces.Services.PayloadProvider;
@@ -57,7 +58,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IUserChecks, UserChecks>();
 		services.AddScoped<IUserEmailLookup, UserEmailLookup>();
 		services.AddScoped<IUserSearch, UserSearch>();
-		services.AddScoped<IUserNames, UserNames>();
+		services.AddScoped<IDisplay<Guid, UserDisplayInfo>, UserDisplay>();
 		services.AddSingleton<IJwtGenerator, JwtGenerator>();
 		services.AddSingleton<IEmailValidator, EmailValidator>();
 		services.AddScoped<IResetPayloadProvider, ResetPayloadProvider>();

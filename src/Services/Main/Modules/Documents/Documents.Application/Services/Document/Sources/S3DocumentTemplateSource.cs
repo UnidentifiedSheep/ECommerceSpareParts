@@ -1,6 +1,6 @@
 using System.Net;
-using Enums;
 using Main.Application.Document.Interfaces.Document;
+using Main.Application.Document.Models;
 using Main.Entities.Documents.Enums.Documents;
 using Microsoft.Extensions.Options;
 using S3.Core.Interfaces;
@@ -16,14 +16,13 @@ public class S3DocumentTemplateSource(
 	public DocumentSourceType SourceType => DocumentSourceType.S3;
 
 	public async Task<byte[]?> TryGetBytesAsync(
-		string templateName,
-		DocumentType templateType,
+		DocumentTemplateKey key,
 		CancellationToken token = default)
 	{
-		var response = await GetResponseAsync(templateName, token);
+		var response = await GetResponseAsync(key.ObjectKey, token);
 		return await ReadTemplateBytesAsync(
 			response,
-			templateName,
+			key.ObjectKey,
 			token);
 	}
 

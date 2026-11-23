@@ -2,6 +2,7 @@ using Application.Common.Extensions;
 using Application.Common.Host;
 using Application.Common.Interfaces;
 using Main.Modules.Product.Abstractions;
+using Main.Modules.Product.Abstractions.Models;
 using Main.Modules.Product.Application.Cache;
 using Main.Modules.Product.Application.Configs;
 using Main.Modules.Product.Application.Interfaces.Cache;
@@ -31,7 +32,7 @@ public static class ServiceCollectionExtensions
 
 		services.AddScoped<IProductCrosses, ProductCrosses>();
 		services.AddScoped<IProductSearch, ProductSearch>();
-		services.AddScoped<IProductNames, ProductNames>();
+		services.AddScoped<IDisplay<int, ProductDisplayInfo>, ProductDisplay>();
 		services.AddScoped<IProductEventPublisher, ProductEventPublisher>();
 		services.AddScoped<IProductEventProvider, ProductEventProvider>();
 		services.AddScoped<IProductEventPartProvider, ProductCoreEventPartProvider>();

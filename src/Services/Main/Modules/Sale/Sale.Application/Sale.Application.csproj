@@ -34,4 +34,8 @@
         <ProjectReference Include="..\..\..\..\Modules.Common\Modules.Common.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Document\**\*.xlsx" WithCulture="false"/>
+    </ItemGroup>
+
 </Project>

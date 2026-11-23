@@ -8,7 +8,5 @@ public interface ICurrencyCacheRepository
 
 	Task<IReadOnlyList<CurrencyDto>> GetAllCurrencies(CancellationToken cancellationToken = default);
 
-	Task InvalidateCurrency(int id, CancellationToken cancellationToken = default);
-
 	Task InvalidateAllCurrencies(CancellationToken cancellationToken = default);
 }
