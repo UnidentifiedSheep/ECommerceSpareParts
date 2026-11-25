@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
 		services.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
 		services.AddScoped<IPriceOfferRefreshStateRepository, PriceOfferRefreshStateRepository>();
-		services.AddScoped<IPriceOfferHistoryRepository, PriceOfferHistoryRepository>();
+		services.AddScoped<IPriceOfferDailyStatRepository, PriceOfferDailyStatRepository>();
 
 		return services;
 	}

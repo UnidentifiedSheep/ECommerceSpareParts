@@ -1333,6 +1333,58 @@ namespace Main.Migrator.Migrations
                     b.ToTable("delivery_schedule_exceptions", "logistics");
                 });
 
+            modelBuilder.Entity("Main.Entities.Logistics.Statistics.DeliveryDailyStat", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("Supplier")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("supplier");
+
+                    b.Property<string>("StorageCode")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_code");
+
+                    b.Property<DateOnly>("Day")
+                        .HasColumnType("date")
+                        .HasColumnName("day");
+
+                    b.Property<int>("DeliveryDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_days");
+
+                    b.Property<DateTime>("FirstSeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("first_seen_at");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_seen_at");
+
+                    b.Property<int>("MaxProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_probability");
+
+                    b.Property<int?>("MinGuaranteedDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("min_guaranteed_days");
+
+                    b.Property<int>("OffersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("offers_count");
+
+                    b.HasKey("ProductId", "Supplier", "StorageCode", "Day", "DeliveryDays")
+                        .HasName("delivery_daily_stat_pk");
+
+                    b.HasIndex(new[] { "StorageCode" }, "delivery_daily_stat_storage_code_index");
+
+                    b.ToTable("delivery_daily_stats", "logistics");
+                });
+
             modelBuilder.Entity("Main.Entities.Notification.InAppNotification", b =>
                 {
                     b.Property<int>("Id")
@@ -3662,72 +3714,54 @@ namespace Main.Migrator.Migrations
                     b.ToTable("price_offers", "public");
                 });
 
-            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferHistory", b =>
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferDailyStat", b =>
                 {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+                    b.Property<string>("Source")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("ForStorage")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("for_storage");
+
+                    b.Property<DateOnly>("Day")
+                        .HasColumnType("date")
+                        .HasColumnName("day");
 
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
-                    b.Property<int>("DeliveryProbability")
-                        .HasColumnType("integer")
-                        .HasColumnName("delivery_probability");
-
-                    b.Property<TimeSpan>("DeliveryTime")
-                        .HasColumnType("interval")
-                        .HasColumnName("delivery_time");
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
 
                     b.Property<DateTime>("FirstSeenAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("first_seen_at");
 
-                    b.Property<string>("ForStorage")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("for_storage");
-
-                    b.Property<bool>("IsOpen")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_open");
-
                     b.Property<DateTime>("LastSeenAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("last_seen_at");
 
-                    b.Property<int>("ProductId")
+                    b.Property<int>("OffersCount")
                         .HasColumnType("integer")
-                        .HasColumnName("product_id");
+                        .HasColumnName("offers_count");
 
-                    b.Property<decimal>("PurchasePrice")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price");
+                    b.HasKey("ProductId", "Source", "ForStorage", "Day", "CurrencyId", "PurchasePrice")
+                        .HasName("price_offer_daily_stat_pk");
 
-                    b.Property<string>("Source")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("source");
+                    b.HasIndex(new[] { "CurrencyId" }, "price_offer_daily_stat_currency_id_index");
 
-                    b.HasKey("Id")
-                        .HasName("price_offer_history_pk");
+                    b.HasIndex(new[] { "ForStorage" }, "price_offer_daily_stat_for_storage_index");
 
-                    b.HasIndex(new[] { "CurrencyId" }, "price_offer_history_currency_id_index");
-
-                    b.HasIndex(new[] { "ForStorage" }, "price_offer_history_for_storage_index");
-
-                    b.HasIndex(new[] { "ProductId", "Source", "ForStorage" }, "price_offer_history_open_index")
-                        .HasFilter("is_open = true");
-
-                    b.HasIndex(new[] { "ProductId", "ForStorage", "FirstSeenAt" }, "price_offer_history_product_index");
-
-                    b.ToTable("price_offer_histories", "public");
+                    b.ToTable("price_offer_daily_stats", "public");
                 });
 
             modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferRefreshState", b =>
@@ -4273,6 +4307,23 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("delivery_schedule_exceptions_delivery_schedules_fk");
+                });
+
+            modelBuilder.Entity("Main.Entities.Logistics.Statistics.DeliveryDailyStat", b =>
+                {
+                    b.HasOne("Main.Entities.Product.Product.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("delivery_daily_stat_product_id_fk");
+
+                    b.HasOne("Main.Entities.Storage.Storage.Storage", null)
+                        .WithMany()
+                        .HasForeignKey("StorageCode")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("delivery_daily_stat_storage_code_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Notification.NotificationDelivery", b =>
@@ -4892,28 +4943,28 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("price_offer_product_id_fk");
                 });
 
-            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferHistory", b =>
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferDailyStat", b =>
                 {
                     b.HasOne("Main.Entities.Currency.Currency", null)
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
-                        .HasConstraintName("price_offer_history_currency_id_fk");
+                        .HasConstraintName("price_offer_daily_stat_currency_id_fk");
 
                     b.HasOne("Main.Entities.Storage.Storage.Storage", null)
                         .WithMany()
                         .HasForeignKey("ForStorage")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("price_offer_history_for_storage_fk");
+                        .HasConstraintName("price_offer_daily_stat_for_storage_fk");
 
                     b.HasOne("Main.Entities.Product.Product.Product", null)
                         .WithMany()
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("price_offer_history_product_id_fk");
+                        .HasConstraintName("price_offer_daily_stat_product_id_fk");
                 });
 
             modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>

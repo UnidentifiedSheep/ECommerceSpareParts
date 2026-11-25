@@ -4,6 +4,8 @@ using Enums;
 using Integrations.Supplier.Models;
 using Main.Modules.Product.Abstractions.Events;
 using Microsoft.Extensions.Logging;
+using Pricing.Abstractions.Events;
+using Pricing.Abstractions.Models;
 using Pricing.Application.Events;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
@@ -20,7 +22,7 @@ public class OfferRefreshService(
 	IIntegrationEventScope integrationEventScope,
 	IPriceOfferRefreshStateRepository stateRepository,
 	ISupplierOfferRequestMarkerService markerService,
-	IPriceOfferHistoryWriter historyWriter,
+	IDomainEventScope domainEventScope,
 	ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
 	public async Task<IReadOnlyList<PriceOffer>> ApplyExtractedOffersAsync(
@@ -137,13 +139,11 @@ public class OfferRefreshService(
 		if (offers.Count != 0)
 			await offerRepository.UpsertOffersAsync(offers, token);
 
-		await historyWriter.TrackAsync(
+		PublishRefreshed(
 			storageCode,
-			source,
-			refreshed,
+			supplier,
 			offers,
-			dataExtractionTime,
-			token);
+			dataExtractionTime);
 
 		await markerService.MarkAsOkAsync(
 			refreshed,
@@ -184,6 +184,7 @@ public class OfferRefreshService(
 		LogNotFoundCurrencies(notFoundCurrencies);
 
 		var sourcesToRemove = new List<PriceOfferSource>();
+		var refreshedSuppliers = new List<Supplier>();
 
 		foreach (var (supplier, positions) in supplierPositions)
 		{
@@ -202,6 +203,7 @@ public class OfferRefreshService(
 				continue;
 
 			sourcesToRemove.Add(source);
+			refreshedSuppliers.Add(supplier);
 		}
 
 		if (sourcesToRemove.Count == 0)
@@ -213,14 +215,12 @@ public class OfferRefreshService(
 			sourcesToRemove,
 			token);
 
-		foreach (var source in sourcesToRemove)
-			await historyWriter.TrackAsync(
+		foreach (var supplier in refreshedSuppliers)
+			PublishRefreshed(
 				storageCode,
-				source,
-				[productId],
+				supplier,
 				offers,
-				dataExtractionTime,
-				token);
+				dataExtractionTime);
 
 		if (offers.Count == 0)
 			return [];
@@ -240,6 +240,36 @@ public class OfferRefreshService(
 		await offerRepository.UpsertOffersAsync(filteredOffers, token);
 
 		return filteredOffers;
+	}
+
+	private void PublishRefreshed(
+		string storageCode,
+		Supplier supplier,
+		IReadOnlyCollection<PriceOffer> offers,
+		DateTime seenAt)
+	{
+		var source = supplier.ToSource();
+
+		var snapshots = offers
+			.Where(x => x.Source == source && x.OfferForStorage == storageCode)
+			.Select(x => new SupplierOfferSnapshot(
+				x.ProductId,
+				x.CurrencyId,
+				x.PurchasePrice,
+				x.DeliveryDate,
+				x.GuaranteedDeliveryDate,
+				x.DeliveryProbability))
+			.ToList();
+
+		if (snapshots.Count == 0)
+			return;
+
+		domainEventScope.Add(
+			new SupplierOffersRefreshedEvent(
+				supplier,
+				storageCode,
+				seenAt,
+				snapshots));
 	}
 
 	private void LogNotFoundCurrencies(HashSet<string> notFoundCurrencies)
