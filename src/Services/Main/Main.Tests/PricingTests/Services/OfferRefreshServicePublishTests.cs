@@ -48,8 +48,11 @@ public sealed class OfferRefreshServicePublishTests
 			]);
 		var states = new Mock<IPriceOfferRefreshStateRepository>();
 		states
-			.Setup(x => x.UpsertStateAsync(It.IsAny<PriceOfferRefreshState>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync((PriceOfferRefreshState state, CancellationToken _) => state.ProductId == 1);
+			.Setup(x => x.UpsertStatesAsync(
+				It.IsAny<IReadOnlyCollection<PriceOfferRefreshState>>(),
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync((IReadOnlyCollection<PriceOfferRefreshState> items, CancellationToken _) =>
+				items.Where(x => x.ProductId == 1).Select(x => x.GetId()).ToHashSet());
 		var eventScope = new DomainEventScope();
 
 		var service = new OfferRefreshService(
@@ -87,8 +90,10 @@ public sealed class OfferRefreshServicePublishTests
 	{
 		var states = new Mock<IPriceOfferRefreshStateRepository>();
 		states
-			.Setup(x => x.UpsertStateAsync(It.IsAny<PriceOfferRefreshState>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(false);
+			.Setup(x => x.UpsertStatesAsync(
+				It.IsAny<IReadOnlyCollection<PriceOfferRefreshState>>(),
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync(new HashSet<PriceOfferRefreshStateKey>());
 		var eventScope = new DomainEventScope();
 
 		var service = new OfferRefreshService(

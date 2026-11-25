@@ -6,5 +6,7 @@ namespace Pricing.Application.Interfaces.Persistence;
 public interface
 	IPriceOfferRefreshStateRepository : IRepository<PriceOfferRefreshState, PriceOfferRefreshStateKey>
 {
-	Task<bool> UpsertStateAsync(PriceOfferRefreshState model, CancellationToken cancellationToken = default);
+	Task<IReadOnlySet<PriceOfferRefreshStateKey>> UpsertStatesAsync(
+		IReadOnlyCollection<PriceOfferRefreshState> states,
+		CancellationToken cancellationToken = default);
 }

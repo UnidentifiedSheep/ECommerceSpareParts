@@ -91,18 +91,15 @@ public class OfferRefreshService(
 		var notFoundCurrencies = new HashSet<string>();
 		var refreshed = new HashSet<int>();
 
+		var allowed = await UpsertStatesAsync(
+			dataExtractionTime,
+			storageCode,
+			supplierPositions.Select(x => (x.Key, source, x.Value.Count)),
+			token);
+
 		foreach (var (productId, positions) in supplierPositions)
 		{
-			var state = PriceOfferRefreshState.Create(
-				productId,
-				source,
-				storageCode);
-
-			state.OffersUpdated(dataExtractionTime, positions.Count);
-
-			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
-
-			if (!canRefresh)
+			if (!allowed.Contains(new PriceOfferRefreshStateKey(productId, source, storageCode)))
 				continue;
 
 			refreshed.Add(productId);
@@ -183,28 +180,17 @@ public class OfferRefreshService(
 
 		LogNotFoundCurrencies(notFoundCurrencies);
 
-		var sourcesToRemove = new List<PriceOfferSource>();
-		var refreshedSuppliers = new List<Supplier>();
+		var allowed = await UpsertStatesAsync(
+			dataExtractionTime,
+			storageCode,
+			supplierPositions.Select(x => (productId, x.Key.ToSource(), x.Value.Count)),
+			token);
 
-		foreach (var (supplier, positions) in supplierPositions)
-		{
-			var source = supplier.ToSource();
+		var refreshedSuppliers = supplierPositions.Keys
+			.Where(x => allowed.Contains(new PriceOfferRefreshStateKey(productId, x.ToSource(), storageCode)))
+			.ToList();
 
-			var state = PriceOfferRefreshState.Create(
-				productId,
-				source,
-				storageCode);
-
-			state.OffersUpdated(dataExtractionTime, positions.Count);
-
-			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
-
-			if (!canRefresh)
-				continue;
-
-			sourcesToRemove.Add(source);
-			refreshedSuppliers.Add(supplier);
-		}
+		var sourcesToRemove = refreshedSuppliers.Select(x => x.ToSource()).ToList();
 
 		if (sourcesToRemove.Count == 0)
 			return [];
@@ -240,6 +226,29 @@ public class OfferRefreshService(
 		await offerRepository.UpsertOffersAsync(filteredOffers, token);
 
 		return filteredOffers;
+	}
+
+	private async Task<IReadOnlySet<PriceOfferRefreshStateKey>> UpsertStatesAsync(
+		DateTime dataExtractionTime,
+		string storageCode,
+		IEnumerable<(int ProductId, PriceOfferSource Source, int OffersCount)> items,
+		CancellationToken token)
+	{
+		var states = items
+			.Select(x =>
+			{
+				var state = PriceOfferRefreshState.Create(
+					x.ProductId,
+					x.Source,
+					storageCode);
+
+				state.OffersUpdated(dataExtractionTime, x.OffersCount);
+
+				return state;
+			})
+			.ToList();
+
+		return await stateRepository.UpsertStatesAsync(states, token);
 	}
 
 	private void PublishRefreshed(

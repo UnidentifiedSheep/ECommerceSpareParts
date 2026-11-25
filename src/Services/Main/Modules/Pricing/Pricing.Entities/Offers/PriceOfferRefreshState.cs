@@ -32,7 +32,7 @@ public class PriceOfferRefreshState : Entity<PriceOfferRefreshState, PriceOfferR
 	public static Expression<Func<PriceOfferRefreshState, bool>>
 		GetEqualityExpression(PriceOfferRefreshStateKey key)
 		=> x => x.ProductId == key.ProductId &&
-			x.Source == key.Supplier && x.StorageCode == key.StorageCode;
+			x.Source == key.Source && x.StorageCode == key.StorageCode;
 
 	public static PriceOfferRefreshState Create(
 		int productId,
@@ -60,14 +60,8 @@ public class PriceOfferRefreshState : Entity<PriceOfferRefreshState, PriceOfferR
 			StorageCode);
 }
 
-public readonly struct PriceOfferRefreshStateKey(int productId, PriceOfferSource source, string storageCode)
+public readonly record struct PriceOfferRefreshStateKey(int ProductId, PriceOfferSource Source, string StorageCode)
 	: ICompositeKey
 {
-	public int ProductId => productId;
-
-	public PriceOfferSource Supplier => source;
-
-	public string StorageCode => storageCode;
-
-	public object[] ToArray() => [productId, source, storageCode];
+	public object[] ToArray() => [ProductId, Source, StorageCode];
 }
