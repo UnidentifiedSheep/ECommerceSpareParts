@@ -4,9 +4,9 @@ using Domain;
 using Domain.Interfaces;
 using Domain.Validation;
 using Enums;
+using Main.Entities.Logistics.DomainEvents;
 using Main.Entities.Logistics.Enums;
 using Main.Entities.Logistics.Exceptions;
-using Main.Entities.Logistics.Extensions;
 
 namespace Main.Entities.Logistics.Schedule;
 
@@ -49,9 +49,12 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 		=> new(supplier, storageCode, days);
 
 	public void SetDays(DeliveryDays days)
-		=> Days = days
+	{
+		Days = days
 			.EnsureNotDefault(DeliveryScheduleDaysNotEmptyMessage.Instance)
 			.EnsureOnlyDefinedFlags(DeliveryScheduleDaysUnsupportedMessage.Instance);
+		RaiseChanged();
+	}
 
 	public DeliveryScheduleException AddException(DateOnly date, DateOnly today)
 	{
@@ -61,6 +64,7 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 
 		var exception = DeliveryScheduleException.Create(Supplier, StorageCode, date);
 		_exceptions.Add(exception);
+		RaiseChanged();
 		return exception;
 	}
 
@@ -69,29 +73,25 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 		var exception = _exceptions.FirstOrDefault(item => item.Date == date) ??
 			throw new ScheduleExceptionNotFoundException(Supplier, StorageCode, date);
 		_exceptions.Remove(exception);
+		RaiseChanged();
 	}
 
-	public bool IsDeliveryDay(DateOnly date)
-		=> Days.Contains(date.DayOfWeek) && _exceptions.All(exception => exception.Date != date);
-
-	public DateOnly GetNextDeliveryDate(DateOnly from)
+	public override void OnCreated()
 	{
-		var exceptions = _exceptions.Select(exception => exception.Date).ToHashSet();
-		var date = from;
-		while (true)
-		{
-			var offset = Days.DaysUntilNext(date.DayOfWeek) ??
-				throw new InvalidOperationException(
-					$"Delivery schedule {Supplier}/{StorageCode} has no delivery days.");
-			date = date.AddDays(offset);
-			if (!exceptions.Contains(date))
-				return date;
+		base.OnCreated();
+		RaiseChanged();
+	}
 
-			date = date.AddDays(1);
-		}
+	public override void OnDeleted()
+	{
+		base.OnDeleted();
+		RaiseChanged();
 	}
 
 	public override DeliveryScheduleKey GetId() => new(Supplier, StorageCode);
+
+	private void RaiseChanged()
+		=> AddDomainEvent(new DeliveryScheduleChangedDomainEvent(Supplier, StorageCode));
 }
 
 public readonly record struct DeliveryScheduleKey(Supplier Supplier, string StorageCode) : ICompositeKey

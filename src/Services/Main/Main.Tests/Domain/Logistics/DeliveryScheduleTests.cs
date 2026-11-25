@@ -58,40 +58,6 @@ public class DeliveryScheduleTests
 	}
 
 	[Fact]
-	public void IsDeliveryDay_MatchesScheduledWeekdaysAndSkipsExceptions()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday | DeliveryDays.Sunday);
-		schedule.AddException(Monday.AddDays(7), Monday);
-
-		schedule.IsDeliveryDay(Monday).Should().BeTrue();
-		schedule.IsDeliveryDay(Monday.AddDays(1)).Should().BeFalse();
-		schedule.IsDeliveryDay(Monday.AddDays(6)).Should().BeTrue();
-		schedule.IsDeliveryDay(Monday.AddDays(7)).Should().BeFalse();
-	}
-
-	[Fact]
-	public void GetNextDeliveryDate_ReturnsSameDayOrNextScheduledDaySkippingExceptions()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Wednesday);
-		var wednesday = Monday.AddDays(2);
-		schedule.AddException(wednesday, Monday);
-
-		schedule.GetNextDeliveryDate(Monday).Should().Be(wednesday.AddDays(7));
-		schedule.GetNextDeliveryDate(wednesday.AddDays(7)).Should().Be(wednesday.AddDays(7));
-	}
-
-	[Fact]
-	public void GetNextDeliveryDate_SkipsConsecutiveExceptionsOfSingleWeeklyDay()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday);
-		schedule.AddException(Monday, Monday);
-		schedule.AddException(Monday.AddDays(7), Monday);
-		schedule.AddException(Monday.AddDays(14), Monday);
-
-		schedule.GetNextDeliveryDate(Monday).Should().Be(Monday.AddDays(21));
-	}
-
-	[Fact]
 	public void AddException_CreatesExceptionBoundToSchedule()
 	{
 		var schedule = DeliverySchedule.Create(Supplier.FavoritParts, "MAIN-01", DeliveryDays.All);
@@ -126,7 +92,6 @@ public class DeliveryScheduleTests
 		var missing = () => schedule.RemoveException(Monday);
 
 		schedule.Exceptions.Should().BeEmpty();
-		schedule.IsDeliveryDay(Monday).Should().BeTrue();
 		missing.Should().Throw<ScheduleExceptionNotFoundException>();
 	}
 }
