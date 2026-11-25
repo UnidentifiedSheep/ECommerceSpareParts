@@ -7,8 +7,8 @@ public record MarketInfoItem
 	[JsonPropertyName("costInBaseCurrency")]
 	public decimal CostInBaseCurrency { get; init; }
 
-	[JsonPropertyName("deliveryTime")]
-	public TimeSpan DeliveryTime { get; init; }
+	[JsonPropertyName("deliveryDays")]
+	public int DeliveryDays { get; init; }
 
 	[JsonPropertyName("score")]
 	public decimal Score { get; init; }

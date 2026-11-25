@@ -15,6 +15,7 @@ public sealed class DeliveryScheduleDtoProjectionProvider : ProjectionProviderBa
 			Supplier = x.Supplier,
 			StorageCode = x.StorageCode,
 			Days = x.Days,
+			ArrivalTime = x.ArrivalTime,
 			Exceptions = x.Exceptions
 				.OrderBy(exception => exception.Date)
 				.Select(exception => exception.Date)

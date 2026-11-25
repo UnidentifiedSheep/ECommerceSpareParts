@@ -54,7 +54,7 @@ public class DeliveryScheduleCacheRepositoryTests : IntegrationTest
 		var date = Today.AddDays(2);
 
 		await Mediator.Send(
-			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday),
+			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday, new TimeOnly(9, 30)),
 			CancellationToken);
 		await Mediator.Send(
 			new AddDeliveryScheduleExceptionCommand(Supplier.Armtek, StorageCode, date),
@@ -62,6 +62,7 @@ public class DeliveryScheduleCacheRepositoryTests : IntegrationTest
 
 		var result = await GetRepository().GetAsync(Supplier.Armtek, StorageCode, CancellationToken);
 		result!.Days.Should().Be(DeliveryDays.Friday);
+		result.ArrivalTime.Should().Be(new TimeOnly(9, 30));
 		result.Exceptions.Should().Equal(date);
 	}
 
@@ -81,7 +82,7 @@ public class DeliveryScheduleCacheRepositoryTests : IntegrationTest
 	{
 		await CreateAsync(DeliveryDays.Monday);
 		await Mediator.Send(
-			new CreateDeliveryScheduleCommand(Supplier.Tmtr, StorageCode, DeliveryDays.Monday),
+			new CreateDeliveryScheduleCommand(Supplier.Tmtr, StorageCode, DeliveryDays.Monday, new TimeOnly(14, 0)),
 			CancellationToken);
 		await GetRepository().GetAsync(Supplier.Armtek, StorageCode, CancellationToken);
 		await GetRepository().GetAsync(Supplier.Tmtr, StorageCode, CancellationToken);
@@ -90,7 +91,7 @@ public class DeliveryScheduleCacheRepositoryTests : IntegrationTest
 			.Where(x => x.Supplier == Supplier.Tmtr)
 			.ExecuteUpdateAsync(x => x.SetProperty(e => e.Days, DeliveryDays.Sunday), CancellationToken);
 		await Mediator.Send(
-			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday),
+			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday, new TimeOnly(14, 0)),
 			CancellationToken);
 
 		(await GetRepository().GetAsync(Supplier.Armtek, StorageCode, CancellationToken))!
@@ -100,7 +101,7 @@ public class DeliveryScheduleCacheRepositoryTests : IntegrationTest
 	}
 
 	private Task CreateAsync(DeliveryDays days)
-		=> Mediator.Send(new CreateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, days), CancellationToken);
+		=> Mediator.Send(new CreateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, days, new TimeOnly(14, 0)), CancellationToken);
 
 	private IDeliveryScheduleCacheRepository GetRepository()
 		=> Scope.ServiceProvider.GetRequiredService<IDeliveryScheduleCacheRepository>();

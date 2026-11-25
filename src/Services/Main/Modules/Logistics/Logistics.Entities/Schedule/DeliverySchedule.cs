@@ -19,7 +19,7 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 
 	private DeliverySchedule() { }
 
-	private DeliverySchedule(Supplier supplier, string storageCode, DeliveryDays days)
+	private DeliverySchedule(Supplier supplier, string storageCode, DeliveryDays days, TimeOnly arrivalTime)
 	{
 		Supplier = supplier;
 		StorageCode = storageCode
@@ -27,6 +27,7 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 			.EnsureNotNullOrEmpty(DeliveryScheduleStorageCodeNotEmptyMessage.Instance)
 			.EnsureMaxLength(StorageCodeMaxLength, DeliveryScheduleStorageCodeMaxLengthMessage.Instance);
 		SetDays(days);
+		SetArrivalTime(arrivalTime);
 	}
 
 	[ValidateTuple("PK")]
@@ -37,6 +38,8 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 
 	public DeliveryDays Days { get; private set; }
 
+	public TimeOnly ArrivalTime { get; private set; }
+
 	public IReadOnlyList<DeliveryScheduleException> Exceptions => _exceptions;
 
 	public static Expression<Func<DeliverySchedule, DeliveryScheduleKey>> GetKeySelector()
@@ -45,14 +48,24 @@ public sealed class DeliverySchedule : AuditableEntity<DeliverySchedule, Deliver
 	public static Expression<Func<DeliverySchedule, bool>> GetEqualityExpression(DeliveryScheduleKey key)
 		=> x => x.Supplier == key.Supplier && x.StorageCode == key.StorageCode;
 
-	public static DeliverySchedule Create(Supplier supplier, string storageCode, DeliveryDays days)
-		=> new(supplier, storageCode, days);
+	public static DeliverySchedule Create(
+		Supplier supplier,
+		string storageCode,
+		DeliveryDays days,
+		TimeOnly arrivalTime)
+		=> new(supplier, storageCode, days, arrivalTime);
 
 	public void SetDays(DeliveryDays days)
 	{
 		Days = days
 			.EnsureNotDefault(DeliveryScheduleDaysNotEmptyMessage.Instance)
 			.EnsureOnlyDefinedFlags(DeliveryScheduleDaysUnsupportedMessage.Instance);
+		RaiseChanged();
+	}
+
+	public void SetArrivalTime(TimeOnly arrivalTime)
+	{
+		ArrivalTime = arrivalTime;
 		RaiseChanged();
 	}
 

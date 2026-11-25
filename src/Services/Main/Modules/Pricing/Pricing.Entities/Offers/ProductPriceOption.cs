@@ -25,9 +25,9 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 
 	public string ForStorageCode { get; private set; } = string.Empty;
 
-	public TimeSpan DeliveryTime { get; private set; }
+	public int DeliveryDays { get; private set; }
 
-	public TimeSpan GuaranteedDeliveryTime { get; private set; }
+	public int GuaranteedDeliveryDays { get; private set; }
 
 	public int DeliveryProbability { get; private set; }
 
@@ -55,8 +55,8 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 		decimal price,
 		int currencyId,
 		decimal markup,
-		TimeSpan deliveryTime,
-		TimeSpan guaranteedDeliveryTime,
+		int deliveryDays,
+		int guaranteedDeliveryDays,
 		int deliveryProbability)
 	{
 		var option = new ProductPriceOption
@@ -67,9 +67,9 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 		option.SetScore(score);
 		option.SetPrice(price);
 		option.SetMarkup(markup);
-		option.SetDeliveryTime(
-			deliveryTime,
-			guaranteedDeliveryTime,
+		option.SetDeliveryDays(
+			deliveryDays,
+			guaranteedDeliveryDays,
 			deliveryProbability);
 		option.MarkupVersion = markupVersion;
 		option.AppliersVersion = appliersVersion;
@@ -90,22 +90,20 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>,
 		=> Markup =
 			markup.EnsureNonNegative(() => new InvalidOperationException("Markup cannot be negative"));
 
-	public void SetDeliveryTime(
-		TimeSpan deliveryTime,
-		TimeSpan guaranteedDeliveryTime,
+	public void SetDeliveryDays(
+		int deliveryDays,
+		int guaranteedDeliveryDays,
 		int deliveryProbability)
 	{
 		deliveryProbability.EnsureNonNegative(() =>
 			new InvalidOperationException("Delivery probability cannot be negative"));
-		deliveryTime.EnsureAtLeast(
-			TimeSpan.Zero,
-			() => new InvalidOperationException("Delivery time cannot be negative"));
-		guaranteedDeliveryTime.EnsureAtLeast(
-			TimeSpan.Zero,
-			() => new InvalidOperationException("Guaranteed delivery time cannot be negative"));
+		deliveryDays.EnsureNonNegative(() =>
+			new InvalidOperationException("Delivery days cannot be negative"));
+		guaranteedDeliveryDays.EnsureNonNegative(() =>
+			new InvalidOperationException("Guaranteed delivery days cannot be negative"));
 
-		DeliveryTime = deliveryTime;
-		GuaranteedDeliveryTime = guaranteedDeliveryTime;
+		DeliveryDays = deliveryDays;
+		GuaranteedDeliveryDays = guaranteedDeliveryDays;
 		DeliveryProbability = deliveryProbability;
 	}
 

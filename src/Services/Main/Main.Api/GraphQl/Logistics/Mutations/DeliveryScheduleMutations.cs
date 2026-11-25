@@ -20,7 +20,11 @@ public sealed class DeliveryScheduleMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new CreateDeliveryScheduleCommand(input.Supplier, input.StorageCode, input.Days.ToDeliveryDays()),
+			new CreateDeliveryScheduleCommand(
+				input.Supplier,
+				input.StorageCode,
+				input.Days.ToDeliveryDays(),
+				input.ArrivalTime),
 			cancellationToken);
 		return new GqlDeliverySchedule(input.Supplier, input.StorageCode);
 	}
@@ -33,7 +37,11 @@ public sealed class DeliveryScheduleMutations
 		CancellationToken cancellationToken)
 	{
 		await sender.Send(
-			new UpdateDeliveryScheduleCommand(input.Supplier, input.StorageCode, input.Days.ToDeliveryDays()),
+			new UpdateDeliveryScheduleCommand(
+				input.Supplier,
+				input.StorageCode,
+				input.Days.ToDeliveryDays(),
+				input.ArrivalTime),
 			cancellationToken);
 		return new GqlDeliverySchedule(input.Supplier, input.StorageCode);
 	}

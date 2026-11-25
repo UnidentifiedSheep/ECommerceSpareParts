@@ -35,12 +35,13 @@ public sealed class DeliveryScheduleCommandsTests : IntegrationTest
 			new CreateDeliveryScheduleCommand(
 				Supplier.Armtek,
 				$"  {StorageCode}  ",
-				DeliveryDays.Monday | DeliveryDays.Thursday),
+				DeliveryDays.Monday | DeliveryDays.Thursday, new TimeOnly(14, 0)),
 			CancellationToken);
 
 		var schedule = await LoadAsync(Supplier.Armtek, StorageCode);
 		schedule.Should().NotBeNull();
 		schedule.Days.Should().Be(DeliveryDays.Monday | DeliveryDays.Thursday);
+		schedule.ArrivalTime.Should().Be(new TimeOnly(14, 0));
 	}
 
 	[Fact]
@@ -49,7 +50,7 @@ public sealed class DeliveryScheduleCommandsTests : IntegrationTest
 		await CreateScheduleAsync();
 
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
-			new CreateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday),
+			new CreateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Friday, new TimeOnly(14, 0)),
 			CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.Error is DeliveryScheduleAlreadyExistsException);
@@ -59,29 +60,31 @@ public sealed class DeliveryScheduleCommandsTests : IntegrationTest
 	public async Task Create_UnknownStorage_ThrowsStorageNotFound()
 	{
 		var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(
-			new CreateDeliveryScheduleCommand(Supplier.Armtek, "missing-storage", DeliveryDays.Friday),
+			new CreateDeliveryScheduleCommand(Supplier.Armtek, "missing-storage", DeliveryDays.Friday, new TimeOnly(14, 0)),
 			CancellationToken));
 
 		exception.Failures.Should().Contain(x => x.Error is StorageNotFoundException);
 	}
 
 	[Fact]
-	public async Task Update_ExistingSchedule_ReplacesDays()
+	public async Task Update_ExistingSchedule_ReplacesDaysAndArrivalTime()
 	{
 		await CreateScheduleAsync();
 
 		await Mediator.Send(
-			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Saturday),
+			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Saturday, new TimeOnly(9, 30)),
 			CancellationToken);
 
-		(await LoadAsync(Supplier.Armtek, StorageCode))!.Days.Should().Be(DeliveryDays.Saturday);
+		var schedule = (await LoadAsync(Supplier.Armtek, StorageCode))!;
+		schedule.Days.Should().Be(DeliveryDays.Saturday);
+		schedule.ArrivalTime.Should().Be(new TimeOnly(9, 30));
 	}
 
 	[Fact]
 	public async Task Update_MissingSchedule_ThrowsNotFound()
 	{
 		var act = () => Mediator.Send(
-			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Saturday),
+			new UpdateDeliveryScheduleCommand(Supplier.Armtek, StorageCode, DeliveryDays.Saturday, new TimeOnly(14, 0)),
 			CancellationToken);
 
 		await act.Should().ThrowAsync<DeliveryScheduleNotFoundException>();
@@ -195,7 +198,7 @@ public class CreateDeliveryScheduleValidationTests
 	[InlineData("storage", (DeliveryDays)128, nameof(CreateDeliveryScheduleCommand.Days))]
 	public async Task InvalidCommand_FailsValidation(string storageCode, DeliveryDays days, string property)
 	{
-		var result = await ValidateAsync(new CreateDeliveryScheduleCommand(Supplier.Armtek, storageCode, days));
+		var result = await ValidateAsync(new CreateDeliveryScheduleCommand(Supplier.Armtek, storageCode, days, new TimeOnly(14, 0)));
 
 		result.ShouldHaveValidationErrorFor(property);
 	}
@@ -206,7 +209,7 @@ public class CreateDeliveryScheduleValidationTests
 		var command = new CreateDeliveryScheduleCommand(
 			Supplier.Armtek,
 			new string('a', DeliverySchedule.StorageCodeMaxLength + 1),
-			DeliveryDays.Monday);
+			DeliveryDays.Monday, new TimeOnly(14, 0));
 
 		var result = await ValidateAsync(command);
 

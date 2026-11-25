@@ -18,5 +18,9 @@ public sealed record PriceCandidate(
 	int CurrencyId,
 	[property: JsonPropertyName("availableQuantity")]
 	int AvailableQuantity,
-	[property: JsonPropertyName("fulfillment")]
-	FulfillmentRouteInfo Fulfillment);
+	[property: JsonPropertyName("deliveryDays")]
+	int DeliveryDays,
+	[property: JsonPropertyName("guaranteedDeliveryDays")]
+	int GuaranteedDeliveryDays,
+	[property: JsonPropertyName("deliveryProbability")]
+	int DeliveryProbability);

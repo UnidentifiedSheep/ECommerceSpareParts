@@ -11,6 +11,79 @@ namespace Main.Migrator.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<int>(
+                name: "delivery_days",
+                schema: "public",
+                table: "price_offers",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.AddColumn<int>(
+                name: "guaranteed_delivery_days",
+                schema: "public",
+                table: "price_offers",
+                type: "integer",
+                nullable: true);
+
+            migrationBuilder.Sql(
+                """
+                UPDATE public.price_offers
+                SET delivery_days = GREATEST(delivery_date::date - updated_at::date, 0),
+                    guaranteed_delivery_days = GREATEST(guaranteed_delivery_date::date - updated_at::date, 0)
+                WHERE delivery_date IS NOT NULL OR guaranteed_delivery_date IS NOT NULL;
+                """);
+
+            migrationBuilder.DropColumn(
+                name: "delivery_date",
+                schema: "public",
+                table: "price_offers");
+
+            migrationBuilder.DropColumn(
+                name: "guaranteed_delivery_date",
+                schema: "public",
+                table: "price_offers");
+
+            migrationBuilder.AddColumn<int>(
+                name: "delivery_days",
+                schema: "public",
+                table: "product_price_options",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "guaranteed_delivery_days",
+                schema: "public",
+                table: "product_price_options",
+                type: "integer",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.Sql(
+                """
+                UPDATE public.product_price_options
+                SET delivery_days = CEIL(EXTRACT(EPOCH FROM delivery_time) / 86400)::integer,
+                    guaranteed_delivery_days = CEIL(EXTRACT(EPOCH FROM guaranteed_delivery_time) / 86400)::integer;
+                """);
+
+            migrationBuilder.DropColumn(
+                name: "delivery_time",
+                schema: "public",
+                table: "product_price_options");
+
+            migrationBuilder.DropColumn(
+                name: "guaranteed_delivery_time",
+                schema: "public",
+                table: "product_price_options");
+
+            migrationBuilder.AddColumn<TimeOnly>(
+                name: "arrival_time",
+                schema: "logistics",
+                table: "delivery_schedules",
+                type: "time without time zone",
+                nullable: false,
+                defaultValue: new TimeOnly(23, 59, 59));
+
             migrationBuilder.CreateTable(
                 name: "delivery_daily_stats",
                 schema: "logistics",
@@ -147,6 +220,71 @@ namespace Main.Migrator.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<DateTime>(
+                name: "delivery_date",
+                schema: "public",
+                table: "price_offers",
+                type: "timestamp with time zone",
+                nullable: true);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "guaranteed_delivery_date",
+                schema: "public",
+                table: "price_offers",
+                type: "timestamp with time zone",
+                nullable: true);
+
+            migrationBuilder.Sql(
+                """
+                UPDATE public.price_offers
+                SET delivery_date = updated_at::date + delivery_days,
+                    guaranteed_delivery_date = updated_at::date + guaranteed_delivery_days
+                WHERE delivery_days IS NOT NULL OR guaranteed_delivery_days IS NOT NULL;
+                """);
+
+            migrationBuilder.DropColumn(
+                name: "delivery_days",
+                schema: "public",
+                table: "price_offers");
+
+            migrationBuilder.DropColumn(
+                name: "guaranteed_delivery_days",
+                schema: "public",
+                table: "price_offers");
+
+            migrationBuilder.AddColumn<TimeSpan>(
+                name: "delivery_time",
+                schema: "public",
+                table: "product_price_options",
+                type: "interval",
+                nullable: false,
+                defaultValue: new TimeSpan(0, 0, 0, 0, 0));
+
+            migrationBuilder.AddColumn<TimeSpan>(
+                name: "guaranteed_delivery_time",
+                schema: "public",
+                table: "product_price_options",
+                type: "interval",
+                nullable: false,
+                defaultValue: new TimeSpan(0, 0, 0, 0, 0));
+
+            migrationBuilder.Sql(
+                """
+                UPDATE public.product_price_options
+                SET delivery_time = make_interval(days => delivery_days),
+                    guaranteed_delivery_time = make_interval(days => guaranteed_delivery_days);
+                """);
+
+            migrationBuilder.DropColumn(
+                name: "delivery_days",
+                schema: "public",
+                table: "product_price_options");
+
+            migrationBuilder.DropColumn(
+                name: "guaranteed_delivery_days",
+                schema: "public",
+                table: "product_price_options");
+
             migrationBuilder.DropForeignKey(
                 name: "price_offer_currency_id_fk",
                 schema: "public",
@@ -169,6 +307,11 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "price_offer_daily_stats",
                 schema: "public");
+
+            migrationBuilder.DropColumn(
+                name: "arrival_time",
+                schema: "logistics",
+                table: "delivery_schedules");
         }
     }
 }

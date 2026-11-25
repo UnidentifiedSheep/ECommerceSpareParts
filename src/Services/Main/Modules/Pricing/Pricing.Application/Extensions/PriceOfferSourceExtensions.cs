@@ -17,6 +17,15 @@ public static class PriceOfferSourceExtensions
 				null)
 		};
 
+	public static Supplier? ToSupplier(this PriceOfferSource source)
+		=> source switch
+		{
+			PriceOfferSource.Armtek => Supplier.Armtek,
+			PriceOfferSource.FavoriteParts => Supplier.FavoritParts,
+			PriceOfferSource.Tmtr => Supplier.Tmtr,
+			_ => null
+		};
+
 	public static PriceOfferSourceType GetSourceType(this PriceOfferSource source)
 		=> source == PriceOfferSource.OurWarehouse
 			? PriceOfferSourceType.OurWarehouse

@@ -143,7 +143,9 @@ public class ProductPriceCalculatorTests
 			100m,
 			1,
 			10,
-			FulfillmentRouteInfo.SameStorage("main"));
+			0,
+			0,
+			100);
 
 	private static CalculatedPriceCandidate Calculated(PriceCandidate candidate)
 		=> new()
@@ -157,8 +159,8 @@ public class ProductPriceCalculatorTests
 			Price = 120m,
 			Markup = 0.2m,
 			AvailableQuantity = candidate.AvailableQuantity,
-			DeliveryTime = TimeSpan.Zero,
-			GuaranteedDeliveryTime = TimeSpan.Zero,
+			DeliveryDays = 0,
+			GuaranteedDeliveryDays = 0,
 			DeliveryProbability = 100
 		};
 }

@@ -1,6 +1,5 @@
 using Enums;
 using Main.Entities.Logistics.Schedule;
-using Main.Modules.Logistics.Abstractions;
 using Main.Modules.Logistics.Abstractions.Interfaces;
 using Main.Modules.Logistics.Abstractions.Models;
 using Main.Modules.Logistics.Application.Interfaces;
@@ -16,21 +15,43 @@ public sealed class DeliveryEstimator(IDeliveryScheduleCacheRepository cacheRepo
 		IEnumerable<DateOnly> supplierDates,
 		CancellationToken cancellationToken = default)
 	{
-		var schedule = await cacheRepository.GetAsync(supplier, storageCode, cancellationToken);
-		var calendar = schedule is null ? null : new DeliveryCalendar(schedule.Days, schedule.Exceptions);
+		var calendar = await GetCalendarAsync(supplier, storageCode, cancellationToken);
 
 		return supplierDates
 			.Distinct()
 			.ToDictionary(x => x, x => Estimate(calendar, from, x));
 	}
 
-	private static DeliveryEstimate Estimate(DeliveryCalendar? calendar, DateOnly from, DateOnly supplierDate)
+	public async Task<IReadOnlyDictionary<int, DateTime>> GetArrivalDatesAsync(
+		Supplier supplier,
+		string storageCode,
+		DateTime from,
+		IEnumerable<int> deliveryDays,
+		CancellationToken cancellationToken = default)
+	{
+		var calendar = await GetCalendarAsync(supplier, storageCode, cancellationToken);
+
+		return deliveryDays
+			.Distinct()
+			.ToDictionary(
+				x => x,
+				x => calendar.GetArrivalAfterDeliveryDays(from, x));
+	}
+
+	private async Task<DeliveryCalendar> GetCalendarAsync(
+		Supplier supplier,
+		string storageCode,
+		CancellationToken cancellationToken)
+	{
+		var schedule = await cacheRepository.GetAsync(supplier, storageCode, cancellationToken);
+		return schedule is null
+			? DeliveryCalendar.WorkingDays
+			: new DeliveryCalendar(schedule.Days, schedule.Exceptions, schedule.ArrivalTime);
+	}
+
+	private static DeliveryEstimate Estimate(DeliveryCalendar calendar, DateOnly from, DateOnly supplierDate)
 	{
 		var date = supplierDate < from ? from : supplierDate;
-
-		if (calendar is null)
-			return new DeliveryEstimate(date, date.DayNumber - from.DayNumber);
-
 		var arrival = calendar.GetNextDeliveryDate(date);
 		return new DeliveryEstimate(arrival, calendar.CountDeliveryDays(from, arrival));
 	}

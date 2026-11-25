@@ -102,7 +102,7 @@ public class TrackPriceOfferDailyStatsHandlerTests : IntegrationTest
 		=> new(supplier, StorageCode, seenAt, offers);
 
 	private SupplierOfferSnapshot Offer(decimal price)
-		=> new(ProductId, CurrencyId, price, Morning.AddDays(3), null, 95);
+		=> new(ProductId, CurrencyId, price, 3, null, 95);
 
 	private Task<List<PriceOfferDailyStat>> GetStatsAsync()
 		=> Context.Set<PriceOfferDailyStat>().AsNoTracking().ToListAsync(CancellationToken);

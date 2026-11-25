@@ -265,8 +265,8 @@ public class OfferRefreshService(
 				x.ProductId,
 				x.CurrencyId,
 				x.PurchasePrice,
-				x.DeliveryDate,
-				x.GuaranteedDeliveryDate,
+				x.DeliveryDays ?? 0,
+				x.GuaranteedDeliveryDays,
 				x.DeliveryProbability))
 			.ToList();
 

@@ -11,7 +11,11 @@ namespace Main.Modules.Logistics.Application.Commands.DeliverySchedules;
 
 [AutoSave]
 [Transactional]
-public record UpdateDeliveryScheduleCommand(Supplier Supplier, string StorageCode, DeliveryDays Days) : ICommand;
+public record UpdateDeliveryScheduleCommand(
+	Supplier Supplier,
+	string StorageCode,
+	DeliveryDays Days,
+	TimeOnly ArrivalTime) : ICommand;
 
 public class UpdateDeliveryScheduleHandler(IRepository<DeliverySchedule, DeliveryScheduleKey> repository)
 	: ICommandHandler<UpdateDeliveryScheduleCommand>
@@ -20,6 +24,7 @@ public class UpdateDeliveryScheduleHandler(IRepository<DeliverySchedule, Deliver
 	{
 		var schedule = await repository.GetRequired(request.Supplier, request.StorageCode, cancellationToken);
 		schedule.SetDays(request.Days);
+		schedule.SetArrivalTime(request.ArrivalTime);
 		return Unit.Value;
 	}
 }

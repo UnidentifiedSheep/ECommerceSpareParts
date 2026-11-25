@@ -11,4 +11,11 @@ public interface IDeliveryEstimator
 		DateOnly from,
 		IEnumerable<DateOnly> supplierDates,
 		CancellationToken cancellationToken = default);
+
+	Task<IReadOnlyDictionary<int, DateTime>> GetArrivalDatesAsync(
+		Supplier supplier,
+		string storageCode,
+		DateTime from,
+		IEnumerable<int> deliveryDays,
+		CancellationToken cancellationToken = default);
 }

@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
 using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Logistics.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -283,7 +284,8 @@ public sealed class GetRecommendedPriceTests : IntegrationTest
 			converter.Object,
 			markup.Object,
 			appliers.Object,
-			settings.Object);
+			settings.Object,
+			Scope.ServiceProvider.GetRequiredService<IDeliveryEstimator>());
 		sender.Setup(x => x.Send(It.IsAny<GetPriceOptionsForProductQuery>(), It.IsAny<CancellationToken>()))
 			.Returns((GetPriceOptionsForProductQuery query, CancellationToken token)
 				=> offers.Handle(query, token));

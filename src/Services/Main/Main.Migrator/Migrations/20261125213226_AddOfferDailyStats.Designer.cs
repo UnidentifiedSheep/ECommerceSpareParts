@@ -15,7 +15,7 @@ using Persistence.Context;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(UnifiedDbContext))]
-    [Migration("20261125200602_AddOfferDailyStats")]
+    [Migration("20261125213226_AddOfferDailyStats")]
     partial class AddOfferDailyStats
     {
         /// <inheritdoc />
@@ -1275,6 +1275,10 @@ namespace Main.Migrator.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("storage_code");
+
+                    b.Property<TimeOnly>("ArrivalTime")
+                        .HasColumnType("time without time zone")
+                        .HasColumnName("arrival_time");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -3624,9 +3628,9 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("days_to_refund");
 
-                    b.Property<DateTime?>("DeliveryDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("delivery_date");
+                    b.Property<int?>("DeliveryDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_days");
 
                     b.Property<int>("DeliveryProbability")
                         .HasColumnType("integer")
@@ -3636,9 +3640,9 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
-                    b.Property<DateTime?>("GuaranteedDeliveryDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("guaranteed_delivery_date");
+                    b.Property<int?>("GuaranteedDeliveryDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("guaranteed_delivery_days");
 
                     b.Property<int>("MinimumPurchaseQuantity")
                         .HasColumnType("integer")
@@ -3816,13 +3820,13 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
+                    b.Property<int>("DeliveryDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_days");
+
                     b.Property<int>("DeliveryProbability")
                         .HasColumnType("integer")
                         .HasColumnName("delivery_probability");
-
-                    b.Property<TimeSpan>("DeliveryTime")
-                        .HasColumnType("interval")
-                        .HasColumnName("delivery_time");
 
                     b.Property<string>("ForStorageCode")
                         .IsRequired()
@@ -3830,9 +3834,9 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("for_storage_name");
 
-                    b.Property<TimeSpan>("GuaranteedDeliveryTime")
-                        .HasColumnType("interval")
-                        .HasColumnName("guaranteed_delivery_time");
+                    b.Property<int>("GuaranteedDeliveryDays")
+                        .HasColumnType("integer")
+                        .HasColumnName("guaranteed_delivery_days");
 
                     b.Property<decimal>("Markup")
                         .HasColumnType("numeric")

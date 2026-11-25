@@ -171,8 +171,8 @@ public class CalculateCandidatesHandlerTests : IntegrationTest
 			Price = offer.PurchasePrice * 1.2m,
 			Markup = 0.2m,
 			AvailableQuantity = offer.AvailableQuantity,
-			DeliveryTime = TimeSpan.FromDays(1),
-			GuaranteedDeliveryTime = TimeSpan.FromDays(2),
+			DeliveryDays = 1,
+			GuaranteedDeliveryDays = 2,
 			DeliveryProbability = offer.DeliveryProbability,
 			Score = 10m
 		};

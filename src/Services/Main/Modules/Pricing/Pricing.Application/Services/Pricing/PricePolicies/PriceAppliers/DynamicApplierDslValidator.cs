@@ -43,7 +43,9 @@ public static class DynamicApplierDslValidator
 			100m,
 			1,
 			1,
-			FulfillmentRouteInfo.SameStorage("validation-storage"));
+			0,
+			0,
+			100);
 
 		yield return PriceCalculationState.Initial(candidate, MarketInfo.Empty);
 		yield return PriceCalculationState.Initial(
@@ -53,7 +55,7 @@ public static class DynamicApplierDslValidator
 					new MarketInfoItem
 					{
 						CostInBaseCurrency = 120m,
-						DeliveryTime = TimeSpan.FromDays(1),
+						DeliveryDays = 1,
 						Score = 1m
 					}
 				])

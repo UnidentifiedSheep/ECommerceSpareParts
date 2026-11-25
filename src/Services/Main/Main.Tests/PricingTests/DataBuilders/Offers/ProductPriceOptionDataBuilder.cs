@@ -74,7 +74,7 @@ public class ProductPriceOptionDataBuilder(Faker faker) : BuilderBase<ProductPri
 			Price,
 			CurrencyId,
 			0.2m,
-			TimeSpan.FromDays(1),
-			TimeSpan.FromDays(2),
+			1,
+			2,
 			95);
 }

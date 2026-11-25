@@ -34,9 +34,9 @@ public class ProductPriceOptionConfiguration : IEntityTypeConfiguration<ProductP
 
 		builder.Property(e => e.ForStorageCode).HasMaxLength(128).HasColumnName("for_storage_name");
 
-		builder.Property(e => e.DeliveryTime).HasColumnName("delivery_time");
+		builder.Property(e => e.DeliveryDays).HasColumnName("delivery_days");
 
-		builder.Property(e => e.GuaranteedDeliveryTime).HasColumnName("guaranteed_delivery_time");
+		builder.Property(e => e.GuaranteedDeliveryDays).HasColumnName("guaranteed_delivery_days");
 
 		builder.Property(e => e.DeliveryProbability).HasColumnName("delivery_probability");
 

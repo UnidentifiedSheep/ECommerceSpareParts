@@ -1,16 +1,12 @@
 using Application.Common.Services.Events;
 using Enums;
 using FluentAssertions;
-using Main.Entities.Logistics.Enums;
 using Main.Entities.Logistics.Statistics;
 using Main.Modules.Logistics.Application.DomainEventHandlers.SupplierOffersRefreshed;
-using Main.Modules.Logistics.Application.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Abstractions.Events;
 using Pricing.Abstractions.Models;
-using Tests.DataBuilders.Logistics;
-using Tests.Extensions;
 using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Storage;
@@ -37,15 +33,15 @@ public sealed class TrackDeliveryDailyStatsHandlerTests : IntegrationTest
 	{
 		await HandleAsync(
 			Event(Morning,
-				Offer(Morning.AddDays(1), 95, Morning.AddDays(2)),
-				Offer(Morning.AddDays(1), 90),
-				Offer(Morning.AddDays(3), 80, Morning.AddDays(4)),
-				Offer(Morning.AddDays(90), 50)));
+				Offer(1, 95, 2),
+				Offer(1, 90),
+				Offer(3, 80, 4),
+				Offer(90, 50)));
 		await HandleAsync(
 			Event(Afternoon,
-				Offer(Afternoon.AddDays(1), 97, Afternoon.AddDays(2)),
-				Offer(Afternoon.AddDays(3), 85, Afternoon.AddDays(3)),
-				Offer(Afternoon.AddDays(60), 50)));
+				Offer(1, 97, 2),
+				Offer(3, 85, 3),
+				Offer(60, 50)));
 
 		var stats = (await GetStatsAsync()).ToDictionary(x => x.DeliveryDays);
 
@@ -62,32 +58,15 @@ public sealed class TrackDeliveryDailyStatsHandlerTests : IntegrationTest
 	}
 
 	[Fact]
-	public async Task Handle_WithSchedule_CountsReceivingDays()
-	{
-		await new DeliveryScheduleBuilder(Faker)
-			.WithSupplier(Supplier.Armtek)
-			.WithStorageCode(StorageCode)
-			.WithDays(DeliveryDays.Tuesday | DeliveryDays.Thursday)
-			.BuildAndAddToDb(Context, CancellationToken);
-		var friday = new DateTime(2026, 11, 27, 10, 0, 0, DateTimeKind.Utc);
-
-		await HandleAsync(Event(friday, Offer(friday.AddDays(3), 95, friday.AddDays(4))));
-
-		var stat = (await GetStatsAsync()).Single();
-		stat.DeliveryDays.Should().Be(1);
-		stat.MinGuaranteedDays.Should().Be(1);
-		stat.Day.Should().Be(new DateOnly(2026, 11, 27));
-	}
-
-	[Fact]
 	public async Task Handle_EventsInOneBatch_Merged()
 	{
 		await HandleAsync(
-			Event(Afternoon, Offer(Afternoon.AddDays(2), 70)),
-			Event(Morning, Offer(Morning.AddDays(2), 90, Morning.AddDays(5))));
+			Event(Afternoon, Offer(2, 70)),
+			Event(Morning, Offer(2, 90, 5)));
 
 		var stat = (await GetStatsAsync()).Single();
 
+		stat.Day.Should().Be(new DateOnly(2026, 11, 25));
 		stat.OffersCount.Should().Be(2);
 		stat.MaxProbability.Should().Be(90);
 		stat.MinGuaranteedDays.Should().Be(5);
@@ -95,20 +74,15 @@ public sealed class TrackDeliveryDailyStatsHandlerTests : IntegrationTest
 		stat.LastSeenAt.Should().Be(Afternoon);
 	}
 
-	private async Task HandleAsync(params SupplierOffersRefreshedEvent[] events)
-	{
-		await Scope.ServiceProvider.GetRequiredService<IDeliveryScheduleCacheRepository>()
-			.InvalidateAsync(Supplier.Armtek, StorageCode, CancellationToken);
-
-		await ActivatorUtilities.CreateInstance<TrackDeliveryDailyStatsHandler>(Scope.ServiceProvider)
+	private Task HandleAsync(params SupplierOffersRefreshedEvent[] events)
+		=> ActivatorUtilities.CreateInstance<TrackDeliveryDailyStatsHandler>(Scope.ServiceProvider)
 			.Handle(new Batch<SupplierOffersRefreshedEvent>(events), CancellationToken);
-	}
 
 	private SupplierOffersRefreshedEvent Event(DateTime seenAt, params SupplierOfferSnapshot[] offers)
 		=> new(Supplier.Armtek, StorageCode, seenAt, offers);
 
-	private SupplierOfferSnapshot Offer(DateTime supplierDate, int probability, DateTime? guaranteedDate = null)
-		=> new(ProductId, 1, 1000m, supplierDate, guaranteedDate, probability);
+	private SupplierOfferSnapshot Offer(int deliveryDays, int probability, int? guaranteedDays = null)
+		=> new(ProductId, 1, 1000m, deliveryDays, guaranteedDays, probability);
 
 	private Task<List<DeliveryDailyStat>> GetStatsAsync()
 		=> Context.Set<DeliveryDailyStat>().AsNoTracking().ToListAsync(CancellationToken);

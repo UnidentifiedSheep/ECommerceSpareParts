@@ -9,8 +9,8 @@ public record CalculatedScoredPriceCandidate : CalculatedPriceCandidate
 		{
 			Score = score,
 			AvailableQuantity = candidate.AvailableQuantity,
-			DeliveryTime = candidate.DeliveryTime,
-			GuaranteedDeliveryTime = candidate.GuaranteedDeliveryTime,
+			DeliveryDays = candidate.DeliveryDays,
+			GuaranteedDeliveryDays = candidate.GuaranteedDeliveryDays,
 			DeliveryProbability = candidate.DeliveryProbability,
 			Markup = candidate.Markup,
 			Price = candidate.Price,

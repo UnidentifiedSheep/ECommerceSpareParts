@@ -14,4 +14,7 @@ public sealed record GqlCreateDeliveryScheduleInput
 
 	[GraphQLName("days")]
 	public required IReadOnlyCollection<DayOfWeek> Days { get; init; }
+
+	[GraphQLName("arrivalTime")]
+	public required TimeOnly ArrivalTime { get; init; }
 }

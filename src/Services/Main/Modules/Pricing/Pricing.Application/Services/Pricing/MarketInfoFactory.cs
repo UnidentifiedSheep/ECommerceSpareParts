@@ -34,14 +34,13 @@ public sealed class MarketInfoFactory(IOfferScorer offerScorer, ICurrencyConvert
 				new MarketInfoItem
 				{
 					CostInBaseCurrency = costInBase,
-					DeliveryTime = candidate.DeliveryTime,
+					DeliveryDays = candidate.DeliveryDays,
 					Score = await offerScorer.GetCostScoreAsync(
 						new OfferCostScoreContext
 						{
 							CostInBase = costInBase,
-							DeliveryDays = (int)Math.Ceiling(candidate.DeliveryTime.TotalDays),
-							GuaranteedDeliveryDays =
-								(int)Math.Ceiling(candidate.GuaranteedDeliveryTime.TotalDays)
+							DeliveryDays = candidate.DeliveryDays,
+							GuaranteedDeliveryDays = candidate.GuaranteedDeliveryDays
 						})
 				});
 		}

@@ -46,7 +46,7 @@ public sealed class GetRecommendedPriceHandler(ISender sender, ISettingsService 
 						(option.PriceOffer.OrderTill == null || option.PriceOffer.OrderTill > now))
 					.OrderByDescending(option => option.Score)
 					.ThenBy(option => option.Price)
-					.ThenBy(option => option.DeliveryTime)
+					.ThenBy(option => option.DeliveryDays)
 					.ThenBy(option => option.PriceOfferId))
 		{
 			var quantity = Math.Min(remaining, option.PriceOffer.AvailableQuantity);
