@@ -27,7 +27,7 @@ public class ModuleBoundariesTests
 		["Currency"] = ["Jobs", "Platform"],
 		["Product"] = ["Jobs"],
 		["Storage"] = ["Currency", "Platform", "Product"],
-		["Pricing"] = ["Analytics", "Currency", "Product", "Storage", "Jobs", "Platform"],
+		["Pricing"] = ["Analytics", "Currency", "Logistics", "Product", "Storage", "Jobs", "Platform"],
 		["Organization"] = ["Identity"],
 		["Analytics"] = ["Currency", "Sale", "Jobs"],
 		["Balance"] = ["Currency", "Identity", "Organization", "Jobs"],
@@ -41,7 +41,7 @@ public class ModuleBoundariesTests
 		["Order"] = ["Currency", "Identity", "Organization", "Product"],
 		["Purchase"] = ["Balance", "Currency", "Identity", "Organization", "Product", "Storage"],
 		["Sale"] = ["Balance", "Currency", "Documents", "Identity", "Organization", "Product", "Storage"],
-		["Logistics"] = ["Storage"]
+		["Logistics"] = ["Pricing", "Storage"]
 	};
 
 	[Fact]
