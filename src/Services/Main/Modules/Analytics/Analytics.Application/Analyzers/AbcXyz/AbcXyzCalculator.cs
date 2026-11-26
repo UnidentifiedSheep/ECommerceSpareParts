@@ -1,8 +1,12 @@
 using Main.Modules.Analytics.Abstractions.Models;
-using Main.Modules.Analytics.Application.Interfaces;
 using Main.Modules.Analytics.Application.Models;
 
 namespace Main.Modules.Analytics.Application.Analyzers.AbcXyz;
+
+public interface IAbcXyzCalculator
+{
+	AbcXyzAnalysisResult Calculate(IEnumerable<ProductPeriodValue> rows, AbcXyzParameters parameters);
+}
 
 public sealed class AbcXyzCalculator : IAbcXyzCalculator
 {
