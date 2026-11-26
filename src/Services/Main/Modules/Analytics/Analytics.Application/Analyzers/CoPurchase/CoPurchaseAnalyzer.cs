@@ -27,10 +27,45 @@ public sealed class CoPurchaseAnalyzer(
 	{
 		var crosses = new Dictionary<int, IReadOnlySet<int>>();
 		await LoadCrossesAsync(productIds, crosses, cancellationToken);
-		var salesByScope = new Dictionary<string, IReadOnlyList<CoPurchaseSaleProduct>>();
-		var relatedByMembers = new Dictionary<string, IReadOnlyList<CoPurchaseRelated>>();
-		var results = new List<CoPurchaseProductResult>(productIds.Count);
 
+		var selected = await SelectCandidatesAsync(productIds, crosses, totalSalesCount, parameters, cancellationToken);
+
+		var candidateIds = selected
+			.SelectMany(candidates => candidates.Candidates)
+			.Select(candidate => candidate.ProductId)
+			.ToHashSet();
+		if (candidateIds.Count == 0)
+			return selected
+				.Select(candidates => new CoPurchaseProductResult(candidates.ProductId, candidates.SalesCount, []))
+				.ToList();
+
+		await LoadCrossesAsync(candidateIds, crosses, cancellationToken);
+		var salesCounts = await reader.GetSalesCountsAsync(parameters, candidateIds, cancellationToken);
+
+		var relatedByMembers = new Dictionary<string, IReadOnlyList<CoPurchaseRelated>>();
+		var results = new List<CoPurchaseProductResult>(selected.Count);
+		foreach (var candidates in selected)
+		{
+			var membersKey = Key(candidates.Members);
+			if (!relatedByMembers.TryGetValue(membersKey, out var related))
+				relatedByMembers[membersKey] = related =
+					calculator.BuildRelated(candidates, crosses, salesCounts, totalSalesCount, parameters);
+
+			results.Add(new CoPurchaseProductResult(candidates.ProductId, candidates.SalesCount, related));
+		}
+
+		return results;
+	}
+
+	private async Task<List<CoPurchaseCandidates>> SelectCandidatesAsync(
+		IReadOnlyList<int> productIds,
+		IReadOnlyDictionary<int, IReadOnlySet<int>> crosses,
+		int totalSalesCount,
+		CoPurchaseParameters parameters,
+		CancellationToken cancellationToken)
+	{
+		var salesByScope = new Dictionary<string, IReadOnlyList<CoPurchaseSaleProduct>>();
+		var selected = new List<CoPurchaseCandidates>(productIds.Count);
 		foreach (var productId in productIds)
 		{
 			var crossIds = crosses[productId];
@@ -39,37 +74,10 @@ public sealed class CoPurchaseAnalyzer(
 			if (!salesByScope.TryGetValue(scopeKey, out var sales))
 				salesByScope[scopeKey] = sales = await reader.GetSalesAsync(parameters, scope, cancellationToken);
 
-			var candidates = calculator.SelectCandidates(productId, crossIds, sales, totalSalesCount, parameters);
-			var membersKey = Key(candidates.Members);
-			if (!relatedByMembers.TryGetValue(membersKey, out var related))
-				relatedByMembers[membersKey] = related = await BuildRelatedAsync(
-					candidates,
-					crosses,
-					totalSalesCount,
-					parameters,
-					cancellationToken);
-
-			results.Add(new CoPurchaseProductResult(productId, candidates.SalesCount, related));
+			selected.Add(calculator.SelectCandidates(productId, crossIds, sales, totalSalesCount, parameters));
 		}
 
-		return results;
-	}
-
-	private async Task<IReadOnlyList<CoPurchaseRelated>> BuildRelatedAsync(
-		CoPurchaseCandidates candidates,
-		Dictionary<int, IReadOnlySet<int>> crosses,
-		int totalSalesCount,
-		CoPurchaseParameters parameters,
-		CancellationToken cancellationToken)
-	{
-		if (candidates.Candidates.Count == 0)
-			return [];
-
-		var candidateIds = candidates.Candidates.Select(candidate => candidate.ProductId).ToList();
-		await LoadCrossesAsync(candidateIds, crosses, cancellationToken);
-
-		var salesCounts = await reader.GetSalesCountsAsync(parameters, candidateIds, cancellationToken);
-		return calculator.BuildRelated(candidates, crosses, salesCounts, totalSalesCount, parameters);
+		return selected;
 	}
 
 	private async Task LoadCrossesAsync(

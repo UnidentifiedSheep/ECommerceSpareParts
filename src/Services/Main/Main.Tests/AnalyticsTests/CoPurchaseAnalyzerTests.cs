@@ -147,4 +147,34 @@ public class CoPurchaseAnalyzerTests
 			crosses => crosses.GetCrossIdsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()),
 			Times.Never);
 	}
+
+	[Fact]
+	public async Task Analyze_ReadsSalesCountsAndCandidateCrossesOncePerBatch()
+	{
+		AddSales(3, 1, 10);
+		AddSales(3, 2, 20);
+
+		var results = await Analyze(1, 2);
+
+		results.Select(result => result.Related.Should().ContainSingle().Subject.Members[0].ProductId)
+			.Should()
+			.Equal(10, 20);
+		_reader.Verify(
+			reader => reader.GetSalesCountsAsync(
+				It.IsAny<CoPurchaseParameters>(),
+				It.Is<IReadOnlyCollection<int>>(ids => ids.Order().SequenceEqual(new[] { 10, 20 })),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+		_reader.Verify(
+			reader => reader.GetSalesCountsAsync(
+				It.IsAny<CoPurchaseParameters>(),
+				It.IsAny<IReadOnlyCollection<int>>(),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+		_crosses.Verify(
+			crosses => crosses.GetCrossIdsAsync(
+				It.Is<IReadOnlyCollection<int>>(ids => ids.Order().SequenceEqual(new[] { 10, 20 })),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+	}
 }

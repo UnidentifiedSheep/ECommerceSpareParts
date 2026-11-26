@@ -1,4 +1,3 @@
-using Application.Common;
 using Application.Common.Interfaces.Persistence;
 using Application.Common.LRT;
 using Attributes;
@@ -17,7 +16,8 @@ public class CoPurchaseCalculationLrt(
 	ILogger<CoPurchaseCalculationLrt> logger)
 	: LrtBase<CoPurchaseCalculationInputState, CoPurchaseCalculationState>(transactionService, logger)
 {
-	protected virtual int BatchSize => 100;
+	protected virtual int BatchSize => 50;
+	protected override TimeSpan LeaseDuration => TimeSpan.FromMinutes(10);
 
 	public override string SystemName => nameof(CoPurchaseCalculationLrt);
 
