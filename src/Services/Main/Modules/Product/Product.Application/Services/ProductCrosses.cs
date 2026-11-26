@@ -9,4 +9,9 @@ public sealed class ProductCrosses(IProductProvider productProvider) : IProductC
 		int productId,
 		CancellationToken cancellationToken = default)
 		=> productProvider.GetProductCrossesAsync(productId, cancellationToken);
+
+	public Task<IReadOnlyDictionary<int, IReadOnlyList<int>>> GetCrossIdsAsync(
+		IReadOnlyCollection<int> productIds,
+		CancellationToken cancellationToken = default)
+		=> productProvider.GetProductsCrossesAsync(productIds, cancellationToken);
 }

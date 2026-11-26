@@ -18,6 +18,8 @@ public class CoPurchaseAnalyzerTests
 
 	private readonly List<CoPurchaseSaleProduct> _sales = [];
 
+	private readonly Dictionary<int, int[]> _crossIds = [];
+
 	public CoPurchaseAnalyzerTests()
 	{
 		_reader
@@ -38,8 +40,11 @@ public class CoPurchaseAnalyzerTests
 			.ReturnsAsync((CoPurchaseParameters _, IReadOnlyCollection<int> ids, CancellationToken _) =>
 				ids.ToDictionary(id => id, id => _sales.Where(row => row.ProductId == id).Select(row => row.SaleId).Distinct().Count()));
 		_crosses
-			.Setup(crosses => crosses.GetCrossIdsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
-			.ReturnsAsync(Array.Empty<int>());
+			.Setup(crosses => crosses.GetCrossIdsAsync(
+				It.IsAny<IReadOnlyCollection<int>>(),
+				It.IsAny<CancellationToken>()))
+			.ReturnsAsync((IReadOnlyCollection<int> ids, CancellationToken _) =>
+				ids.ToDictionary(id => id, IReadOnlyList<int> (id) => _crossIds.GetValueOrDefault(id, [])));
 	}
 
 	private static CoPurchaseParameters Parameters()
@@ -58,10 +63,7 @@ public class CoPurchaseAnalyzerTests
 		}
 	}
 
-	private void SetCrosses(int productId, params int[] crossIds)
-		=> _crosses
-			.Setup(crosses => crosses.GetCrossIdsAsync(productId, It.IsAny<CancellationToken>()))
-			.ReturnsAsync(crossIds);
+	private void SetCrosses(int productId, params int[] crossIds) => _crossIds[productId] = crossIds;
 
 	private Task<IReadOnlyList<CoPurchaseProductResult>> Analyze(params int[] productIds)
 		=> new CoPurchaseAnalyzer(_reader.Object, new CoPurchaseCalculator(), _crosses.Object)
@@ -123,6 +125,26 @@ public class CoPurchaseAnalyzerTests
 				It.IsAny<CoPurchaseParameters>(),
 				It.IsAny<IReadOnlyCollection<int>>(),
 				It.IsAny<CancellationToken>()),
+			Times.Never);
+	}
+
+	[Fact]
+	public async Task Analyze_LoadsProductCrossesInSingleCall()
+	{
+		SetCrosses(1, 2);
+		AddSales(3, 1);
+		AddSales(3, 2);
+		AddSales(3, 3);
+
+		await Analyze(1, 2, 3);
+
+		_crosses.Verify(
+			crosses => crosses.GetCrossIdsAsync(
+				It.Is<IReadOnlyCollection<int>>(ids => ids.Order().SequenceEqual(new[] { 1, 2, 3 })),
+				It.IsAny<CancellationToken>()),
+			Times.Once);
+		_crosses.Verify(
+			crosses => crosses.GetCrossIdsAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()),
 			Times.Never);
 	}
 }

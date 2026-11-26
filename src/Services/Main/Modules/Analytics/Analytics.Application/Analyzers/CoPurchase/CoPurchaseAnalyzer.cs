@@ -26,13 +26,14 @@ public sealed class CoPurchaseAnalyzer(
 		CancellationToken cancellationToken = default)
 	{
 		var crosses = new Dictionary<int, IReadOnlySet<int>>();
+		await LoadCrossesAsync(productIds, crosses, cancellationToken);
 		var salesByScope = new Dictionary<string, IReadOnlyList<CoPurchaseSaleProduct>>();
 		var relatedByMembers = new Dictionary<string, IReadOnlyList<CoPurchaseRelated>>();
 		var results = new List<CoPurchaseProductResult>(productIds.Count);
 
 		foreach (var productId in productIds)
 		{
-			var crossIds = await GetCrossesAsync(productId, crosses, cancellationToken);
+			var crossIds = crosses[productId];
 			var scope = crossIds.Append(productId).ToHashSet();
 			var scopeKey = Key(scope);
 			if (!salesByScope.TryGetValue(scopeKey, out var sales))
@@ -65,25 +66,26 @@ public sealed class CoPurchaseAnalyzer(
 			return [];
 
 		var candidateIds = candidates.Candidates.Select(candidate => candidate.ProductId).ToList();
-		var candidateCrosses = new Dictionary<int, IReadOnlySet<int>>(candidateIds.Count);
-		foreach (var candidateId in candidateIds)
-			candidateCrosses[candidateId] = await GetCrossesAsync(candidateId, crosses, cancellationToken);
+		await LoadCrossesAsync(candidateIds, crosses, cancellationToken);
 
 		var salesCounts = await reader.GetSalesCountsAsync(parameters, candidateIds, cancellationToken);
-		return calculator.BuildRelated(candidates, candidateCrosses, salesCounts, totalSalesCount, parameters);
+		return calculator.BuildRelated(candidates, crosses, salesCounts, totalSalesCount, parameters);
 	}
 
-	private async Task<IReadOnlySet<int>> GetCrossesAsync(
-		int productId,
+	private async Task LoadCrossesAsync(
+		IEnumerable<int> productIds,
 		Dictionary<int, IReadOnlySet<int>> crosses,
 		CancellationToken cancellationToken)
 	{
-		if (crosses.TryGetValue(productId, out var cached))
-			return cached;
+		var missingIds = productIds.Where(productId => !crosses.ContainsKey(productId)).Distinct().ToList();
+		if (missingIds.Count == 0)
+			return;
 
-		var result = (await productCrosses.GetCrossIdsAsync(productId, cancellationToken)).ToHashSet();
-		crosses[productId] = result;
-		return result;
+		var loaded = await productCrosses.GetCrossIdsAsync(missingIds, cancellationToken);
+		foreach (var productId in missingIds)
+			crosses[productId] = loaded.TryGetValue(productId, out var crossIds)
+				? crossIds.ToHashSet()
+				: new HashSet<int>();
 	}
 
 	private static string Key(IEnumerable<int> productIds) => string.Join(',', productIds.Order());
