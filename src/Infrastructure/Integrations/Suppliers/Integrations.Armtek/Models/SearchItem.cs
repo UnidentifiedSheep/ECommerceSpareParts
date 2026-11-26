@@ -12,8 +12,6 @@ public record SearchItem
 
 	private const string NotAnalogFlag = "0";
 
-	private static readonly TimeSpan ArmtekOffset = TimeSpan.FromHours(3);
-
 	[JsonPropertyName("PIN")]
 	[JsonConverter(typeof(FlexibleStringConverter))]
 	public string? Number { get; init; }
@@ -74,6 +72,10 @@ public record SearchItem
 	[JsonConverter(typeof(FlexibleStringConverter))]
 	public string? GuaranteedDeliveryDateRaw { get; init; }
 
+	[JsonPropertyName("ORDDT")]
+	[JsonConverter(typeof(FlexibleStringConverter))]
+	public string? OrderDeadlineRaw { get; init; }
+
 	[JsonPropertyName("ANALOG")]
 	[JsonConverter(typeof(FlexibleStringConverter))]
 	public string? AnalogFlag { get; init; }
@@ -104,6 +106,9 @@ public record SearchItem
 	public DateTimeOffset? GuaranteedDeliveryDate => ParseDate(GuaranteedDeliveryDateRaw);
 
 	[JsonIgnore]
+	public DateTimeOffset? OrderDeadline => ParseDate(OrderDeadlineRaw);
+
+	[JsonIgnore]
 	public bool IsPartnerWarehouse
 		=> !string.IsNullOrWhiteSpace(PartnerCode) && PartnerCode.Trim() != OwnWarehousePartnerCode;
 
@@ -129,6 +134,6 @@ public record SearchItem
 			CultureInfo.InvariantCulture,
 			DateTimeStyles.None,
 			out var local)
-			? new DateTimeOffset(local, ArmtekOffset)
+			? new DateTimeOffset(local, ArmtekTime.Offset)
 			: null;
 }
