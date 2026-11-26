@@ -1,6 +1,5 @@
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Pricing;
-using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
@@ -30,9 +29,9 @@ public sealed class PriceCandidateBuilder : IPriceCandidateBuilder
 					offer.PurchasePrice,
 					offer.CurrencyId,
 					offer.AvailableQuantity,
-					sourceType == PriceOfferSourceType.OurWarehouse
-						? FulfillmentRouteInfo.SameStorage(targetStorageCode)
-						: FulfillmentRouteInfo.FromSupplier(offer)));
+					offer.DeliveryDays ?? 0,
+					offer.GuaranteedDeliveryDays ?? 0,
+					sourceType == PriceOfferSourceType.OurWarehouse ? 100 : offer.DeliveryProbability));
 		}
 
 		return result;

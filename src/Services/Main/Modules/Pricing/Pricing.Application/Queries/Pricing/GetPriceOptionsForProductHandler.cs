@@ -1,3 +1,4 @@
+using Enums;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -5,10 +6,12 @@ using Application.Common.Interfaces.Settings;
 using Application.Common.Models;
 using Application.Common.Querying;
 using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Logistics.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Commands.Pricing;
 using Pricing.Application.Dtos.Price;
+using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Entities.Enums;
@@ -33,7 +36,8 @@ public class GetPriceOptionsForProductHandler(
 	ICurrencyConverter currencyConverter,
 	IMarkupContainer markupContainer,
 	IPriceApplierService priceApplierService,
-	ISettingsService settingsService)
+	ISettingsService settingsService,
+	IDeliveryEstimator deliveryEstimator)
 	: IQueryHandler<GetPriceOptionsForProductQuery, GetPriceOptionsForProductResult>
 {
 	public async Task<GetPriceOptionsForProductResult> Handle(
@@ -48,6 +52,7 @@ public class GetPriceOptionsForProductHandler(
 			await CalculateCandidates(request, cancellationToken);
 
 		var options = await GetOptionsAsync(request, cancellationToken);
+		var arrivalDates = await GetArrivalDatesAsync(options, cancellationToken);
 
 		var result = new List<PriceOptionDto>();
 
@@ -57,8 +62,8 @@ public class GetPriceOptionsForProductHandler(
 				{
 					CurrencyId = request.CurrencyId,
 					DeliveryProbability = option.DeliveryProbability,
-					DeliveryTime = option.DeliveryTime,
-					GuaranteedDeliveryTime = option.GuaranteedDeliveryTime,
+					DeliveryDays = option.DeliveryDays,
+					GuaranteedDeliveryDays = option.GuaranteedDeliveryDays,
 					ForStorageCode = option.ForStorageCode,
 					Markup = option.Markup,
 					Price = await currencyConverter.ConvertAsync(
@@ -75,8 +80,11 @@ public class GetPriceOptionsForProductHandler(
 						DaysToRefund = option.PriceOffer.DaysToRefund,
 						DeliveryProbability = option.PriceOffer.DeliveryProbability,
 						ExpiresAt = option.PriceOffer.ExpiresAt,
-						DeliveryDate = option.PriceOffer.DeliveryDate,
-						GuaranteedDeliveryDate = option.PriceOffer.GuaranteedDeliveryDate,
+						DeliveryDate = GetArrivalDate(arrivalDates, option.PriceOffer, option.PriceOffer.DeliveryDays),
+						GuaranteedDeliveryDate = GetArrivalDate(
+							arrivalDates,
+							option.PriceOffer,
+							option.PriceOffer.GuaranteedDeliveryDays),
 						OrderTill = option.PriceOffer.OrderTill,
 						Id = option.PriceOffer.Id,
 						MinimumPurchaseQuantity = option.PriceOffer.MinimumPurchaseQuantity,
@@ -89,6 +97,46 @@ public class GetPriceOptionsForProductHandler(
 				});
 
 		return new GetPriceOptionsForProductResult(result);
+	}
+
+	private async Task<Dictionary<(Supplier, string), IReadOnlyDictionary<int, DateTime>>> GetArrivalDatesAsync(
+		IReadOnlyCollection<ProductPriceOption> options,
+		CancellationToken cancellationToken)
+	{
+		var now = DateTime.UtcNow;
+		var result = new Dictionary<(Supplier, string), IReadOnlyDictionary<int, DateTime>>();
+
+		var groups = options
+			.Select(x => x.PriceOffer)
+			.Where(x => x.Source.ToSupplier() != null)
+			.GroupBy(x => (Supplier: x.Source.ToSupplier()!.Value, x.OfferForStorage));
+
+		foreach (var group in groups)
+			result[group.Key] = await deliveryEstimator.GetArrivalDatesAsync(
+				group.Key.Supplier,
+				group.Key.OfferForStorage,
+				now,
+				group
+					.SelectMany(x => new[] { x.DeliveryDays, x.GuaranteedDeliveryDays })
+					.Where(x => x.HasValue)
+					.Select(x => x!.Value),
+				cancellationToken);
+
+		return result;
+	}
+
+	private static DateTime? GetArrivalDate(
+		Dictionary<(Supplier, string), IReadOnlyDictionary<int, DateTime>> arrivalDates,
+		PriceOffer offer,
+		int? deliveryDays)
+	{
+		if (deliveryDays is not { } days || offer.Source.ToSupplier() is not { } supplier)
+			return null;
+
+		return arrivalDates.TryGetValue((supplier, offer.OfferForStorage), out var dates) &&
+			dates.TryGetValue(days, out var date)
+				? date
+				: null;
 	}
 
 	private async Task CalculateCandidates(

@@ -22,9 +22,9 @@ public record CalculatedPriceCandidate
 
 	public required int AvailableQuantity { get; init; }
 
-	public required TimeSpan DeliveryTime { get; init; }
+	public required int DeliveryDays { get; init; }
 
-	public required TimeSpan GuaranteedDeliveryTime { get; init; }
+	public required int GuaranteedDeliveryDays { get; init; }
 
 	public required int DeliveryProbability { get; init; }
 }

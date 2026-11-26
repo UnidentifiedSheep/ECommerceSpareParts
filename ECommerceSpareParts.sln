@@ -372,6 +372,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logistics.Module", "src\Ser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logistics.Application", "src\Services\Main\Modules\Logistics\Logistics.Application\Logistics.Application.csproj", "{074A4C55-E078-4D97-AF28-EE237976FE50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logistics.Abstractions", "src\Services\Main\Modules\Logistics\Logistics.Abstractions\Logistics.Abstractions.csproj", "{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2074,6 +2076,18 @@ Global
 		{074A4C55-E078-4D97-AF28-EE237976FE50}.Release|x64.Build.0 = Release|Any CPU
 		{074A4C55-E078-4D97-AF28-EE237976FE50}.Release|x86.ActiveCfg = Release|Any CPU
 		{074A4C55-E078-4D97-AF28-EE237976FE50}.Release|x86.Build.0 = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|x64.Build.0 = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Debug|x86.Build.0 = Debug|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x64.ActiveCfg = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x64.Build.0 = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x86.ActiveCfg = Release|Any CPU
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2258,5 +2272,6 @@ Global
 		{C016A5EA-4816-4221-83B8-D27AE4A71BE9} = {D162626F-2957-4CC3-BE74-F591682AF67D}
 		{04D99C2A-3865-4DBD-AE0C-7295C3530A10} = {D162626F-2957-4CC3-BE74-F591682AF67D}
 		{074A4C55-E078-4D97-AF28-EE237976FE50} = {D162626F-2957-4CC3-BE74-F591682AF67D}
+		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13} = {D162626F-2957-4CC3-BE74-F591682AF67D}
 	EndGlobalSection
 EndGlobal

@@ -49,8 +49,8 @@ public class CalculateCandidatesHandler(
 				x.Price,
 				x.CurrencyId,
 				x.Markup,
-				x.DeliveryTime,
-				x.GuaranteedDeliveryTime,
+				x.DeliveryDays,
+				x.GuaranteedDeliveryDays,
 				x.DeliveryProbability))
 			.ToList();
 		await optionsRepository.UpsertAsync(priceOptions, cancellationToken);

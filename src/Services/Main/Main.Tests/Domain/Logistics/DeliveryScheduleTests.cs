@@ -11,10 +11,12 @@ public class DeliveryScheduleTests
 {
 	private static readonly DateOnly Monday = new(2026, 11, 23);
 
+	private static readonly TimeOnly Arrival = new(14, 0);
+
 	[Fact]
 	public void Create_TrimsStorageCodeAndUsesSupplierAndStorageAsKey()
 	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "  MAIN-01 ", DeliveryDays.Monday | DeliveryDays.Thursday);
+		var schedule = DeliverySchedule.Create(Supplier.Armtek, "  MAIN-01 ", DeliveryDays.Monday | DeliveryDays.Thursday, Arrival);
 
 		schedule.StorageCode.Should().Be("MAIN-01");
 		schedule.GetId().Should().Be(new DeliveryScheduleKey(Supplier.Armtek, "MAIN-01"));
@@ -27,7 +29,7 @@ public class DeliveryScheduleTests
 	[InlineData("   ")]
 	public void Create_RejectsEmptyStorageCode(string storageCode)
 	{
-		var action = () => DeliverySchedule.Create(Supplier.Tmtr, storageCode, DeliveryDays.Monday);
+		var action = () => DeliverySchedule.Create(Supplier.Tmtr, storageCode, DeliveryDays.Monday, Arrival);
 
 		action.Should().Throw<InvalidInputException>();
 	}
@@ -38,7 +40,7 @@ public class DeliveryScheduleTests
 		var action = () => DeliverySchedule.Create(
 			Supplier.Tmtr,
 			new string('A', DeliverySchedule.StorageCodeMaxLength + 1),
-			DeliveryDays.Monday);
+			DeliveryDays.Monday, Arrival);
 
 		action.Should().Throw<InvalidInputException>();
 	}
@@ -49,7 +51,7 @@ public class DeliveryScheduleTests
 	[InlineData(DeliveryDays.Monday | (DeliveryDays)256)]
 	public void SetDays_RejectsEmptyOrUnsupportedDays(DeliveryDays days)
 	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday);
+		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday, Arrival);
 
 		var action = () => schedule.SetDays(days);
 
@@ -58,43 +60,9 @@ public class DeliveryScheduleTests
 	}
 
 	[Fact]
-	public void IsDeliveryDay_MatchesScheduledWeekdaysAndSkipsExceptions()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday | DeliveryDays.Sunday);
-		schedule.AddException(Monday.AddDays(7), Monday);
-
-		schedule.IsDeliveryDay(Monday).Should().BeTrue();
-		schedule.IsDeliveryDay(Monday.AddDays(1)).Should().BeFalse();
-		schedule.IsDeliveryDay(Monday.AddDays(6)).Should().BeTrue();
-		schedule.IsDeliveryDay(Monday.AddDays(7)).Should().BeFalse();
-	}
-
-	[Fact]
-	public void GetNextDeliveryDate_ReturnsSameDayOrNextScheduledDaySkippingExceptions()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Wednesday);
-		var wednesday = Monday.AddDays(2);
-		schedule.AddException(wednesday, Monday);
-
-		schedule.GetNextDeliveryDate(Monday).Should().Be(wednesday.AddDays(7));
-		schedule.GetNextDeliveryDate(wednesday.AddDays(7)).Should().Be(wednesday.AddDays(7));
-	}
-
-	[Fact]
-	public void GetNextDeliveryDate_SkipsConsecutiveExceptionsOfSingleWeeklyDay()
-	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.Monday);
-		schedule.AddException(Monday, Monday);
-		schedule.AddException(Monday.AddDays(7), Monday);
-		schedule.AddException(Monday.AddDays(14), Monday);
-
-		schedule.GetNextDeliveryDate(Monday).Should().Be(Monday.AddDays(21));
-	}
-
-	[Fact]
 	public void AddException_CreatesExceptionBoundToSchedule()
 	{
-		var schedule = DeliverySchedule.Create(Supplier.FavoritParts, "MAIN-01", DeliveryDays.All);
+		var schedule = DeliverySchedule.Create(Supplier.FavoritParts, "MAIN-01", DeliveryDays.All, Arrival);
 
 		var exception = schedule.AddException(Monday, Monday);
 
@@ -105,7 +73,7 @@ public class DeliveryScheduleTests
 	[Fact]
 	public void AddException_RejectsPastAndDuplicateDates()
 	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.All);
+		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.All, Arrival);
 		schedule.AddException(Monday, Monday);
 
 		var past = () => schedule.AddException(Monday.AddDays(-1), Monday);
@@ -119,14 +87,13 @@ public class DeliveryScheduleTests
 	[Fact]
 	public void RemoveException_RemovesExistingAndRejectsMissingDate()
 	{
-		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.All);
+		var schedule = DeliverySchedule.Create(Supplier.Armtek, "MAIN-01", DeliveryDays.All, Arrival);
 		schedule.AddException(Monday, Monday);
 
 		schedule.RemoveException(Monday);
 		var missing = () => schedule.RemoveException(Monday);
 
 		schedule.Exceptions.Should().BeEmpty();
-		schedule.IsDeliveryDay(Monday).Should().BeTrue();
 		missing.Should().Throw<ScheduleExceptionNotFoundException>();
 	}
 }

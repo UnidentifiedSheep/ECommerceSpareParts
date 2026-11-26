@@ -11,6 +11,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\..\..\..\Persistence.Common\Persistence.Common.csproj"/>
+        <ProjectReference Include="..\Logistics.Application\Logistics.Application.csproj"/>
         <ProjectReference Include="..\Logistics.Entities\Logistics.Entities.csproj"/>
     </ItemGroup>
 

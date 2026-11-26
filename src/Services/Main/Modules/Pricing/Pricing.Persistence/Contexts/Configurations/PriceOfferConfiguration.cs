@@ -57,11 +57,11 @@ public class PriceOfferConfiguration : IEntityTypeConfiguration<PriceOffer>
 
 		builder.Property(e => e.DaysToRefund).HasColumnName("days_to_refund");
 
-		builder.Property(e => e.DeliveryDate).HasColumnName("delivery_date");
+		builder.Property(e => e.DeliveryDays).HasColumnName("delivery_days");
 
 		builder.Property(e => e.SourceOccurredAt).HasColumnName("source_occurred_at");
 
-		builder.Property(e => e.GuaranteedDeliveryDate).HasColumnName("guaranteed_delivery_date");
+		builder.Property(e => e.GuaranteedDeliveryDays).HasColumnName("guaranteed_delivery_days");
 
 		builder.Property(e => e.DeliveryProbability).HasColumnName("delivery_probability");
 

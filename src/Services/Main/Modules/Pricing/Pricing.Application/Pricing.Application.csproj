@@ -22,6 +22,8 @@
         <ProjectReference Include="..\..\..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\..\Analytics\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Currency\Currency.Abstractions\Currency.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\Logistics\Logistics.Abstractions\Logistics.Abstractions.csproj"/>
+        <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Product\Product.Abstractions\Product.Abstractions.csproj"/>
         <ProjectReference Include="..\..\Storage\Storage.Abstractions\Storage.Abstractions.csproj"/>
         <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>

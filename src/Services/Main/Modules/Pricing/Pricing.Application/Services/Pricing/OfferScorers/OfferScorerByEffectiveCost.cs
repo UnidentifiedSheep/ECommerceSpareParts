@@ -41,8 +41,8 @@ public sealed class OfferScorerByEffectiveCost(
 				candidate.CurrencyId,
 				cancellationToken);
 			var effect = costInBaseCurrency + GetAverageDeliveryPenalty(
-				(int)Math.Ceiling(candidate.DeliveryTime.TotalDays),
-				(int)Math.Ceiling(candidate.GuaranteedDeliveryTime.TotalDays),
+				candidate.DeliveryDays,
+				candidate.GuaranteedDeliveryDays,
 				penaltyPerDay);
 			scored.Add((CalculatedScoredPriceCandidate.From(candidate, ToScore(effect)), costInBaseCurrency));
 		}
@@ -50,8 +50,8 @@ public sealed class OfferScorerByEffectiveCost(
 		return scored
 			.OrderByDescending(x => x.candidate.Score)
 			.ThenBy(x => x.basePrice)
-			.ThenBy(x => x.candidate.DeliveryTime)
-			.ThenBy(x => x.candidate.GuaranteedDeliveryTime)
+			.ThenBy(x => x.candidate.DeliveryDays)
+			.ThenBy(x => x.candidate.GuaranteedDeliveryDays)
 			.ThenByDescending(x => x.candidate.AvailableQuantity)
 			.Select(x => x.candidate)
 			.ToList();

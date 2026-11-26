@@ -37,6 +37,12 @@ public sealed class GqlDeliverySchedule
 		CancellationToken cancellationToken)
 		=> (await GetDtoAsync(loader, cancellationToken)).Days.ToDaysOfWeek();
 
+	[GraphQLName("arrivalTime")]
+	public async Task<TimeOnly> GetArrivalTimeAsync(
+		IDeliveryScheduleByKeyDataLoader loader,
+		CancellationToken cancellationToken)
+		=> (await GetDtoAsync(loader, cancellationToken)).ArrivalTime;
+
 	[GraphQLName("exceptions")]
 	public async Task<IReadOnlyList<DateOnly>> GetExceptionsAsync(
 		IDeliveryScheduleByKeyDataLoader loader,

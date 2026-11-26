@@ -28,6 +28,8 @@ public sealed class DeliveryScheduleConfiguration : IEntityTypeConfiguration<Del
 			.HasColumnName("days")
 			.HasConversion(new EnumToNumberConverter<DeliveryDays, int>());
 
+		builder.Property(schedule => schedule.ArrivalTime).HasColumnName("arrival_time");
+
 		builder.HasIndex(schedule => schedule.StorageCode).HasDatabaseName("delivery_schedules_storage_code_index");
 
 		builder

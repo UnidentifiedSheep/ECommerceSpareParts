@@ -39,9 +39,9 @@ public class ProductPriceOptionRepository(
 					nameof(ProductPriceOption.MarkupVersion),
 					nameof(ProductPriceOption.AppliersVersion),
 					nameof(ProductPriceOption.PricingSettingsVersion),
-					nameof(ProductPriceOption.DeliveryTime),
+					nameof(ProductPriceOption.DeliveryDays),
 					nameof(ProductPriceOption.DeliveryProbability),
-					nameof(ProductPriceOption.GuaranteedDeliveryTime)
+					nameof(ProductPriceOption.GuaranteedDeliveryDays)
 				]
 			},
 			cancellationToken: cancellationToken);

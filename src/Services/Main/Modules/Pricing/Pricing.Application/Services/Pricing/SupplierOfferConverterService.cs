@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Settings;
 using Enums;
 using Integrations.Supplier.Models;
 using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Logistics.Abstractions.Interfaces;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
@@ -12,7 +13,8 @@ namespace Pricing.Application.Services.Pricing;
 
 public class SupplierOfferConverterService(
 	ICurrencyLookup currencyLookup,
-	ISettingsService settingsService) : ISupplierOfferConverterService
+	ISettingsService settingsService,
+	IDeliveryEstimator deliveryEstimator) : ISupplierOfferConverterService
 {
 	public async Task<IReadOnlyList<SupplierOfferConversionResult>> ConvertAsync(
 		int productId,
@@ -43,8 +45,23 @@ public class SupplierOfferConverterService(
 		IReadOnlyList<SupplierPosition> positions,
 		CancellationToken token = default)
 	{
+		var now = DateTime.UtcNow;
 		var offerTtl = (await settingsService.GetOrDefault<PricingSetting>(token)).Data.OfferTtl;
-		var expiresAt = DateTime.UtcNow.Add(offerTtl);
+		var expiresAt = now.Add(offerTtl);
+		var from = DateOnly.FromDateTime(now);
+
+		var estimates = await deliveryEstimator.EstimateAsync(
+			supplier,
+			storageCode,
+			from,
+			positions
+				.Where(x => x.DeliveryInfo != null)
+				.SelectMany(x => new[]
+				{
+					DateOnly.FromDateTime(x.DeliveryInfo!.DeliveryDate),
+					DateOnly.FromDateTime(x.DeliveryInfo.GuaranteedDeliveryDate)
+				}),
+			token);
 
 		var offers = new List<PriceOffer>();
 		var notFoundCurrencies = new HashSet<string>();
@@ -78,8 +95,8 @@ public class SupplierOfferConverterService(
 					supplierOffer.PurchaseInfo.MinimumPurchaseQuantity,
 					supplierOffer.PurchaseInfo.QuantityCoefficient,
 					supplierOffer.PurchaseInfo.DaysToRefund,
-					supplierOffer.DeliveryInfo.DeliveryDate,
-					supplierOffer.DeliveryInfo.GuaranteedDeliveryDate,
+					estimates[DateOnly.FromDateTime(supplierOffer.DeliveryInfo.DeliveryDate)].DeliveryDays,
+					estimates[DateOnly.FromDateTime(supplierOffer.DeliveryInfo.GuaranteedDeliveryDate)].DeliveryDays,
 					supplierOffer.DeliveryInfo.DeliveryProbability,
 					supplierOffer.DeliveryInfo.OrderTill,
 					expiresAt));

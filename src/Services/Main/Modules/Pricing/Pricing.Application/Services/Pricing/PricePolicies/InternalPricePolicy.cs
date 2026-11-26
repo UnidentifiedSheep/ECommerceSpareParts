@@ -33,9 +33,9 @@ public class InternalPricePolicy(IPriceApplierService applierService) : IInterna
 				new CalculatedPriceCandidate
 				{
 					AvailableQuantity = candidate.AvailableQuantity,
-					DeliveryTime = candidate.Fulfillment.DeliveryTime,
-					DeliveryProbability = candidate.Fulfillment.DeliveryProbability,
-					GuaranteedDeliveryTime = candidate.Fulfillment.GuaranteedDeliveryTime,
+					DeliveryDays = candidate.DeliveryDays,
+					DeliveryProbability = candidate.DeliveryProbability,
+					GuaranteedDeliveryDays = candidate.GuaranteedDeliveryDays,
 					Markup = state.BaseMarkup?.Proportion ?? 0,
 					Price = state.SalePrice,
 					CurrencyId = candidate.CurrencyId,

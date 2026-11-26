@@ -10,13 +10,21 @@ namespace Main.Modules.Logistics.Application.Commands.DeliverySchedules.CreateDe
 
 [AutoSave]
 [Transactional]
-public record CreateDeliveryScheduleCommand(Supplier Supplier, string StorageCode, DeliveryDays Days) : ICommand;
+public record CreateDeliveryScheduleCommand(
+	Supplier Supplier,
+	string StorageCode,
+	DeliveryDays Days,
+	TimeOnly ArrivalTime) : ICommand;
 
 public class CreateDeliveryScheduleHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateDeliveryScheduleCommand>
 {
 	public async Task<Unit> Handle(CreateDeliveryScheduleCommand request, CancellationToken cancellationToken)
 	{
-		var schedule = DeliverySchedule.Create(request.Supplier, request.StorageCode, request.Days);
+		var schedule = DeliverySchedule.Create(
+			request.Supplier,
+			request.StorageCode,
+			request.Days,
+			request.ArrivalTime);
 		await unitOfWork.AddAsync(schedule, cancellationToken);
 		return Unit.Value;
 	}

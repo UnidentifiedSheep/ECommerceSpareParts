@@ -33,9 +33,9 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 
 	public int DaysToRefund { get; private set; }
 
-	public DateTime? DeliveryDate { get; private set; }
+	public int? DeliveryDays { get; private set; }
 
-	public DateTime? GuaranteedDeliveryDate { get; private set; }
+	public int? GuaranteedDeliveryDays { get; private set; }
 
 	public DateTime? OrderTill { get; private set; }
 
@@ -60,8 +60,8 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 		int minimumPurchaseQuantity,
 		int quantityCoefficient,
 		int daysToRefund,
-		DateTime deliveryDate,
-		DateTime guaranteedDeliveryDate,
+		int deliveryDays,
+		int guaranteedDeliveryDays,
 		int deliveryProbability,
 		DateTime orderTill,
 		DateTime expiresAt)
@@ -78,8 +78,8 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 			MinimumPurchaseQuantity = minimumPurchaseQuantity,
 			QuantityCoefficient = quantityCoefficient,
 			DaysToRefund = daysToRefund,
-			DeliveryDate = deliveryDate,
-			GuaranteedDeliveryDate = guaranteedDeliveryDate,
+			DeliveryDays = deliveryDays,
+			GuaranteedDeliveryDays = guaranteedDeliveryDays,
 			DeliveryProbability = deliveryProbability,
 			OrderTill = orderTill,
 			ExpiresAt = expiresAt
@@ -109,8 +109,8 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
 			MinimumPurchaseQuantity = minimumPurchaseQuantity,
 			QuantityCoefficient = quantityCoefficient,
 			DaysToRefund = daysToRefund,
-			DeliveryDate = null,
-			GuaranteedDeliveryDate = null,
+			DeliveryDays = null,
+			GuaranteedDeliveryDays = null,
 			DeliveryProbability = 99,
 			OrderTill = null,
 			SourceOccurredAt = occuredAt,

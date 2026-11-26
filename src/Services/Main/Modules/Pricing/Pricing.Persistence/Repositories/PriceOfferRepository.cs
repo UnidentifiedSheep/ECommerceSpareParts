@@ -42,8 +42,8 @@ public class PriceOfferRepository(UnifiedDbContext context,
 					nameof(PriceOffer.MinimumPurchaseQuantity),
 					nameof(PriceOffer.QuantityCoefficient),
 					nameof(PriceOffer.DaysToRefund),
-					nameof(PriceOffer.DeliveryDate),
-					nameof(PriceOffer.GuaranteedDeliveryDate),
+					nameof(PriceOffer.DeliveryDays),
+					nameof(PriceOffer.GuaranteedDeliveryDays),
 					nameof(PriceOffer.DeliveryProbability),
 					nameof(PriceOffer.OrderTill),
 					nameof(PriceOffer.ExpiresAt),
@@ -68,5 +68,24 @@ public class PriceOfferRepository(UnifiedDbContext context,
 			.Where(x => x.ProductId == productId)
 			.Where(x => x.OfferForStorage == storageCode)
 			.Where(x => sources.Contains(x.Source))
+			.ExecuteDeleteAsync(cancellationToken);
+
+	public Task DeleteOurWarehouseOffersAsync(
+		IEnumerable<string> sourceKeys,
+		CancellationToken cancellationToken = default)
+	{
+		var keys = sourceKeys.ToList();
+		return Context
+			.Set<PriceOffer>()
+			.Where(x => x.Source == PriceOfferSource.OurWarehouse)
+			.Where(x => keys.Contains(x.SourceKey))
+			.ExecuteDeleteAsync(cancellationToken);
+	}
+
+	public Task DeleteEmptyOurWarehouseOffersAsync(CancellationToken cancellationToken = default)
+		=> Context
+			.Set<PriceOffer>()
+			.Where(x => x.Source == PriceOfferSource.OurWarehouse)
+			.Where(x => x.AvailableQuantity <= 0)
 			.ExecuteDeleteAsync(cancellationToken);
 }

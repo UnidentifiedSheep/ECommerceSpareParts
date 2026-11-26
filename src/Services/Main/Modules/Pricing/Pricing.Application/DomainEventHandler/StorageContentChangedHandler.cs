@@ -24,6 +24,7 @@ public sealed class StorageContentChangedHandler(
 			.ToList();
 
 		var offers = latest
+			.Where(x => x.Content.AvailableCount > 0)
 			.Select(x => PriceOffer.CreateForOurWarehouse(
 				x.Content.ProductId,
 				x.Content.CurrencyId,
@@ -43,6 +44,11 @@ public sealed class StorageContentChangedHandler(
 				StorageCode = x.Content.StorageCode, ProductId = x.Content.ProductId
 			}));
 
+		await offerRepository.DeleteOurWarehouseOffersAsync(
+			latest
+				.Where(x => x.Content.AvailableCount <= 0)
+				.Select(x => x.Content.StorageContentId.ToString(CultureInfo.InvariantCulture)),
+			cancellationToken);
 		await offerRepository.UpsertOffersAsync(offers, cancellationToken);
 	}
 }

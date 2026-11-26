@@ -8,4 +8,9 @@
         <RootNamespace>Pricing.Abstractions</RootNamespace>
     </PropertyGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\..\..\..\Core\Enums\Enums.csproj"/>
+    </ItemGroup>
+
 </Project>

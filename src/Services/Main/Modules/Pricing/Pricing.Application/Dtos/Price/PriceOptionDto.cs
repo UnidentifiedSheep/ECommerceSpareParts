@@ -22,11 +22,11 @@ public record PriceOptionDto
 	[JsonPropertyName("forStorage")]
 	public required string ForStorageCode { get; init; }
 
-	[JsonPropertyName("deliveryTime")]
-	public required TimeSpan DeliveryTime { get; init; }
+	[JsonPropertyName("deliveryDays")]
+	public required int DeliveryDays { get; init; }
 
-	[JsonPropertyName("guaranteedDeliveryTime")]
-	public required TimeSpan GuaranteedDeliveryTime { get; init; }
+	[JsonPropertyName("guaranteedDeliveryDays")]
+	public required int GuaranteedDeliveryDays { get; init; }
 
 	[JsonPropertyName("deliveryProbability")]
 	public required int DeliveryProbability { get; init; }

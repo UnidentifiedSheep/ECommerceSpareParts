@@ -16,6 +16,8 @@ public sealed class DeliveryScheduleBuilder(Faker faker) : BuilderBase<DeliveryS
 
 	public DeliveryDays? Days { get; private set; }
 
+	public TimeOnly? ArrivalTime { get; private set; }
+
 	public DeliveryScheduleBuilder WithSupplier(Supplier supplier)
 	{
 		Supplier = supplier;
@@ -34,6 +36,12 @@ public sealed class DeliveryScheduleBuilder(Faker faker) : BuilderBase<DeliveryS
 		return this;
 	}
 
+	public DeliveryScheduleBuilder WithArrivalTime(TimeOnly arrivalTime)
+	{
+		ArrivalTime = arrivalTime;
+		return this;
+	}
+
 	public DeliveryScheduleBuilder WithException(DateOnly date)
 	{
 		_exceptions.Add(date);
@@ -45,7 +53,7 @@ public sealed class DeliveryScheduleBuilder(Faker faker) : BuilderBase<DeliveryS
 		var schedule = DeliverySchedule.Create(
 			Supplier ?? Faker.PickRandom<Supplier>(),
 			StorageCode ?? Faker.Random.AlphaNumeric(8),
-			Days ?? DeliveryDays.Monday);
+			Days ?? DeliveryDays.Monday, ArrivalTime ?? new TimeOnly(14, 0));
 
 		foreach (var date in _exceptions)
 			schedule.AddException(date, DateOnly.MinValue);

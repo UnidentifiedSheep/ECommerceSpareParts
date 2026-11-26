@@ -15,6 +15,9 @@ public record DeliveryScheduleDto
 	[JsonPropertyName("days")]
 	public required DeliveryDays Days { get; init; }
 
+	[JsonPropertyName("arrivalTime")]
+	public required TimeOnly ArrivalTime { get; init; }
+
 	[JsonPropertyName("exceptions")]
 	public required IReadOnlyList<DateOnly> Exceptions { get; init; }
 }

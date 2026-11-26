@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using FluentAssertions;
 using Main.Modules.Currency.Abstractions.Interfaces;
+using Main.Modules.Logistics.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -17,14 +18,34 @@ using Pricing.Entities.Settings;
 using Tests.Extensions;
 using Tests.PricingTests.DataBuilders.Offers;
 using Tests.TestContainers.Combined;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Storage;
 
 namespace Tests.PricingTests.HandlerTests.Pricing;
 
-public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public sealed class GetRecommendedPriceTests : IntegrationTest
 {
-	private const int ProductId = 100;
-	private const string StorageCode = "main";
 	private const string Version = "current";
+
+	public GetRecommendedPriceTests(CombinedContainerFixture fixture) : base(fixture)
+	{
+		RegisterBasicContext<ProductTestContext>();
+		RegisterBasicContext<CurrencyTestContext>();
+		RegisterBasicContext<StorageTestContext>();
+	}
+
+	private int ProductId => GetContext<ProductTestContext>().Products[0].Id;
+
+	private int OtherProductId => GetContext<ProductTestContext>().Products[1].Id;
+
+	private string StorageCode => GetContext<StorageTestContext>().Storages.First().Code;
+
+	private string OtherStorageCode => GetContext<StorageTestContext>().Storages.Last().Code;
+
+	private int BaseCurrencyId => GetContext<CurrencyTestContext>().Currencies[0].Id;
+
+	private int OtherCurrencyId => GetContext<CurrencyTestContext>().Currencies[1].Id;
 
 	[Theory]
 	[InlineData(4, 100)]
@@ -127,12 +148,12 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 			100,
 			1m,
 			10m,
-			ProductId + 1);
+			OtherProductId);
 		await AddOption(
 			100,
 			1m,
 			10m,
-			storageCode: "other");
+			storageCode: OtherStorageCode);
 		await AddOption(
 			100,
 			1m,
@@ -174,7 +195,7 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 			2,
 			10m,
 			2m,
-			currencyId: 2);
+			currencyId: OtherCurrencyId);
 		await AddOption(
 			2,
 			30m,
@@ -182,7 +203,7 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 
 		var result = await GetRecommendation(4);
 
-		result.CurrencyId.Should().Be(1);
+		result.CurrencyId.Should().Be(BaseCurrencyId);
 		result.UnitPrice.Should().Be(115m);
 		result.TotalPrice.Should().Be(460m);
 	}
@@ -244,11 +265,11 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 		converter.Setup(x => x.ConvertAsync(
 				It.IsAny<decimal>(),
 				It.IsAny<int>(),
-				1,
+				BaseCurrencyId,
 				It.IsAny<CancellationToken>()))
 			.ReturnsAsync((
 				decimal value, int currency,
-				int _, CancellationToken _) => currency == 2 ? value * 20 : value);
+				int _, CancellationToken _) => currency == OtherCurrencyId ? value * 20 : value);
 		var markup = new Mock<IMarkupContainer>();
 		markup.SetupGet(x => x.CurrentVersion).Returns(Version);
 		var appliers = new Mock<IPriceApplierService>();
@@ -263,14 +284,15 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 			converter.Object,
 			markup.Object,
 			appliers.Object,
-			settings.Object);
+			settings.Object,
+			Scope.ServiceProvider.GetRequiredService<IDeliveryEstimator>());
 		sender.Setup(x => x.Send(It.IsAny<GetPriceOptionsForProductQuery>(), It.IsAny<CancellationToken>()))
 			.Returns((GetPriceOptionsForProductQuery query, CancellationToken token)
 				=> offers.Handle(query, token));
 		var result = await new GetRecommendedPriceHandler(sender.Object, settings.Object).Handle(
 			new GetRecommendedPriceQuery(
 				ProductId,
-				1,
+				BaseCurrencyId,
 				StorageCode,
 				quantity,
 				sources ?? []),
@@ -282,16 +304,20 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 		int quantity,
 		decimal price,
 		decimal score,
-		int productId = ProductId,
-		string storageCode = StorageCode,
-		int currencyId = 1,
+		int? productId = null,
+		string? storageCode = null,
+		int? currencyId = null,
 		PriceOfferSource source = PriceOfferSource.Armtek,
 		Action<PriceOfferDataBuilder>? configure = null)
 	{
+		productId ??= ProductId;
+		storageCode ??= StorageCode;
+		currencyId ??= BaseCurrencyId;
+
 		var offerBuilder = new PriceOfferDataBuilder(Faker)
-			.WithProductId(productId)
+			.WithProductId(productId.Value)
 			.WithStorageCode(storageCode)
-			.WithCurrencyId(currencyId)
+			.WithCurrencyId(currencyId.Value)
 			.WithAvailableQuantity(quantity)
 			.WithSource(source);
 		configure?.Invoke(offerBuilder);
@@ -299,7 +325,7 @@ public sealed class GetRecommendedPriceTests(CombinedContainerFixture fixture) :
 		return await new ProductPriceOptionDataBuilder(Faker)
 			.WithPriceOfferId(offer.Id)
 			.WithStorageCode(storageCode)
-			.WithCurrencyId(currencyId)
+			.WithCurrencyId(currencyId.Value)
 			.WithPrice(price)
 			.WithScore(score)
 			.WithVersions(

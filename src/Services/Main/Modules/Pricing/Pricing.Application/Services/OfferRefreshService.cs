@@ -4,43 +4,41 @@ using Enums;
 using Integrations.Supplier.Models;
 using Main.Modules.Product.Abstractions.Events;
 using Microsoft.Extensions.Logging;
+using Pricing.Abstractions.Events;
+using Pricing.Abstractions.Models;
 using Pricing.Application.Events;
 using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
+using Pricing.Application.Models;
 using Pricing.Entities.Enums;
 using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Services;
 
 public class OfferRefreshService(
-	ISupplierOfferExtractorService extractorService,
 	ISupplierOfferConverterService converterService,
 	IPriceOfferRepository offerRepository,
 	IIntegrationEventScope integrationEventScope,
 	IPriceOfferRefreshStateRepository stateRepository,
 	ISupplierOfferRequestMarkerService markerService,
+	IDomainEventScope domainEventScope,
 	ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
-	public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
+	public async Task<IReadOnlyList<PriceOffer>> ApplyExtractedOffersAsync(
+		DateTime extractedAt,
 		int productId,
 		string storageCode,
+		IReadOnlyList<SupplierOfferExtractionResult> extracted,
 		CancellationToken token = default)
 	{
-		var extracted = await extractorService.ExtractOffers(
-			storageCode,
-			productId,
-			token);
-
-		var now = DateTime.UtcNow;
-
 		var successful = extracted.Where(x => x is { IsSuccess: true, Offer: not null }).ToList();
 
 		var events = successful
 			.Select(x => new SupplierProductsRequestedEvent
 			{
 				Supplier = x.Supplier,
-				OccurredAt = now,
+				OccurredAt = extractedAt,
 				RequestedStorageCode = storageCode,
 				Products = [x.Offer!.ToContract()]
 			})
@@ -53,7 +51,7 @@ public class OfferRefreshService(
 				IReadOnlyList<SupplierPosition> (x) => x.SelectMany(r => r.Offer!.Positions).ToList());
 
 		var offers = await RefreshOffersAsync(
-			now,
+			extractedAt,
 			productId,
 			storageCode,
 			supplierPositions,
@@ -93,18 +91,15 @@ public class OfferRefreshService(
 		var notFoundCurrencies = new HashSet<string>();
 		var refreshed = new HashSet<int>();
 
+		var allowed = await UpsertStatesAsync(
+			dataExtractionTime,
+			storageCode,
+			supplierPositions.Select(x => (x.Key, source, x.Value.Count)),
+			token);
+
 		foreach (var (productId, positions) in supplierPositions)
 		{
-			var state = PriceOfferRefreshState.Create(
-				productId,
-				source,
-				storageCode);
-
-			state.OffersUpdated(dataExtractionTime, positions.Count);
-
-			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
-
-			if (!canRefresh)
+			if (!allowed.Contains(new PriceOfferRefreshStateKey(productId, source, storageCode)))
 				continue;
 
 			refreshed.Add(productId);
@@ -140,6 +135,12 @@ public class OfferRefreshService(
 
 		if (offers.Count != 0)
 			await offerRepository.UpsertOffersAsync(offers, token);
+
+		PublishRefreshed(
+			storageCode,
+			supplier,
+			offers,
+			dataExtractionTime);
 
 		await markerService.MarkAsOkAsync(
 			refreshed,
@@ -179,26 +180,17 @@ public class OfferRefreshService(
 
 		LogNotFoundCurrencies(notFoundCurrencies);
 
-		var sourcesToRemove = new List<PriceOfferSource>();
+		var allowed = await UpsertStatesAsync(
+			dataExtractionTime,
+			storageCode,
+			supplierPositions.Select(x => (productId, x.Key.ToSource(), x.Value.Count)),
+			token);
 
-		foreach (var (supplier, positions) in supplierPositions)
-		{
-			var source = supplier.ToSource();
+		var refreshedSuppliers = supplierPositions.Keys
+			.Where(x => allowed.Contains(new PriceOfferRefreshStateKey(productId, x.ToSource(), storageCode)))
+			.ToList();
 
-			var state = PriceOfferRefreshState.Create(
-				productId,
-				source,
-				storageCode);
-
-			state.OffersUpdated(dataExtractionTime, positions.Count);
-
-			var canRefresh = await stateRepository.UpsertStateAsync(state, token);
-
-			if (!canRefresh)
-				continue;
-
-			sourcesToRemove.Add(source);
-		}
+		var sourcesToRemove = refreshedSuppliers.Select(x => x.ToSource()).ToList();
 
 		if (sourcesToRemove.Count == 0)
 			return [];
@@ -208,6 +200,13 @@ public class OfferRefreshService(
 			storageCode,
 			sourcesToRemove,
 			token);
+
+		foreach (var supplier in refreshedSuppliers)
+			PublishRefreshed(
+				storageCode,
+				supplier,
+				offers,
+				dataExtractionTime);
 
 		if (offers.Count == 0)
 			return [];
@@ -227,6 +226,59 @@ public class OfferRefreshService(
 		await offerRepository.UpsertOffersAsync(filteredOffers, token);
 
 		return filteredOffers;
+	}
+
+	private async Task<IReadOnlySet<PriceOfferRefreshStateKey>> UpsertStatesAsync(
+		DateTime dataExtractionTime,
+		string storageCode,
+		IEnumerable<(int ProductId, PriceOfferSource Source, int OffersCount)> items,
+		CancellationToken token)
+	{
+		var states = items
+			.Select(x =>
+			{
+				var state = PriceOfferRefreshState.Create(
+					x.ProductId,
+					x.Source,
+					storageCode);
+
+				state.OffersUpdated(dataExtractionTime, x.OffersCount);
+
+				return state;
+			})
+			.ToList();
+
+		return await stateRepository.UpsertStatesAsync(states, token);
+	}
+
+	private void PublishRefreshed(
+		string storageCode,
+		Supplier supplier,
+		IReadOnlyCollection<PriceOffer> offers,
+		DateTime seenAt)
+	{
+		var source = supplier.ToSource();
+
+		var snapshots = offers
+			.Where(x => x.Source == source && x.OfferForStorage == storageCode)
+			.Select(x => new SupplierOfferSnapshot(
+				x.ProductId,
+				x.CurrencyId,
+				x.PurchasePrice,
+				x.DeliveryDays ?? 0,
+				x.GuaranteedDeliveryDays,
+				x.DeliveryProbability))
+			.ToList();
+
+		if (snapshots.Count == 0)
+			return;
+
+		domainEventScope.Add(
+			new SupplierOffersRefreshedEvent(
+				supplier,
+				storageCode,
+				seenAt,
+				snapshots));
 	}
 
 	private void LogNotFoundCurrencies(HashSet<string> notFoundCurrencies)

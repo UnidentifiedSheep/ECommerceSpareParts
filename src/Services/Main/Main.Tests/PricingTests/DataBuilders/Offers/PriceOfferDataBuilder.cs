@@ -21,6 +21,22 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
 
 	public DateTime OrderTill { get; private set; } = DateTime.UtcNow.AddHours(1);
 
+	public decimal? Price { get; private set; }
+
+	public int? DeliveryDays { get; private set; }
+
+	public PriceOfferDataBuilder WithPrice(decimal price)
+	{
+		Price = price;
+		return this;
+	}
+
+	public PriceOfferDataBuilder WithDeliveryDays(int deliveryDays)
+	{
+		DeliveryDays = deliveryDays;
+		return this;
+	}
+
 	public PriceOfferDataBuilder WithAvailableQuantity(int quantity)
 	{
 		AvailableQuantity = quantity;
@@ -65,20 +81,20 @@ public class PriceOfferDataBuilder(Faker faker) : BuilderBase<PriceOffer>(faker)
 
 	public override PriceOffer Build()
 	{
-		var now = DateTime.UtcNow;
+		var deliveryDays = DeliveryDays ?? 1;
 		return PriceOffer.CreateForSupplier(
 			ProductId,
 			CurrencyId,
 			StorageCode,
-			Faker.Random.Decimal(1m, 10_000m),
+			Price ?? Faker.Random.Decimal(1m, 10_000m),
 			Source,
 			$"offer-{Faker.Random.Guid():N}",
 			AvailableQuantity,
 			1,
 			1,
 			0,
-			now.AddDays(1),
-			now.AddDays(2),
+			deliveryDays,
+			deliveryDays + 1,
 			95,
 			OrderTill,
 			ExpiresAt);

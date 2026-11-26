@@ -52,6 +52,7 @@ public class ResyncOurWarehouseOffersLrt(
 
 					var now = DateTime.UtcNow;
 					var offers = snapshots
+						.Where(x => x.AvailableCount > 0)
 						.Select(x => PriceOffer.CreateForOurWarehouse(
 							x.ProductId,
 							x.CurrencyId,
@@ -74,9 +75,13 @@ public class ResyncOurWarehouseOffersLrt(
 								StorageCode = x.StorageCode, ProductId = x.ProductId
 							}));
 
-					await context
-						.GetRequiredService<IPriceOfferRepository>()
-						.UpsertOffersAsync(offers, cancellationToken);
+					var offerRepository = context.GetRequiredService<IPriceOfferRepository>();
+					await offerRepository.DeleteOurWarehouseOffersAsync(
+						snapshots
+							.Where(x => x.AvailableCount <= 0)
+							.Select(x => x.StorageContentId.ToString(CultureInfo.InvariantCulture)),
+						cancellationToken);
+					await offerRepository.UpsertOffersAsync(offers, cancellationToken);
 
 					await SaveStateAsync(
 						new ResyncOurWarehouseOffersState
@@ -92,5 +97,12 @@ public class ResyncOurWarehouseOffersLrt(
 			if (processed < BatchSize)
 				break;
 		}
+
+		await ExecuteInTransactionAsync(
+			TransactionalAttribute.ReadCommitted(60, 3),
+			(context, cancellationToken) => context
+				.GetRequiredService<IPriceOfferRepository>()
+				.DeleteEmptyOurWarehouseOffersAsync(cancellationToken),
+			CancellationToken);
 	}
 }

@@ -23,11 +23,11 @@ public sealed record GqlPriceOption([property: GraphQLIgnore]
 	[GraphQLName("forStorage")]
 	public GqlStorage ForStorage => new(Dto.ForStorageCode);
 
-	[GraphQLName("deliveryTime")]
-	public TimeSpan DeliveryTime => Dto.DeliveryTime;
+	[GraphQLName("deliveryDays")]
+	public int DeliveryDays => Dto.DeliveryDays;
 
-	[GraphQLName("guaranteedDeliveryTime")]
-	public TimeSpan GuaranteedDeliveryTime => Dto.GuaranteedDeliveryTime;
+	[GraphQLName("guaranteedDeliveryDays")]
+	public int GuaranteedDeliveryDays => Dto.GuaranteedDeliveryDays;
 
 	[GraphQLName("deliveryProbability")]
 	public int DeliveryProbability => Dto.DeliveryProbability;
