@@ -233,6 +233,8 @@
     "co.purchase.related.member.product.id.name": "Ürün",
     "co.purchase.related.member.product.id.description": "Varyant ürün kimliği.",
     "co.purchase.related.member.pair.count.name": "Birlikte satışlar",
-    "co.purchase.related.member.pair.count.description": "Bu varyantın ürünle birlikte satın alındığı satış sayısı."
+    "co.purchase.related.member.pair.count.description": "Bu varyantın ürünle birlikte satın alındığı satış sayısı.",
+    "lrt.co.purchase.calculation.name": "Birlikte alınanlar hesaplaması",
+    "lrt.co.purchase.calculation.description": "Her satılan ürünle, analogları dikkate alınarak birlikte satın alınan ürünleri bulur ve sonucu analiz çalıştırması olarak kaydeder."
   }
 }

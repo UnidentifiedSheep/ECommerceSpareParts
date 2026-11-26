@@ -233,6 +233,8 @@
     "co.purchase.related.member.product.id.name": "Product",
     "co.purchase.related.member.product.id.description": "Variant product identifier.",
     "co.purchase.related.member.pair.count.name": "Co-purchases",
-    "co.purchase.related.member.pair.count.description": "Number of sales where this variant was bought together with the product."
+    "co.purchase.related.member.pair.count.description": "Number of sales where this variant was bought together with the product.",
+    "lrt.co.purchase.calculation.name": "Also bought calculation",
+    "lrt.co.purchase.calculation.description": "Finds products bought together with each sold product, taking its analogs into account, and stores the result as an analysis run."
   }
 }

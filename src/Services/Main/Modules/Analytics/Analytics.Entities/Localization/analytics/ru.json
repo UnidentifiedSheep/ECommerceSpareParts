@@ -233,6 +233,8 @@
     "co.purchase.related.member.product.id.name": "Товар",
     "co.purchase.related.member.product.id.description": "Идентификатор товара варианта.",
     "co.purchase.related.member.pair.count.name": "Совместные продажи",
-    "co.purchase.related.member.pair.count.description": "Количество продаж, в которых этот вариант купили вместе с товаром."
+    "co.purchase.related.member.pair.count.description": "Количество продаж, в которых этот вариант купили вместе с товаром.",
+    "lrt.co.purchase.calculation.name": "Расчет «Также покупают»",
+    "lrt.co.purchase.calculation.description": "Находит товары, которые покупают вместе с каждым проданным товаром с учетом его аналогов, и сохраняет результат как запуск анализа."
   }
 }
