@@ -75,8 +75,9 @@ public sealed class CoPurchaseRelatedProvider(
 			.Where(run =>
 				run.AnalysisType == CoPurchaseRunFactory.AnalysisType &&
 				run.CompletedAt != null)
-			.OrderByDescending(run => run.CompletedAt)
-			.Select(run => run.Id)
+			.OrderByDescending(run => run.IsPinned)
+			.ThenByDescending(run => run.CompletedAt)
+			.Select(run => (Guid?)run.Id)
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 

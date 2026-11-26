@@ -48,11 +48,9 @@ public sealed record CoPurchaseRunItemDataPoint : IChartDataPoint
 	public decimal? TopLift { get; init; }
 
 	public IReadOnlyList<ChartReference> GetReferences()
-		=> TopRelatedProductId is { } topRelatedProductId
-			?
-			[
-				new(SchemaEntity.Product, ProductIdField, ProductId),
-				new(SchemaEntity.Product, TopRelatedProductIdField, topRelatedProductId)
-			]
-			: [new(SchemaEntity.Product, ProductIdField, ProductId)];
+		=>
+		[
+			new(SchemaEntity.Product, ProductIdField, ProductId),
+			new(SchemaEntity.Product, TopRelatedProductIdField, TopRelatedProductId)
+		];
 }
