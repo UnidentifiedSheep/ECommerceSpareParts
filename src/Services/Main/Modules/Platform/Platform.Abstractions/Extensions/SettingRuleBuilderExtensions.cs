@@ -29,6 +29,25 @@ public static class SettingRuleBuilderExtensions
 			.Must(value => value is null || SettingValues.TryParseUrl(value, out _))
 			.WithFieldError(SettingFieldUrlInvalidMessage.Create);
 
+	public static IRuleBuilderOptions<T, TProperty> GreaterThanZero<T, TProperty>(this IRuleBuilder<T, TProperty> rule)
+		where TProperty : struct, IComparable<TProperty>
+		=> rule
+			.Must(value => value.CompareTo(default) > 0)
+			.WithFieldError(SettingFieldPositiveMessage.Create);
+
+	public static IRuleBuilderOptions<T, TProperty?> GreaterThanZero<T, TProperty>(
+		this IRuleBuilder<T, TProperty?> rule)
+		where TProperty : struct, IComparable<TProperty>
+		=> rule
+			.Must(value => value is null || value.Value.CompareTo(default) > 0)
+			.WithFieldError(SettingFieldPositiveMessage.Create);
+
+	public static IRuleBuilderOptions<T, TProperty> NotNegative<T, TProperty>(this IRuleBuilder<T, TProperty> rule)
+		where TProperty : struct, IComparable<TProperty>
+		=> rule
+			.Must(value => value.CompareTo(default) >= 0)
+			.WithFieldError(SettingFieldNotNegativeMessage.Create);
+
 	public static IRuleBuilderOptions<T, TEnum> DefinedEnum<T, TEnum>(this IRuleBuilder<T, TEnum> rule)
 		where TEnum : struct, Enum
 		=> rule

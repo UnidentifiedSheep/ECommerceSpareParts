@@ -8,6 +8,8 @@
     "setting.field.max.length": "Поле '{Field}' не может быть длиннее {MaxLength} символов.",
     "setting.field.url.invalid": "Поле '{Field}' должно быть абсолютным http или https URL.",
     "setting.field.value.invalid": "Поле '{Field}' содержит неподдерживаемое значение.",
-    "setting.field.duplicate": "Поле '{Field}' содержит повторяющиеся значения."
+    "setting.field.duplicate": "Поле '{Field}' содержит повторяющиеся значения.",
+    "setting.field.positive": "Поле '{Field}' должно быть больше нуля.",
+    "setting.field.not.negative": "Поле '{Field}' не может быть отрицательным."
   }
 }

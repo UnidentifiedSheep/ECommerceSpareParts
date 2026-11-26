@@ -11,7 +11,7 @@ namespace Application.Common.NamedObject;
 public abstract class SettingDefinitionBase<TSetting, TData, TInput, TOutput>(
 	ISettingsService settingsService,
 	IValidator<TInput> inputValidator,
-	IValidator<TData> dataValidator) : SettingDefinitionNamedObjectBase<TSetting>(settingsService)
+	IValidator<TData>? dataValidator = null) : SettingDefinitionNamedObjectBase<TSetting>(settingsService)
 	where TSetting : Setting<TData>, ISetting<TSetting>
 	where TInput : class
 {
@@ -26,7 +26,8 @@ public abstract class SettingDefinitionBase<TSetting, TData, TInput, TOutput>(
 
 		var current = await SettingsService.GetOrDefault<TSetting>(cancellationToken);
 		var data = Map(input, current.Data);
-		await dataValidator.ValidateAndThrowAsync(data, cancellationToken);
+		if (dataValidator is not null)
+			await dataValidator.ValidateAndThrowAsync(data, cancellationToken);
 
 		await SettingsService.SetSetting(CreateSetting(data), cancellationToken);
 		await OnUpdatedAsync(data, cancellationToken);

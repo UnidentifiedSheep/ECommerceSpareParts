@@ -3,7 +3,6 @@
   "messages": {
     "supplier.favorit.setting.name": "Настройки поставщика Favorit",
     "supplier.favorit.setting.description": "Управляет настройками подключения к интеграции поставщика Favorit.",
-    "supplier.favorit.setting.input.invalid": "Переданы некорректные данные настроек поставщика Favorit.",
     "supplier.favorit.setting.is.enabled.name": "Интеграция включена",
     "supplier.favorit.setting.is.enabled.description": "Включает или отключает интеграцию с поставщиком Favorit.",
     "supplier.favorit.setting.base.url.name": "Базовый URL",
@@ -14,7 +13,6 @@
     "supplier.favorit.setting.has.api.key.description": "Показывает, сохранен ли API-ключ для интеграции с поставщиком Favorit.",
     "supplier.tmtr.setting.name": "Настройки поставщика TMTR",
     "supplier.tmtr.setting.description": "Управляет настройками подключения и доставки для интеграции с поставщиком TMTR.",
-    "supplier.tmtr.setting.input.invalid": "Переданы некорректные данные настроек поставщика TMTR.",
     "supplier.tmtr.setting.is.enabled.name": "Интеграция включена",
     "supplier.tmtr.setting.is.enabled.description": "Включает или отключает интеграцию с поставщиком TMTR.",
     "supplier.tmtr.setting.base.url.name": "Базовый URL",

@@ -37,8 +37,8 @@ public record TmtrSupplierSettingData
 public record TmtrAuthData
 {
 	[JsonPropertyName("login")]
-	public required string Login { get; init; }
+	public string? Login { get; init; }
 
 	[JsonPropertyName("encryptedPassword")]
-	public required string EncryptedPassword { get; init; }
+	public string? EncryptedPassword { get; init; }
 }

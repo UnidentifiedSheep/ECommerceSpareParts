@@ -1,8 +1,7 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Exceptions;
+using FluentValidation;
 using Locan.Core.Interfaces;
 using MassTransit;
 using Pricing.Application.Events;
@@ -13,8 +12,17 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Pricing.Application.NamedObjects.SettingDefinitions;
 
-public class PricingSettingDefinition(ISettingsService settingsService, IPublishEndpoint publishEndpoint)
-	: SettingDefinitionNamedObjectBase<PricingSetting>(settingsService)
+public class PricingSettingDefinition(
+	ISettingsService settingsService,
+	IPublishEndpoint publishEndpoint,
+	IValidator<PricingSettingInputData> inputValidator)
+	: SettingDefinitionBase<
+		PricingSetting,
+		PricingSettingData,
+		PricingSettingInputData,
+		PricingSettingData>(
+		settingsService,
+		inputValidator)
 {
 	public override string SystemName => PricingSetting.SettingName;
 
@@ -23,44 +31,24 @@ public class PricingSettingDefinition(ISettingsService settingsService, IPublish
 	public override ILocalizableMessage DescriptionLocalizationMessage
 		=> PricingSettingDescriptionMessage.Instance;
 
-	public override Type InputSettingType => typeof(PricingSettingInputData);
+	protected override PricingSettingData Map(PricingSettingInputData input, PricingSettingData current)
+		=> new()
+		{
+			Version = Guid.NewGuid(),
+			SelectedMarkupId = input.SelectedMarkupId,
+			DefaultMarkup = input.DefaultMarkup,
+			OfferTtl = input.OfferTtl,
+			PriceRoundingStep = input.PriceRoundingStep,
+			DeliveryDayPenalty = input.DeliveryDayPenalty,
+			UniqProductAdditionalMarkup = input.UniqProductAdditionalMarkup
+		};
 
-	public override Type OutputSettingType => typeof(PricingSettingData);
+	protected override PricingSettingData ToOutput(PricingSettingData data) => data;
 
-	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
-	{
-		var deser = JsonSerializer.Deserialize<PricingSettingInputData>(json) ??
-			throw new InvalidInputException(PricingSettingInputInvalidMessage.Instance);
+	protected override PricingSetting CreateSetting(PricingSettingData data) => new(data);
 
-		Validate(deser);
-
-		await SettingsService.SetSetting(
-			new PricingSetting(
-				new PricingSettingData
-				{
-					Version = Guid.NewGuid(),
-					SelectedMarkupId = deser.SelectedMarkupId,
-					DefaultMarkup = deser.DefaultMarkup,
-					OfferTtl = deser.OfferTtl,
-					PriceRoundingStep = deser.PriceRoundingStep,
-					DeliveryDayPenalty = deser.DeliveryDayPenalty,
-					UniqProductAdditionalMarkup = deser.UniqProductAdditionalMarkup
-				}),
-			cancellationToken);
-
-		await publishEndpoint.Publish(new MarkupRangesRefreshRequestedEvent(), cancellationToken);
-	}
-
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-		=> (await SettingsService.GetOrDefault<PricingSetting>(cancellationToken)).Json;
-
-	private static void Validate(PricingSettingInputData input)
-	{
-		if (input.SelectedMarkupId <= 0 || input.DefaultMarkup < 0 || input.OfferTtl <= TimeSpan.Zero ||
-			input.PriceRoundingStep <= 0 || input.DeliveryDayPenalty < 0 ||
-			input.UniqProductAdditionalMarkup <= 0)
-			throw new InvalidInputException(PricingSettingInputInvalidMessage.Instance);
-	}
+	protected override Task OnUpdatedAsync(PricingSettingData data, CancellationToken cancellationToken)
+		=> publishEndpoint.Publish(new MarkupRangesRefreshRequestedEvent(), cancellationToken);
 }
 
 public record PricingSettingInputData

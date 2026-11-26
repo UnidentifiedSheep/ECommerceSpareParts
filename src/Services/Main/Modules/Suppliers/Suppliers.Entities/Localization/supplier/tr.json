@@ -3,7 +3,6 @@
   "messages": {
     "supplier.favorit.setting.name": "Favorit tedarikçi ayarları",
     "supplier.favorit.setting.description": "Favorit tedarikçi entegrasyonu için bağlantı ayarlarını yönetir.",
-    "supplier.favorit.setting.input.invalid": "Geçersiz Favorit tedarikçi ayarları verisi sağlandı.",
     "supplier.favorit.setting.is.enabled.name": "Entegrasyon etkin",
     "supplier.favorit.setting.is.enabled.description": "Favorit tedarikçi entegrasyonunu etkinleştirir veya devre dışı bırakır.",
     "supplier.favorit.setting.base.url.name": "Temel URL",
@@ -14,7 +13,6 @@
     "supplier.favorit.setting.has.api.key.description": "Favorit tedarikçi entegrasyonu için API anahtarının kaydedilip kaydedilmediğini gösterir.",
     "supplier.tmtr.setting.name": "TMTR tedarikçi ayarları",
     "supplier.tmtr.setting.description": "TMTR tedarikçi entegrasyonu için bağlantı ve teslimat ayarlarını yönetir.",
-    "supplier.tmtr.setting.input.invalid": "Geçersiz TMTR tedarikçi ayarları verisi sağlandı.",
     "supplier.tmtr.setting.is.enabled.name": "Entegrasyon etkin",
     "supplier.tmtr.setting.is.enabled.description": "TMTR tedarikçi entegrasyonunu etkinleştirir veya devre dışı bırakır.",
     "supplier.tmtr.setting.base.url.name": "Temel URL",

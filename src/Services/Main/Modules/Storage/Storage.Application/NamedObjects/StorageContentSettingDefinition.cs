@@ -1,13 +1,10 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Exceptions;
+using FluentValidation;
 using Locan.Core.Interfaces;
 using Main.Entities.Storage;
 using Main.Entities.Storage.Settings;
-using Main.Modules.Storage.Application.NamedObjects.StorageContentExtractPolicies;
-using NamedObject.Core.Interfaces;
 using SchemaGeneration.Abstractions.Attributes;
 using SchemaGeneration.Abstractions.Enums;
 
@@ -15,8 +12,14 @@ namespace Main.Modules.Storage.Application.NamedObjects;
 
 public class StorageContentSettingDefinition(
 	ISettingsService settingsService,
-	INamedObjectRegistry<StorageContentExtractPolicyBase> registry)
-	: SettingDefinitionNamedObjectBase<StorageContentSetting>(settingsService)
+	IValidator<StorageContentSettingInputData> inputValidator)
+	: SettingDefinitionBase<
+		StorageContentSetting,
+		StorageContentSettingData,
+		StorageContentSettingInputData,
+		StorageContentSettingData>(
+		settingsService,
+		inputValidator)
 {
 	public override string SystemName => StorageContentSetting.SettingName;
 
@@ -25,29 +28,17 @@ public class StorageContentSettingDefinition(
 	public override ILocalizableMessage DescriptionLocalizationMessage
 		=> StorageContentSettingDescriptionMessage.Instance;
 
-	public override Type InputSettingType => typeof(StorageContentSettingInputData);
+	protected override StorageContentSettingData Map(
+		StorageContentSettingInputData input,
+		StorageContentSettingData current)
+		=> new()
+		{
+			StorageContentExtractionPolicy = input.StorageContentExtractionPolicy
+		};
 
-	public override Type OutputSettingType => typeof(StorageContentSettingData);
+	protected override StorageContentSettingData ToOutput(StorageContentSettingData data) => data;
 
-	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
-	{
-		var deser = JsonSerializer.Deserialize<StorageContentSettingInputData>(json) ??
-			throw new InvalidInputException(StorageContentSettingInputInvalidMessage.Instance);
-
-		if (registry.TryGetBySystemName(deser.StorageContentExtractionPolicy) == null)
-			throw new InvalidInputException(StorageContentSettingInputInvalidMessage.Instance);
-
-		await SettingsService.SetSetting(
-			new StorageContentSetting(
-				new StorageContentSettingData
-				{
-					StorageContentExtractionPolicy = deser.StorageContentExtractionPolicy
-				}),
-			cancellationToken);
-	}
-
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-		=> (await SettingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
+	protected override StorageContentSetting CreateSetting(StorageContentSettingData data) => new(data);
 }
 
 public record StorageContentSettingInputData

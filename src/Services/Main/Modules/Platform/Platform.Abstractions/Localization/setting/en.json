@@ -8,6 +8,8 @@
     "setting.field.max.length": "Field '{Field|string}' must not exceed {MaxLength|int} characters.",
     "setting.field.url.invalid": "Field '{Field|string}' must be an absolute http or https URL.",
     "setting.field.value.invalid": "Field '{Field|string}' has an unsupported value.",
-    "setting.field.duplicate": "Field '{Field|string}' contains duplicate values."
+    "setting.field.duplicate": "Field '{Field|string}' contains duplicate values.",
+    "setting.field.positive": "Field '{Field|string}' must be greater than zero.",
+    "setting.field.not.negative": "Field '{Field|string}' cannot be negative."
   }
 }

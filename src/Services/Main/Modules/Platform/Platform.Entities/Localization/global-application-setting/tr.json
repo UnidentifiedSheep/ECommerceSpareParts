@@ -3,7 +3,6 @@
   "messages": {
     "global.application.setting.name": "Genel uygulama ayarları",
     "global.application.setting.description": "Uygulama hizmetleri tarafından kullanılan genel URL'leri yönetir.",
-    "global.application.setting.input.invalid": "Geçersiz genel uygulama ayarları verisi sağlandı.",
     "global.application.setting.s3.service.url.name": "S3 hizmeti URL'si",
     "global.application.setting.s3.service.url.description": "S3'te depolanan dosyalara erişmek için kullanılan genel temel URL.",
     "global.application.setting.s3.service.url.not.configured": "S3 hizmeti URL'si yapılandırılmamış. Genel uygulama ayarlarında yapılandırın.",
