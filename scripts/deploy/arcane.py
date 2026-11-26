@@ -80,7 +80,7 @@ class Arcane:
 
     def request(self, method, path, body=None, *, environment=None, global_api=False):
         env = self.environment if environment is None else environment
-        prefix = f"{self.url}/api" if global_api else f"{self.url}/api/environments/{quote(env, safe='')}"
+        prefix = f"{self.url}/api" if global_api else f"{self.url}/api/agents/{quote(env, safe='')}"
         url = f"{prefix}/{path}"
         data = json.dumps(body).encode() if body is not None else None
         for attempt in range(4):
@@ -108,7 +108,7 @@ class Arcane:
 
     def download_logs(self, container_id, *, environment):
         path = f"containers/{quote(container_id, safe='')}/logs/download"
-        url = f"{self.url}/api/environments/{quote(environment, safe='')}/{path}"
+        url = f"{self.url}/api/agents/{quote(environment, safe='')}/{path}"
         maximum = 4 * 1024 * 1024
         try:
             request = Request(url, headers={"X-Api-Key": self.key, "Accept": "text/plain"})
@@ -250,14 +250,14 @@ class Deployment:
 
     def check_registry(self):
         matches = []
-        for registry in self.api.listing("container-registries", global_api=True):
+        for registry in self.api.listing("registries", global_api=True):
             url = registry.get("url", "")
             parsed = urlsplit(url if "://" in url else "https://" + url)
             if parsed.hostname == "ghcr.io" and registry.get("enabled"):
                 matches.append(registry)
         require(len(matches) == 1 and matches[0].get("username"), "Add one enabled GHCR registry with a read:packages PAT to Arcane")
         if self.operation != "plan":
-            self.api.request("POST", f"container-registries/{matches[0]['id']}/test", global_api=True)
+            self.api.request("POST", f"registries/{matches[0]['id']}?action=test", global_api=True)
         log("Using GHCR credentials stored in Arcane.")
 
     def prepare(self):
@@ -267,12 +267,12 @@ class Deployment:
         require(any(n.get("managerStatus") == "leader" for n in managers), "Swarm has no leader")
         require(sum(n.get("reachability") == "reachable" and n["status"] == "ready" for n in managers) > len(managers) // 2,
                 "Swarm manager quorum is unavailable")
-        for sync in self.api.listing("gitops-syncs"):
+        for sync in self.api.listing("gitops/syncs"):
             if (sync.get("projectName") or sync.get("name")) not in STACKS or not sync.get("autoSync"):
                 continue
             require(self.operation != "plan", f"Disable Auto Sync for {sync.get('name')} before deployment")
-            self.api.request("PUT", f"gitops-syncs/{sync['id']}", {"autoSync": False})
-            require(self.api.get(f"gitops-syncs/{sync['id']}")["autoSync"] is False, "Failed to disable application Auto Sync")
+            self.api.request("PATCH", f"gitops/syncs/{sync['id']}", {"autoSync": False})
+            require(self.api.get(f"gitops/syncs/{sync['id']}")["autoSync"] is False, "Failed to disable application Auto Sync")
             log(f"Disabled Auto Sync for {sync.get('name')}.")
         summaries = self.api.listing("swarm/services")
         self.services = {row["name"]: row for row in summaries}
@@ -314,7 +314,7 @@ class Deployment:
             networks = [n for n in self.api.listing("networks") if n["name"] == "backend"]
             require(len(networks) == 1 and networks[0].get("driver") == "overlay", "The backend overlay network is missing")
             self.backend = networks[0]["id"]
-            self.secrets = {item["spec"]["Name"]: item["id"] for item in self.api.get("swarm/secrets")}
+            self.secrets = {item["spec"]["Name"]: item["id"] for item in self.api.listing("swarm/secrets")}
             self.secret_names = json.loads(os.getenv("MIGRATOR_SECRET_NAMES", "{}"))
             require(isinstance(self.secret_names, dict), "MIGRATOR_SECRET_NAMES must be a JSON object")
             for row in self.report["images"]:
