@@ -31,22 +31,17 @@ public class ArmtekClient(
 		CancellationToken token = default)
 	{
 		ArgumentException.ThrowIfNullOrWhiteSpace(request.Number);
-		ArgumentException.ThrowIfNullOrWhiteSpace(request.StorageCode);
+		ArgumentException.ThrowIfNullOrWhiteSpace(request.PointCode);
 
 		var connection = await connectionProvider.GetConnectionAsync(token);
-		if (connection.FindStorage(request.StorageCode) is not { } storage)
-			return Response<IReadOnlyList<SearchItem>>.Fail(
-				HttpStatusCode.UnprocessableEntity,
-				$"Armtek storage binding not found for '{request.StorageCode}'");
-
 		var form = new Dictionary<string, string>
 		{
 			["VKORG"] = connection.SalesOrganization,
 			["KUNNR_RG"] = connection.CustomerCode,
 			["PIN"] = request.Number,
 			["QUERY_TYPE"] = request.WithAnalogues ? "2" : "1",
-			["KUNNR_ZA"] = storage.PointCode,
-			["INCOTERMS"] = storage.DeliveryMode == DeliveryMode.Pickup ? "1" : "0"
+			["KUNNR_ZA"] = request.PointCode,
+			["INCOTERMS"] = request.DeliveryMode == DeliveryMode.Pickup ? "1" : "0"
 		};
 
 		if (!string.IsNullOrWhiteSpace(request.Brand))

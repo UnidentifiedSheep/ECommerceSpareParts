@@ -21,7 +21,7 @@ public sealed class SuppliersModule : ModuleBase
 		services
 			.AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
 			.AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
-			.AddArmtekIntegration<ArmtekConnectionProvider>();
+			.AddArmtekIntegration<ArmtekConnectionProvider, ArmtekSettingsProvider>();
 		services.AddSuppliersPersistence();
 	}
 }

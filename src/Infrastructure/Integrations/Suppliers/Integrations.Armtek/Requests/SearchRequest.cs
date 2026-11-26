@@ -1,3 +1,5 @@
+using Enums;
+
 namespace Integrations.Armtek.Requests;
 
 public record SearchRequest
@@ -8,5 +10,7 @@ public record SearchRequest
 
 	public bool WithAnalogues { get; init; }
 
-	public required string StorageCode { get; init; }
+	public required string PointCode { get; init; }
+
+	public required DeliveryMode DeliveryMode { get; init; }
 }

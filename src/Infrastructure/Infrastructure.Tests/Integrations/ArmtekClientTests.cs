@@ -20,18 +20,7 @@ public sealed class ArmtekClientTests
 		Password = "secret",
 		SalesOrganization = "4000",
 		CustomerCode = "0000123456",
-		ContractCode = "0000000777",
-		Storages =
-		[
-			new ArmtekStorageConnection
-			{
-				StorageCode = "MAIN-01", DeliveryMode = DeliveryMode.Pickup, PointCode = "0000001234"
-			},
-			new ArmtekStorageConnection
-			{
-				StorageCode = "MAIN-02", DeliveryMode = DeliveryMode.Delivery, PointCode = "0000005678"
-			}
-		]
+		ContractCode = "0000000777"
 	};
 
 	[Fact]
@@ -45,7 +34,8 @@ public sealed class ArmtekClientTests
 				Number = "A152",
 				Brand = "MFILTER",
 				WithAnalogues = true,
-				StorageCode = "MAIN-01"
+				PointCode = "0000001234",
+				DeliveryMode = DeliveryMode.Pickup
 			},
 			CancellationToken);
 
@@ -208,33 +198,22 @@ public sealed class ArmtekClientTests
 	}
 
 	[Fact]
-	public async Task SearchAsync_WithDeliveryStorage_SendsDeliveryPoint()
+	public async Task SearchAsync_WithDeliveryMode_SendsDeliveryIncoterms()
 	{
 		var handler = new StubHandler("""{ "STATUS": 200, "MESSAGES": [], "RESP": [] }""");
 
-		await CreateClient(handler).SearchAsync(SearchRequest(" main-02 "), CancellationToken);
+		await CreateClient(handler).SearchAsync(SearchRequest(), CancellationToken);
 
 		Assert.Equal("0000005678", handler.Form["KUNNR_ZA"]);
 		Assert.Equal("0", handler.Form["INCOTERMS"]);
 	}
 
-	[Fact]
-	public async Task SearchAsync_WithUnboundStorage_ReturnsFailWithoutRequest()
-	{
-		var handler = new StubHandler("""{ "STATUS": 200, "MESSAGES": [], "RESP": [] }""");
-
-		var result = await CreateClient(handler).SearchAsync(SearchRequest("UNKNOWN"), CancellationToken);
-
-		Assert.False(result.Success);
-		Assert.Contains("UNKNOWN", result.Error);
-		Assert.Null(handler.Method);
-	}
-
-	private static SearchRequest SearchRequest(string storageCode = "MAIN-02")
+	private static SearchRequest SearchRequest()
 		=> new()
 		{
 			Number = "A152",
-			StorageCode = storageCode
+			PointCode = "0000005678",
+			DeliveryMode = DeliveryMode.Delivery
 		};
 
 	private static ArmtekClient CreateClient(StubHandler handler)

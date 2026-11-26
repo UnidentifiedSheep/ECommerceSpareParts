@@ -62,16 +62,7 @@ public class ArmtekConnectionProvider(
 				Password = password!,
 				SalesOrganization = settings.SalesOrganization,
 				CustomerCode = settings.CustomerCode,
-				ContractCode = settings.ContractCode,
-				Storages = settings
-					.Storages
-					.Select(x => new ArmtekStorageConnection
-					{
-						StorageCode = x.StorageCode,
-						DeliveryMode = x.DeliveryMode,
-						PointCode = x.PointCode
-					})
-					.ToList()
+				ContractCode = settings.ContractCode
 			});
 	}
 

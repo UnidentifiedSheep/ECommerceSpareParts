@@ -48,13 +48,16 @@ public static class ServiceCollectionExtensions
 		return services;
 	}
 
-	public static IServiceCollection AddArmtekIntegration<TConnectionProvider>(this IServiceCollection services)
+	public static IServiceCollection AddArmtekIntegration<TConnectionProvider, TSettingsProvider>(
+		this IServiceCollection services)
 		where TConnectionProvider : class, IConnectionProvider<ArmtekConnection>
+		where TSettingsProvider : class, ISupplierSettingsProvider<ArmtekSettings>
 	{
 		services.AddSupplierBase();
 		services.TryAddSingleton(TimeProvider.System);
 
 		services.AddScoped<IConnectionProvider<ArmtekConnection>, TConnectionProvider>();
+		services.AddScoped<ISupplierSettingsProvider<ArmtekSettings>, TSettingsProvider>();
 
 		services.AddHttpClient<IArmtekClient, ArmtekClient>().AddDefaultResilenceHandler();
 

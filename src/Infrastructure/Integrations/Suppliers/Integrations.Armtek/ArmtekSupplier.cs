@@ -1,3 +1,4 @@
+using System.Net;
 using Integrations.Armtek.Interfaces;
 using Integrations.Armtek.Models;
 using Integrations.Armtek.Requests;
@@ -6,12 +7,14 @@ using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models;
 using Integrations.Supplier.Models.Requests;
+using Integrations.Supplier.Settings;
 
 namespace Integrations.Armtek;
 
 public class ArmtekSupplier(
 	IArmtekClient client,
 	IConnectionProvider<ArmtekConnection> connectionProvider,
+	ISupplierSettingsProvider<ArmtekSettings> settingsProvider,
 	TimeProvider timeProvider) : ISupplier
 {
 	private const string DefaultCurrency = "RUB";
@@ -65,13 +68,20 @@ public class ArmtekSupplier(
 		string brand,
 		CancellationToken cancellationToken)
 	{
+		var settings = await settingsProvider.GetSettingsAsync(cancellationToken);
+		if (settings.FindStorage(request.StorageCode) is not { } storage)
+			return Response<IReadOnlyList<SupplierProduct>>.Fail(
+				HttpStatusCode.UnprocessableEntity,
+				$"Armtek storage binding not found for '{request.StorageCode}'");
+
 		var response = await client.SearchAsync(
 			new SearchRequest
 			{
 				Number = request.Number,
 				Brand = brand,
 				WithAnalogues = request.ShowAnalogues,
-				StorageCode = request.StorageCode
+				PointCode = storage.PointCode,
+				DeliveryMode = storage.DeliveryMode
 			},
 			cancellationToken);
 

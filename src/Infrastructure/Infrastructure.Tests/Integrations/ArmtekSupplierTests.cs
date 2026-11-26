@@ -1,11 +1,14 @@
 using System.Net;
+using Enums;
 using Integrations.Armtek;
 using Integrations.Armtek.Interfaces;
 using Integrations.Armtek.Models;
 using Integrations.Armtek.Requests;
 using Integrations.Common;
 using Integrations.Supplier.Connections;
+using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models.Requests;
+using Integrations.Supplier.Settings;
 
 namespace Infrastructure.Tests.Integrations;
 
@@ -41,7 +44,7 @@ public sealed class ArmtekSupplierTests
 	}
 
 	[Fact]
-	public async Task GetProductsAsync_SendsSearchRequest()
+	public async Task GetProductsAsync_SendsSearchRequestWithStoragePoint()
 	{
 		await CreateSupplier().GetProductsAsync(Request("MFILTER"), CancellationToken);
 
@@ -49,7 +52,29 @@ public sealed class ArmtekSupplierTests
 		Assert.Equal("A152", request.Number);
 		Assert.Equal("MFILTER", request.Brand);
 		Assert.True(request.WithAnalogues);
-		Assert.Equal("MAIN-01", request.StorageCode);
+		Assert.Equal("0000001234", request.PointCode);
+		Assert.Equal(DeliveryMode.Pickup, request.DeliveryMode);
+	}
+
+	[Fact]
+	public async Task GetProductsAsync_FindsStorageIgnoringCaseAndSpaces()
+	{
+		await CreateSupplier().GetProductsAsync(Request("MFILTER", " main-02 "), CancellationToken);
+
+		var request = Assert.IsType<SearchRequest>(_client.LastSearchRequest);
+		Assert.Equal("0000005678", request.PointCode);
+		Assert.Equal(DeliveryMode.Delivery, request.DeliveryMode);
+	}
+
+	[Fact]
+	public async Task GetProductsAsync_WithUnboundStorage_ReturnsFailWithoutClientCall()
+	{
+		var result = await CreateSupplier().GetProductsAsync(Request("MFILTER", "UNKNOWN"), CancellationToken);
+
+		Assert.False(result.Success);
+		Assert.Equal(HttpStatusCode.UnprocessableEntity, result.StatusCode);
+		Assert.Equal("Armtek storage binding not found for 'UNKNOWN'", result.Error);
+		Assert.Null(_client.LastSearchRequest);
 	}
 
 	[Fact]
@@ -135,14 +160,14 @@ public sealed class ArmtekSupplierTests
 	public async Task GetProductsAsync_WhenClientFails_ReturnsFail()
 	{
 		_client.SearchResponse = Response<IReadOnlyList<SearchItem>>.Fail(
-			HttpStatusCode.UnprocessableEntity,
-			"Armtek storage binding not found for 'MAIN-01'");
+			HttpStatusCode.Unauthorized,
+			"Покупатель не найден");
 
 		var result = await CreateSupplier().GetProductsAsync(Request("MFILTER"), CancellationToken);
 
 		Assert.False(result.Success);
-		Assert.Equal(HttpStatusCode.UnprocessableEntity, result.StatusCode);
-		Assert.Equal("Armtek storage binding not found for 'MAIN-01'", result.Error);
+		Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
+		Assert.Equal("Покупатель не найден", result.Error);
 	}
 
 	[Fact]
@@ -170,12 +195,16 @@ public sealed class ArmtekSupplierTests
 	}
 
 	private ArmtekSupplier CreateSupplier()
-		=> new(_client, new StubConnectionProvider(), new FixedTimeProvider(Now));
+		=> new(
+			_client,
+			new StubConnectionProvider(),
+			new StubSettingsProvider(),
+			new FixedTimeProvider(Now));
 
-	private static GetProductsRequest Request(string? brand)
+	private static GetProductsRequest Request(string? brand, string storageCode = "MAIN-01")
 		=> new()
 		{
-			StorageCode = "MAIN-01",
+			StorageCode = storageCode,
 			Number = "A152",
 			Brand = brand,
 			ShowAnalogues = true
@@ -248,6 +277,26 @@ public sealed class ArmtekSupplierTests
 
 		async Task<ConnectionCheck> IConnectionProvider.CheckConnectionAsync(CancellationToken cancellationToken)
 			=> await CheckConnectionAsync(cancellationToken);
+	}
+
+	private sealed class StubSettingsProvider : ISupplierSettingsProvider<ArmtekSettings>
+	{
+		public Task<ArmtekSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
+			=> Task.FromResult(
+				new ArmtekSettings
+				{
+					Storages =
+					[
+						new ArmtekStoragePoint
+						{
+							StorageCode = "MAIN-01", DeliveryMode = DeliveryMode.Pickup, PointCode = "0000001234"
+						},
+						new ArmtekStoragePoint
+						{
+							StorageCode = "MAIN-02", DeliveryMode = DeliveryMode.Delivery, PointCode = "0000005678"
+						}
+					]
+				});
 	}
 
 	private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
