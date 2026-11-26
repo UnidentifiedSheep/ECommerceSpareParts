@@ -105,7 +105,7 @@ public sealed class AbcXyzRunItemsChartDataSource(
 		return new AbcXyzRunItemDataPoint
 		{
 			ProductId = int.Parse(model.SubjectKey, CultureInfo.InvariantCulture),
-			Rank = model.Rank ?? 0,
+			Rank = model.Rank,
 			Value = model.Value ?? 0m,
 			Share = model.Share ?? 0m,
 			CumulativeShare = model.Data.CumulativeShare,

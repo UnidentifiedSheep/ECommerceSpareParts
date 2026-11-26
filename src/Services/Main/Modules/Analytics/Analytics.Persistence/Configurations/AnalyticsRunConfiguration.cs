@@ -23,6 +23,7 @@ public sealed class AnalyticsRunConfiguration : IEntityTypeConfiguration<Analyti
 		builder.Property(item => item.CreatedBy).HasColumnName("created_by");
 		builder.Property(item => item.IsPinned).HasColumnName("is_pinned");
 		builder.Property(item => item.CreatedAt).HasColumnName("created_at");
+		builder.Property(item => item.CompletedAt).HasColumnName("completed_at");
 		builder.HasIndex(item => item.JobId, "analytics_runs_job_id_index");
 		builder.HasIndex(item => item.CreatedAt, "analytics_runs_created_at_index");
 		builder.HasIndex(
@@ -37,5 +38,11 @@ public sealed class AnalyticsRunConfiguration : IEntityTypeConfiguration<Analyti
 				item.AnalysisType, item.PeriodEnd
 			},
 			"analytics_runs_analysis_type_period_end_index");
+		builder.HasIndex(
+			item => new
+			{
+				item.AnalysisType, item.CompletedAt
+			},
+			"analytics_runs_analysis_type_completed_at_index");
 	}
 }

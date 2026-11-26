@@ -52,6 +52,7 @@ public class AbcXyzRunFactoryTests
 		draft.Run.PeriodStart.Should().Be(From);
 		draft.Run.PeriodEnd.Should().Be(new DateTime(2026, 11, 1, 0, 0, 0, DateTimeKind.Utc));
 		draft.Run.ItemsCount.Should().Be(2);
+		draft.Run.CompletedAt.Should().NotBeNull();
 		draft.Run.ParametersHash.Should().HaveLength(64);
 		JsonDocument.Parse(draft.Run.Parameters).RootElement.GetProperty("abcMetric").GetString()
 			.Should()

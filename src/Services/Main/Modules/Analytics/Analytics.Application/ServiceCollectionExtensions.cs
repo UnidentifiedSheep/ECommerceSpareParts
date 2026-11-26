@@ -5,8 +5,8 @@ using Main.Modules.Analytics.Abstractions.Analyzers;
 using Main.Modules.Analytics.Abstractions.Charts;
 using Main.Modules.Analytics.Abstractions.Interfaces;
 using Main.Modules.Analytics.Application.Analyzers.AbcXyz;
+using Main.Modules.Analytics.Application.Analyzers.CoPurchase;
 using Main.Modules.Analytics.Application.Configs;
-using Main.Modules.Analytics.Application.Interfaces;
 using Main.Modules.Analytics.Application.Services;
 using Microsoft.Extensions.DependencyInjection;
 using NamedObject;
@@ -31,8 +31,12 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<SaleContentAnalyticsCalculator>();
 		services.AddScoped<SaleAnalyticsWriter>();
 		services.AddScoped<AbcXyzDataReader>();
+		services.AddScoped<ICoPurchaseDataReader, CoPurchaseDataReader>();
+		services.AddScoped<ICoPurchaseRelatedProvider, CoPurchaseRelatedProvider>();
 		services.AddScoped<IAbcXyzAnalyzer, AbcXyzAnalyzer>();
 		services.AddSingleton<IAbcXyzCalculator, AbcXyzCalculator>();
+		services.AddScoped<ICoPurchaseAnalyzer, CoPurchaseAnalyzer>();
+		services.AddSingleton<ICoPurchaseCalculator, CoPurchaseCalculator>();
 
 		return services;
 	}

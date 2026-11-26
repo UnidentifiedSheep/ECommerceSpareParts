@@ -41,6 +41,6 @@ internal sealed class ProducerNode(
 	private record GetFullProducersResponse
 	{
 		[JsonPropertyName("producers")]
-		public IReadOnlyList<InternalFullProducer> Producers { get; } = [];
+		public IReadOnlyList<InternalFullProducer> Producers { get; init; } = [];
 	}
 }

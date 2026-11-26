@@ -15,7 +15,7 @@ public class AnalyticsRunItem : Entity<AnalyticsRunItem, (Guid, string)>,
 
 	public string SubjectKey { get; private set; } = null!;
 
-	public int? Rank { get; private set; }
+	public int Rank { get; private set; }
 
 	public decimal? Value { get; private set; }
 
@@ -36,7 +36,7 @@ public class AnalyticsRunItem : Entity<AnalyticsRunItem, (Guid, string)>,
 	public static AnalyticsRunItem Create(
 		Guid runId,
 		string subjectKey,
-		int? rank,
+		int rank,
 		decimal? value,
 		decimal? share,
 		string? segments,
@@ -45,8 +45,7 @@ public class AnalyticsRunItem : Entity<AnalyticsRunItem, (Guid, string)>,
 		if (runId == Guid.Empty)
 			throw new ArgumentException("Run id cannot be empty.", nameof(runId));
 		ArgumentException.ThrowIfNullOrWhiteSpace(subjectKey);
-		if (rank is not null)
-			ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rank.Value);
+		ArgumentOutOfRangeException.ThrowIfNegativeOrZero(rank);
 		if (share is not null)
 			ArgumentOutOfRangeException.ThrowIfNegative(share.Value);
 
