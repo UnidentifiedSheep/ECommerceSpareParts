@@ -26,64 +26,74 @@ public sealed class CoPurchaseAnalyzer(
 		CancellationToken cancellationToken = default)
 	{
 		var crosses = new Dictionary<int, IReadOnlySet<int>>();
-		var salesByScope = new Dictionary<string, IReadOnlyList<CoPurchaseSaleProduct>>();
+		await LoadCrossesAsync(productIds, crosses, cancellationToken);
+
+		var selected = await SelectCandidatesAsync(productIds, crosses, totalSalesCount, parameters, cancellationToken);
+
+		var candidateIds = selected
+			.SelectMany(candidates => candidates.Candidates)
+			.Select(candidate => candidate.ProductId)
+			.ToHashSet();
+		if (candidateIds.Count == 0)
+			return selected
+				.Select(candidates => new CoPurchaseProductResult(candidates.ProductId, candidates.SalesCount, []))
+				.ToList();
+
+		await LoadCrossesAsync(candidateIds, crosses, cancellationToken);
+		var salesCounts = await reader.GetSalesCountsAsync(parameters, candidateIds, cancellationToken);
+
 		var relatedByMembers = new Dictionary<string, IReadOnlyList<CoPurchaseRelated>>();
-		var results = new List<CoPurchaseProductResult>(productIds.Count);
-
-		foreach (var productId in productIds)
+		var results = new List<CoPurchaseProductResult>(selected.Count);
+		foreach (var candidates in selected)
 		{
-			var crossIds = await GetCrossesAsync(productId, crosses, cancellationToken);
-			var scope = crossIds.Append(productId).ToHashSet();
-			var scopeKey = Key(scope);
-			if (!salesByScope.TryGetValue(scopeKey, out var sales))
-				salesByScope[scopeKey] = sales = await reader.GetSalesAsync(parameters, scope, cancellationToken);
-
-			var candidates = calculator.SelectCandidates(productId, crossIds, sales, totalSalesCount, parameters);
 			var membersKey = Key(candidates.Members);
 			if (!relatedByMembers.TryGetValue(membersKey, out var related))
-				relatedByMembers[membersKey] = related = await BuildRelatedAsync(
-					candidates,
-					crosses,
-					totalSalesCount,
-					parameters,
-					cancellationToken);
+				relatedByMembers[membersKey] = related =
+					calculator.BuildRelated(candidates, crosses, salesCounts, totalSalesCount, parameters);
 
-			results.Add(new CoPurchaseProductResult(productId, candidates.SalesCount, related));
+			results.Add(new CoPurchaseProductResult(candidates.ProductId, candidates.SalesCount, related));
 		}
 
 		return results;
 	}
 
-	private async Task<IReadOnlyList<CoPurchaseRelated>> BuildRelatedAsync(
-		CoPurchaseCandidates candidates,
-		Dictionary<int, IReadOnlySet<int>> crosses,
+	private async Task<List<CoPurchaseCandidates>> SelectCandidatesAsync(
+		IReadOnlyList<int> productIds,
+		IReadOnlyDictionary<int, IReadOnlySet<int>> crosses,
 		int totalSalesCount,
 		CoPurchaseParameters parameters,
 		CancellationToken cancellationToken)
 	{
-		if (candidates.Candidates.Count == 0)
-			return [];
+		var salesByScope = new Dictionary<string, IReadOnlyList<CoPurchaseSaleProduct>>();
+		var selected = new List<CoPurchaseCandidates>(productIds.Count);
+		foreach (var productId in productIds)
+		{
+			var crossIds = crosses[productId];
+			var scope = crossIds.Append(productId).ToHashSet();
+			var scopeKey = Key(scope);
+			if (!salesByScope.TryGetValue(scopeKey, out var sales))
+				salesByScope[scopeKey] = sales = await reader.GetSalesAsync(parameters, scope, cancellationToken);
 
-		var candidateIds = candidates.Candidates.Select(candidate => candidate.ProductId).ToList();
-		var candidateCrosses = new Dictionary<int, IReadOnlySet<int>>(candidateIds.Count);
-		foreach (var candidateId in candidateIds)
-			candidateCrosses[candidateId] = await GetCrossesAsync(candidateId, crosses, cancellationToken);
+			selected.Add(calculator.SelectCandidates(productId, crossIds, sales, totalSalesCount, parameters));
+		}
 
-		var salesCounts = await reader.GetSalesCountsAsync(parameters, candidateIds, cancellationToken);
-		return calculator.BuildRelated(candidates, candidateCrosses, salesCounts, totalSalesCount, parameters);
+		return selected;
 	}
 
-	private async Task<IReadOnlySet<int>> GetCrossesAsync(
-		int productId,
+	private async Task LoadCrossesAsync(
+		IEnumerable<int> productIds,
 		Dictionary<int, IReadOnlySet<int>> crosses,
 		CancellationToken cancellationToken)
 	{
-		if (crosses.TryGetValue(productId, out var cached))
-			return cached;
+		var missingIds = productIds.Where(productId => !crosses.ContainsKey(productId)).Distinct().ToList();
+		if (missingIds.Count == 0)
+			return;
 
-		var result = (await productCrosses.GetCrossIdsAsync(productId, cancellationToken)).ToHashSet();
-		crosses[productId] = result;
-		return result;
+		var loaded = await productCrosses.GetCrossIdsAsync(missingIds, cancellationToken);
+		foreach (var productId in missingIds)
+			crosses[productId] = loaded.TryGetValue(productId, out var crossIds)
+				? crossIds.ToHashSet()
+				: new HashSet<int>();
 	}
 
 	private static string Key(IEnumerable<int> productIds) => string.Join(',', productIds.Order());
