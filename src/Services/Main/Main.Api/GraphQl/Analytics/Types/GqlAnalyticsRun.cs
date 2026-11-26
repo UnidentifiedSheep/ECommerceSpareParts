@@ -47,4 +47,7 @@ public sealed record GqlAnalyticsRun([property: GraphQLIgnore]
 
 	[GraphQLName("createdAt")]
 	public DateTime CreatedAt => Run.CreatedAt;
+
+	[GraphQLName("completedAt")]
+	public DateTime? CompletedAt => Run.CompletedAt;
 }

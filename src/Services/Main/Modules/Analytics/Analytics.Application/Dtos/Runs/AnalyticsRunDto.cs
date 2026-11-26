@@ -25,4 +25,6 @@ public sealed record AnalyticsRunDto
 	public required bool IsPinned { get; init; }
 
 	public required DateTime CreatedAt { get; init; }
+
+	public DateTime? CompletedAt { get; init; }
 }

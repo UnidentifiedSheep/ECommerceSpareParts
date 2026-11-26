@@ -22,6 +22,7 @@ public sealed class AnalyticsRunDtoProjectionProvider : ProjectionProviderBase<A
 		JobId = run.JobId,
 		CreatedBy = run.CreatedBy,
 		IsPinned = run.IsPinned,
-		CreatedAt = run.CreatedAt
+		CreatedAt = run.CreatedAt,
+		CompletedAt = run.CompletedAt
 	};
 }

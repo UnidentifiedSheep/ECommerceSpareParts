@@ -38,6 +38,8 @@ public class AnalyticsRun : Entity<AnalyticsRun, Guid>, ILinqEntity<AnalyticsRun
 
 	public DateTime CreatedAt { get; private set; }
 
+	public DateTime? CompletedAt { get; private set; }
+
 	public IReadOnlyCollection<AnalyticsRunItem> Items => _items;
 
 	public static Expression<Func<AnalyticsRun, Guid>> GetKeySelector() => item => item.Id;
@@ -82,8 +84,11 @@ public class AnalyticsRun : Entity<AnalyticsRun, Guid>, ILinqEntity<AnalyticsRun
 	public void Complete(string? summary, int itemsCount)
 	{
 		ArgumentOutOfRangeException.ThrowIfNegative(itemsCount);
+		if (CompletedAt is not null)
+			throw new InvalidOperationException("Analytics run is already completed.");
 		Summary = summary;
 		ItemsCount = itemsCount;
+		CompletedAt = DateTime.UtcNow;
 	}
 
 	public void Pin() => IsPinned = true;

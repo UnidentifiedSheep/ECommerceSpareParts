@@ -154,4 +154,12 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Domain\Analytics\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Domain\Analytics\AnalyticsRunTests.cs" />
+    </ItemGroup>
+
 </Project>

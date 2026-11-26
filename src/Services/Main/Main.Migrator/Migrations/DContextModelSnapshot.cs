@@ -422,6 +422,10 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("analysis_type");
 
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("completed_at");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -471,6 +475,8 @@ namespace Main.Migrator.Migrations
 
                     b.HasKey("Id")
                         .HasName("analytics_runs_pk");
+
+                    b.HasIndex(new[] { "AnalysisType", "CompletedAt" }, "analytics_runs_analysis_type_completed_at_index");
 
                     b.HasIndex(new[] { "AnalysisType", "ParametersHash" }, "analytics_runs_analysis_type_parameters_hash_index");
 
