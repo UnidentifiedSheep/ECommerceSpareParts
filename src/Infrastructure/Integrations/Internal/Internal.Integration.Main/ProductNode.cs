@@ -68,7 +68,7 @@ internal sealed class ProductNode(
 	private record GetSupplierProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; } = [];
+		public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; init; } = [];
 	}
 
 	private record ResolveProductReferencesRequest
@@ -80,6 +80,6 @@ internal sealed class ProductNode(
 	private record ResolveProductReferencesResponse
 	{
 		[JsonPropertyName("products")]
-		public IReadOnlyList<InternalResolvedProductReference> Products { get; } = [];
+		public IReadOnlyList<InternalResolvedProductReference> Products { get; init; } = [];
 	}
 }
