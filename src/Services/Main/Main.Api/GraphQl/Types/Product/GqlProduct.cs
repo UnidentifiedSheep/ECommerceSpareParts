@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Enums;
 using GraphQL.Common.Attributes;
 using GraphQL.Common.Extensions;
@@ -7,6 +8,8 @@ using Main.Api.GraphQl.DataLoaders;
 using Main.Api.GraphQl.Types.Inputs.Product;
 using Main.Api.GraphQl.Types.Producer;
 using Main.Entities.Product.Exceptions;
+using Main.Modules.Analytics.Application.Charts.CoPurchaseRelated;
+using Main.Modules.Analytics.Application.Queries;
 using Main.Modules.Product.Application.Dtos.Product;
 using Main.Modules.Product.Application.Queries.Products.GetProductCrosses;
 using Main.Modules.Sale.Application.Queries.Sales.GetProductSaleHistory;
@@ -149,6 +152,25 @@ public record GqlProduct
 				input.SearchTerm),
 			cancellationToken);
 		return result.Crosses.Select(product => new GqlProduct(product)).ToArray();
+	}
+
+	[GraphQLName("alsoBought")]
+	public async Task<IReadOnlyList<GqlProduct>> GetAlsoBoughtAsync(
+		ISender sender,
+		CancellationToken cancellationToken)
+	{
+		var result = await sender.Send(
+			new QueryChartDataSourceQuery(
+				CoPurchaseRelatedChartDataSource.DataSourceSystemName,
+				JsonSerializer.Serialize(
+					new CoPurchaseRelatedChartQuery { ProductId = Id },
+					JsonSerializerOptions.Web)),
+			cancellationToken);
+
+		return result.DataPoints
+			.Cast<CoPurchaseRelatedDataPoint>()
+			.Select(point => new GqlProduct(point.ProductId))
+			.ToArray();
 	}
 
 	[GraphQLName("storageContents")]
