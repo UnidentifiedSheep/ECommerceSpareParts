@@ -1,6 +1,15 @@
 {
   "culture": "tr",
   "messages": {
-    "setting.not.found": "Ayar {Name} bulunamadı."
+    "setting.not.found": "Ayar {Name} bulunamadı.",
+    "setting.input.invalid": "Geçersiz ayar verisi sağlandı.",
+    "setting.field.required": "'{Field}' alanı zorunludur.",
+    "setting.field.empty": "'{Field}' alanı boş olamaz.",
+    "setting.field.max.length": "'{Field}' alanı {MaxLength} karakteri geçemez.",
+    "setting.field.url.invalid": "'{Field}' alanı mutlak bir http veya https URL'si olmalıdır.",
+    "setting.field.value.invalid": "'{Field}' alanı desteklenmeyen bir değer içeriyor.",
+    "setting.field.duplicate": "'{Field}' alanı yinelenen değerler içeriyor.",
+    "setting.field.positive": "'{Field}' alanı sıfırdan büyük olmalıdır.",
+    "setting.field.not.negative": "'{Field}' alanı negatif olamaz."
   }
 }

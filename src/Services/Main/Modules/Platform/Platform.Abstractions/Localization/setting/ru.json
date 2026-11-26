@@ -1,6 +1,15 @@
 {
   "culture": "ru",
   "messages": {
-    "setting.not.found": "Не удалось найти настройку {Name}."
+    "setting.not.found": "Не удалось найти настройку {Name}.",
+    "setting.input.invalid": "Переданы некорректные данные настройки.",
+    "setting.field.required": "Поле '{Field}' обязательно.",
+    "setting.field.empty": "Поле '{Field}' не может быть пустым.",
+    "setting.field.max.length": "Поле '{Field}' не может быть длиннее {MaxLength} символов.",
+    "setting.field.url.invalid": "Поле '{Field}' должно быть абсолютным http или https URL.",
+    "setting.field.value.invalid": "Поле '{Field}' содержит неподдерживаемое значение.",
+    "setting.field.duplicate": "Поле '{Field}' содержит повторяющиеся значения.",
+    "setting.field.positive": "Поле '{Field}' должно быть больше нуля.",
+    "setting.field.not.negative": "Поле '{Field}' не может быть отрицательным."
   }
 }

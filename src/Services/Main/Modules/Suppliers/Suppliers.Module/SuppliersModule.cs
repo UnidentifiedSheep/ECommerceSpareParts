@@ -2,6 +2,7 @@ using System.Reflection;
 using Application.Common.Host;
 using Integrations.Supplier.DI;
 using Main.Modules.Suppliers.Application;
+using Main.Modules.Suppliers.Application.Services.Armtek;
 using Main.Modules.Suppliers.Application.Services.Favorite;
 using Main.Modules.Suppliers.Application.Services.Tmtr;
 using Main.Modules.Suppliers.Persistence;
@@ -19,7 +20,8 @@ public sealed class SuppliersModule : ModuleBase
 		services.AddSuppliersApplication();
 		services
 			.AddFavoriteIntegration<FavoriteConnectionProvider, FavoriteSettingsProvider>()
-			.AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>();
+			.AddTmtrIntegration<TmtrConnectionProvider, TmtrSettingsProvider>()
+			.AddArmtekIntegration<ArmtekConnectionProvider, ArmtekSettingsProvider>();
 		services.AddSuppliersPersistence();
 	}
 }

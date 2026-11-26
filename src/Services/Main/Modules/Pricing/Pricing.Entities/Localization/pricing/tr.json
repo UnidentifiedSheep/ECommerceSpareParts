@@ -23,7 +23,6 @@
     "price.applier.usage.duplicate": "Fiyat uygulayıcı kullanım türleri benzersiz olmalıdır.",
     "pricing.setting.name": "Fiyatlandırma ayarları",
     "pricing.setting.description": "Fiyat hesaplamasını, kâr marjı seçimini, teklif ömrünü ve tedarikçi teslimat puanlamasını yönetir.",
-    "pricing.setting.input.invalid": "Geçersiz fiyatlandırma ayarları verisi sağlandı.",
     "pricing.setting.selected.markup.id.name": "Seçili kâr marjı grubu",
     "pricing.setting.selected.markup.id.description": "Fiyat hesaplamasında kullanılan kâr marjı grubu. En son otomatik oluşturulan grubu kullanmak için boş bırakın.",
     "pricing.setting.default.markup.name": "Varsayılan kâr marjı",

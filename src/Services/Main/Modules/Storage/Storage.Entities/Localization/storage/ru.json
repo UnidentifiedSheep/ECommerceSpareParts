@@ -36,7 +36,6 @@
     "storage.content.items.required": "Для вычитания со склада требуется чтобы список вычитаемых не был пуст.",
     "storage.content.setting.name": "Настройки содержимого склада",
     "storage.content.setting.description": "Управляет тем, как позиции выбираются и списываются из содержимого склада.",
-    "storage.content.setting.input.invalid": "Переданы некорректные данные настроек содержимого склада.",
     "storage.content.setting.extraction.policy.name": "Политика списания со склада",
     "storage.content.setting.extraction.policy.description": "Политика, определяющая какие позиции содержимого склада будут списываться первыми.",
     "storage.content.product.id.greater.than.zero": "Идентификатор артикула должен быть больше 0.",

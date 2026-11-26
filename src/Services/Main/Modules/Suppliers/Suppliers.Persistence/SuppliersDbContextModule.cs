@@ -12,5 +12,6 @@ public sealed class SuppliersDbContextModule : IDbContextModule
 			.Entity<Setting>()
 			.HasDiscriminator(e => e.Key)
 			.HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName)
-			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName);
+			.HasValue<TmtrSupplierSetting>(TmtrSupplierSetting.SettingName)
+			.HasValue<ArmtekSupplierSetting>(ArmtekSupplierSetting.SettingName);
 }

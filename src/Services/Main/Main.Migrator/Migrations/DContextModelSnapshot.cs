@@ -4012,6 +4012,13 @@ namespace Main.Migrator.Migrations
                     b.HasDiscriminator().HasValue("StorageContentSetting");
                 });
 
+            modelBuilder.Entity("Main.Entities.Suppliers.Settings.Supplier.ArmtekSupplierSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("ArmtekSupplierSetting");
+                });
+
             modelBuilder.Entity("Main.Entities.Suppliers.Settings.Supplier.FavoritSupplierSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");

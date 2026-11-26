@@ -1,8 +1,8 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Application.Common.Interfaces.Settings;
-using Exceptions;
 using FluentAssertions;
+using FluentValidation;
 using Moq;
 using Pricing.Application.Events;
 using Pricing.Application.NamedObjects.SettingDefinitions;
@@ -27,8 +27,14 @@ public class PricingSettingDefinitionTests
 			.Setup(x => x.SetSetting(It.IsAny<PricingSetting>(), It.IsAny<CancellationToken>()))
 			.Callback<PricingSetting, CancellationToken>((setting, _) => _savedSettings.Add(setting))
 			.Returns(Task.CompletedTask);
+		_settingsService
+			.Setup(x => x.GetOrDefault<PricingSetting>(It.IsAny<CancellationToken>()))
+			.ReturnsAsync(PricingSetting.Default);
 
-		_definition = new PricingSettingDefinition(_settingsService.Object, _publisher);
+		_definition = new PricingSettingDefinition(
+			_settingsService.Object,
+			_publisher,
+			new PricingSettingInputValidator());
 	}
 
 	[Fact]
@@ -86,7 +92,7 @@ public class PricingSettingDefinitionTests
 			JsonSerializer.Serialize(invalidInput),
 			CancellationToken.None);
 
-		await action.Should().ThrowAsync<InvalidInputException>();
+		await action.Should().ThrowAsync<ValidationException>();
 		_savedSettings.Should().BeEmpty();
 		_publisher.PublishedMessagesOfType<MarkupRangesRefreshRequestedEvent>().Should().BeEmpty();
 	}

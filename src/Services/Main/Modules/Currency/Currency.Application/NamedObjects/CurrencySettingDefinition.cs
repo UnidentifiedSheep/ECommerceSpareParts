@@ -1,9 +1,8 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Enums;
-using Exceptions;
+using FluentValidation;
 using Locan.Core.Interfaces;
 using Main.Entities.Currency;
 using Main.Entities.Currency.Settings;
@@ -12,8 +11,16 @@ using SchemaGeneration.Abstractions.Enums;
 
 namespace Main.Modules.Currency.Application.NamedObjects;
 
-public class CurrencySettingDefinition(ISettingsService settingsService)
-	: SettingDefinitionNamedObjectBase<CurrencySetting>(settingsService)
+public class CurrencySettingDefinition(
+	ISettingsService settingsService,
+	IValidator<CurrencySettingInputData> inputValidator)
+	: SettingDefinitionBase<
+		CurrencySetting,
+		CurrencySettingData,
+		CurrencySettingInputData,
+		CurrencySettingData>(
+		settingsService,
+		inputValidator)
 {
 	public override string SystemName => CurrencySetting.SettingName;
 
@@ -22,26 +29,15 @@ public class CurrencySettingDefinition(ISettingsService settingsService)
 	public override ILocalizableMessage DescriptionLocalizationMessage
 		=> CurrencySettingDescriptionMessage.Instance;
 
-	public override Type InputSettingType => typeof(CurrencySettingInputData);
+	protected override CurrencySettingData Map(CurrencySettingInputData input, CurrencySettingData current)
+		=> current with
+		{
+			RateProvider = input.RateProvider
+		};
 
-	public override Type OutputSettingType => typeof(CurrencySettingData);
+	protected override CurrencySettingData ToOutput(CurrencySettingData data) => data;
 
-	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
-	{
-		var deser = JsonSerializer.Deserialize<CurrencySettingInputData>(json) ??
-			throw new InvalidInputException(CurrencySettingInputInvalidMessage.Instance);
-		var currentSetting = await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken);
-		await SettingsService.SetSetting(
-			new CurrencySetting(
-				new CurrencySettingData
-				{
-					BaseCurrencyId = currentSetting.Data.BaseCurrencyId, RateProvider = deser.RateProvider
-				}),
-			cancellationToken);
-	}
-
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-		=> (await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
+	protected override CurrencySetting CreateSetting(CurrencySettingData data) => new(data);
 }
 
 public record CurrencySettingInputData

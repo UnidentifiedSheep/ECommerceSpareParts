@@ -24,7 +24,7 @@ public class FavoritPartsSupplier(
 		var result = await client.GetPricesAsync(AdaptRequest(request), cancellationToken);
 
 		if (!result.Success)
-			Response<IReadOnlyList<SupplierProduct>>.Fail(result.StatusCode, result.Error);
+			return Response<IReadOnlyList<SupplierProduct>>.Fail(result.StatusCode, result.Error);
 
 		var settings = await settingsProvider.GetSettingsAsync(cancellationToken);
 		return Response<IReadOnlyList<SupplierProduct>>.Ok(AdaptResponse(result.ValueOrThrow, settings));

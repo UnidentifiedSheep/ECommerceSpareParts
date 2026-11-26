@@ -1,15 +1,22 @@
-using System.Text.Json;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
-using Exceptions;
+using FluentValidation;
 using Locan.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Platform.Settings;
 
 namespace Main.Modules.Platform.Application.NamedObjects;
 
-public class GlobalApplicationSettingDefinition(ISettingsService settingsService)
-	: SettingDefinitionNamedObjectBase<GlobalApplicationSetting>(settingsService)
+public class GlobalApplicationSettingDefinition(
+	ISettingsService settingsService,
+	IValidator<GlobalApplicationSettingData> inputValidator)
+	: SettingDefinitionBase<
+		GlobalApplicationSetting,
+		GlobalApplicationSettingData,
+		GlobalApplicationSettingData,
+		GlobalApplicationSettingData>(
+		settingsService,
+		inputValidator)
 {
 	public override string SystemName => GlobalApplicationSetting.SettingName;
 
@@ -19,35 +26,16 @@ public class GlobalApplicationSettingDefinition(ISettingsService settingsService
 	public override ILocalizableMessage DescriptionLocalizationMessage
 		=> GlobalApplicationSettingDescriptionMessage.Instance;
 
-	public override Type InputSettingType => typeof(GlobalApplicationSettingData);
-
-	public override Type OutputSettingType => typeof(GlobalApplicationSettingData);
-
-	public override async Task UpdateSettingAsync(string json, CancellationToken cancellationToken)
-	{
-		var input = JsonSerializer.Deserialize<GlobalApplicationSettingData>(json) ??
-			throw new InvalidInputException(GlobalApplicationSettingInputInvalidMessage.Instance);
-
-		var data = new GlobalApplicationSettingData
+	protected override GlobalApplicationSettingData Map(
+		GlobalApplicationSettingData input,
+		GlobalApplicationSettingData current)
+		=> new()
 		{
-			ApiServiceUrl = NormalizeUrl(input.ApiServiceUrl),
-			AppServiceUrl = NormalizeUrl(input.AppServiceUrl)
+			ApiServiceUrl = SettingValues.Url(input.ApiServiceUrl!),
+			AppServiceUrl = SettingValues.Url(input.AppServiceUrl!)
 		};
 
-		await SettingsService.SetSetting(new GlobalApplicationSetting(data), cancellationToken);
-	}
+	protected override GlobalApplicationSettingData ToOutput(GlobalApplicationSettingData data) => data;
 
-	public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-		=> (await SettingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Json;
-
-	private static string NormalizeUrl(string? value)
-	{
-		if (string.IsNullOrWhiteSpace(value) || !Uri.TryCreate(
-				value.Trim(),
-				UriKind.Absolute,
-				out var uri) || uri.Scheme is not ("http" or "https"))
-			throw new InvalidInputException(GlobalApplicationSettingInputInvalidMessage.Instance);
-
-		return uri.AbsoluteUri.TrimEnd('/');
-	}
+	protected override GlobalApplicationSetting CreateSetting(GlobalApplicationSettingData data) => new(data);
 }

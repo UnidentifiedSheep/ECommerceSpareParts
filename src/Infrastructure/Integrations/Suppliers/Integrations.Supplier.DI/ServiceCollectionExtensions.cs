@@ -1,4 +1,6 @@
 using Abstractions.Models.Options;
+using Integrations.Armtek;
+using Integrations.Armtek.Interfaces;
 using Integrations.Common;
 using Integrations.Favorit;
 using Integrations.Supplier.Connections;
@@ -42,6 +44,24 @@ public static class ServiceCollectionExtensions
 		services.AddHttpClient<ITmtrClient, TmtrClient>().AddDefaultResilenceHandler();
 
 		services.AddScoped<ISupplier, TmtrSupplier>();
+
+		return services;
+	}
+
+	public static IServiceCollection AddArmtekIntegration<TConnectionProvider, TSettingsProvider>(
+		this IServiceCollection services)
+		where TConnectionProvider : class, IConnectionProvider<ArmtekConnection>
+		where TSettingsProvider : class, ISupplierSettingsProvider<ArmtekSettings>
+	{
+		services.AddSupplierBase();
+		services.TryAddSingleton(TimeProvider.System);
+
+		services.AddScoped<IConnectionProvider<ArmtekConnection>, TConnectionProvider>();
+		services.AddScoped<ISupplierSettingsProvider<ArmtekSettings>, TSettingsProvider>();
+
+		services.AddHttpClient<IArmtekClient, ArmtekClient>().AddDefaultResilenceHandler();
+
+		services.AddScoped<ISupplier, ArmtekSupplier>();
 
 		return services;
 	}
