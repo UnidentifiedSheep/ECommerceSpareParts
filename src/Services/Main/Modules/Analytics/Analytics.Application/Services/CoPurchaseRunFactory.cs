@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using Main.Entities.Analytics;
+using Main.Modules.Analytics.Application.Analyses;
 using Main.Modules.Analytics.Abstractions.Models.CoPurchase;
 using Main.Modules.Analytics.Application.Models;
 using Main.Modules.Analytics.Application.Models.CoPurchase;
@@ -10,9 +11,9 @@ namespace Main.Modules.Analytics.Application.Services;
 
 public static class CoPurchaseRunFactory
 {
-	public const string AnalysisType = "CoPurchase";
+	public const string AnalysisType = CoPurchaseAnalysis.Name;
 
-	public const int SchemaVersion = 1;
+	public const int SchemaVersion = CoPurchaseAnalysis.Version;
 
 	public static AnalyticsRun CreateRun(CoPurchaseParameters parameters, Guid? jobId, Guid? createdBy)
 	{

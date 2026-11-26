@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<SaleAnalyticsWriter>();
 		services.AddScoped<AbcXyzDataReader>();
 		services.AddScoped<ICoPurchaseDataReader, CoPurchaseDataReader>();
+		services.AddScoped<ICoPurchaseRelatedProvider, CoPurchaseRelatedProvider>();
 		services.AddScoped<IAbcXyzAnalyzer, AbcXyzAnalyzer>();
 		services.AddSingleton<IAbcXyzCalculator, AbcXyzCalculator>();
 		services.AddScoped<ICoPurchaseAnalyzer, CoPurchaseAnalyzer>();
