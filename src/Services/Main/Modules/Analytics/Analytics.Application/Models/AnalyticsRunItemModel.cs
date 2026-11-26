@@ -5,7 +5,7 @@ namespace Main.Modules.Analytics.Application.Models;
 
 public sealed record AnalyticsRunItemModel<TSegments, TData>(
 	string SubjectKey,
-	int? Rank,
+	int Rank,
 	decimal? Value,
 	decimal? Share,
 	TSegments Segments,

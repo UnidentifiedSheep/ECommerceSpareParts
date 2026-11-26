@@ -9,5 +9,5 @@ public static class AnalyticsCursorConfig
 	public static void Configure()
 		=> QueryableCursor.Value
 			.Map<SalesProfitDataPoint, DateTime>(x => x.PeriodStart)
-			.Map<AnalyticsRunItem, int>(x => x.Rank!.Value);
+			.Map<AnalyticsRunItem, int>(x => x.Rank);
 }

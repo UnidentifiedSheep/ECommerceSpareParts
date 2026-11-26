@@ -505,7 +505,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("jsonb")
                         .HasColumnName("data");
 
-                    b.Property<int?>("Rank")
+                    b.Property<int>("Rank")
                         .HasColumnType("integer")
                         .HasColumnName("rank");
 

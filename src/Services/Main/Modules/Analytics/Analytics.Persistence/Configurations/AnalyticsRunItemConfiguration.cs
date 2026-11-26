@@ -16,7 +16,7 @@ public sealed class AnalyticsRunItemConfiguration : IEntityTypeConfiguration<Ana
 			.HasName("analytics_run_items_pk");
 		builder.Property(item => item.RunId).HasColumnName("run_id");
 		builder.Property(item => item.SubjectKey).HasColumnName("subject_key").HasMaxLength(64);
-		builder.Property(item => item.Rank).HasColumnName("rank");
+		builder.Property(item => item.Rank).HasColumnName("rank").IsRequired();
 		builder.Property(item => item.Value).HasColumnName("value");
 		builder.Property(item => item.Share).HasColumnName("share");
 		builder.Property(item => item.Segments).HasColumnName("segments").HasColumnType("jsonb");

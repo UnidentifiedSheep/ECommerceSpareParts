@@ -31,7 +31,7 @@ public static class CoPurchaseRunFactory
 	public static AnalyticsRunItem CreateItem(Guid runId, CoPurchaseProductResult result)
 		=> new AnalyticsRunItemModel<CoPurchaseItemSegments, CoPurchaseItemData>(
 				result.ProductId.ToString(CultureInfo.InvariantCulture),
-				null,
+				result.ProductId,
 				result.SalesCount,
 				null,
 				new CoPurchaseItemSegments(result.Related.Count > 0),
