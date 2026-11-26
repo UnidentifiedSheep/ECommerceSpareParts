@@ -15,6 +15,8 @@ namespace Tests.SuppliersTests.NamedObjects;
 
 public class ArmtekSupplierSettingDefinitionTests
 {
+	private static CancellationToken CancellationToken => TestContext.Current.CancellationToken;
+
 	private readonly ArmtekSupplierSettingDefinition _definition;
 
 	private readonly List<ArmtekSupplierSetting> _savedSettings = [];
@@ -46,7 +48,7 @@ public class ArmtekSupplierSettingDefinitionTests
 	[Fact]
 	public async Task UpdateSettingAsync_WithValidInput_SavesNormalizedData()
 	{
-		await _definition.UpdateSettingAsync(ValidInput().ToJsonString(), CancellationToken.None);
+		await _definition.UpdateSettingAsync(ValidInput().ToJsonString(), CancellationToken);
 
 		var data = _savedSettings.Single().Data;
 		data.IsEnabled.Should().BeTrue();
@@ -70,7 +72,7 @@ public class ArmtekSupplierSettingDefinitionTests
 	{
 		_current = CurrentData();
 
-		await _definition.UpdateSettingAsync("""{ "isEnabled": true }""", CancellationToken.None);
+		await _definition.UpdateSettingAsync("""{ "isEnabled": true }""", CancellationToken);
 
 		_savedSettings.Single().Data.Should().BeEquivalentTo(_current);
 	}
@@ -85,7 +87,7 @@ public class ArmtekSupplierSettingDefinitionTests
 
 		await _definition.UpdateSettingAsync(
 			"""{ "isEnabled": true, "contractCode": " " }""",
-			CancellationToken.None);
+			CancellationToken);
 
 		_savedSettings.Single().Data.ContractCode.Should().BeNull();
 	}
@@ -95,7 +97,7 @@ public class ArmtekSupplierSettingDefinitionTests
 	{
 		await _definition.UpdateSettingAsync(
 			"""{ "isEnabled": false, "login": "user" }""",
-			CancellationToken.None);
+			CancellationToken);
 
 		var data = _savedSettings.Single().Data;
 		data.IsEnabled.Should().BeFalse();
@@ -169,7 +171,7 @@ public class ArmtekSupplierSettingDefinitionTests
 	[Fact]
 	public async Task UpdateSettingAsync_WithMalformedJson_ThrowsInvalidInput()
 	{
-		var action = () => _definition.UpdateSettingAsync("{", CancellationToken.None);
+		var action = () => _definition.UpdateSettingAsync("{", CancellationToken);
 
 		await action.Should().ThrowAsync<InvalidInputException>();
 	}
@@ -179,7 +181,7 @@ public class ArmtekSupplierSettingDefinitionTests
 	{
 		_current = CurrentData();
 
-		var json = JsonNode.Parse(await _definition.GetOutputJsonAsync(CancellationToken.None))!.AsObject();
+		var json = JsonNode.Parse(await _definition.GetOutputJsonAsync(CancellationToken))!.AsObject();
 
 		json["hasPassword"]!.GetValue<bool>().Should().BeTrue();
 		json.ContainsKey("password").Should().BeFalse();
@@ -189,7 +191,7 @@ public class ArmtekSupplierSettingDefinitionTests
 
 	private async Task<IReadOnlyList<FluentValidation.Results.ValidationFailure>> GetErrors(string json)
 	{
-		var action = () => _definition.UpdateSettingAsync(json, CancellationToken.None);
+		var action = () => _definition.UpdateSettingAsync(json, CancellationToken);
 		var exception = await action.Should().ThrowAsync<ValidationException>();
 		return exception.Which.Errors.ToList();
 	}

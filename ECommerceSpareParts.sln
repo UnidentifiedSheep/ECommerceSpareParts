@@ -374,6 +374,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logistics.Application", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Logistics.Abstractions", "src\Services\Main\Modules\Logistics\Logistics.Abstractions\Logistics.Abstractions.csproj", "{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.Armtek", "src\Infrastructure\Integrations\Suppliers\Integrations.Armtek\Integrations.Armtek.csproj", "{FB414CD9-A5B0-4640-A438-859DDCD48121}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2088,6 +2090,18 @@ Global
 		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x64.Build.0 = Release|Any CPU
 		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x86.ActiveCfg = Release|Any CPU
 		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13}.Release|x86.Build.0 = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|x64.Build.0 = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Debug|x86.Build.0 = Debug|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|x64.ActiveCfg = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|x64.Build.0 = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|x86.ActiveCfg = Release|Any CPU
+		{FB414CD9-A5B0-4640-A438-859DDCD48121}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -2273,5 +2287,6 @@ Global
 		{04D99C2A-3865-4DBD-AE0C-7295C3530A10} = {D162626F-2957-4CC3-BE74-F591682AF67D}
 		{074A4C55-E078-4D97-AF28-EE237976FE50} = {D162626F-2957-4CC3-BE74-F591682AF67D}
 		{7E3A1C52-4B9D-4F6E-A8C1-2D5F9B0E6A13} = {D162626F-2957-4CC3-BE74-F591682AF67D}
+		{FB414CD9-A5B0-4640-A438-859DDCD48121} = {4469AF48-D4DF-4280-8DCE-C9B3D3ACC959}
 	EndGlobalSection
 EndGlobal
