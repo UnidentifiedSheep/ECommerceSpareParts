@@ -1,16 +1,13 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Exceptions;
 using Locan.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Suppliers.Settings.Supplier;
-using SchemaGeneration.Abstractions.Attributes;
-using SchemaGeneration.Abstractions.Enums;
 using Security.Core.Interfaces;
 
-namespace Main.Modules.Suppliers.Application.NamedObjects.Supplier;
+namespace Main.Modules.Suppliers.Application.NamedObjects.Supplier.Favorit;
 
 public class FavoritSupplierSettingDefinition(
 	ISettingsService settingsService,
@@ -99,45 +96,4 @@ public class FavoritSupplierSettingDefinition(
 			? throw new InvalidInputException(SupplierFavoritSettingInputInvalidMessage.Instance)
 			: secretEncryptor.Encrypt(inputApiKey);
 	}
-}
-
-public record FavoritSupplierSettingInputData
-{
-	[JsonPropertyName("isEnabled")]
-	[RequiredSchemaField]
-	[SchemaFieldLabel(SupplierFavoritSettingIsEnabledNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingIsEnabledDescriptionMessage.Key)]
-	public bool IsEnabled { get; init; }
-
-	[JsonPropertyName("baseUrl")]
-	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel(SupplierFavoritSettingBaseUrlNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingBaseUrlDescriptionMessage.Key)]
-	public string? BaseUrl { get; init; }
-
-	[JsonPropertyName("apiKey")]
-	[SchemaInputControl(InputControlType.TextField)]
-	[SchemaFieldLabel(SupplierFavoritSettingApiKeyNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingApiKeyDescriptionMessage.Key)]
-	public string? ApiKey { get; init; }
-}
-
-public record FavoritSupplierSettingOutputData
-{
-	[JsonPropertyName("isEnabled")]
-	[RequiredSchemaField]
-	[SchemaFieldLabel(SupplierFavoritSettingIsEnabledNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingIsEnabledDescriptionMessage.Key)]
-	public bool IsEnabled { get; init; }
-
-	[JsonPropertyName("baseUrl")]
-	[SchemaFieldLabel(SupplierFavoritSettingBaseUrlNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingBaseUrlDescriptionMessage.Key)]
-	public string? BaseUrl { get; init; }
-
-	[JsonPropertyName("hasApiKey")]
-	[RequiredSchemaField]
-	[SchemaFieldLabel(SupplierFavoritSettingHasApiKeyNameMessage.Key)]
-	[SchemaFieldDescription(SupplierFavoritSettingHasApiKeyDescriptionMessage.Key)]
-	public bool HasApiKey { get; init; }
 }

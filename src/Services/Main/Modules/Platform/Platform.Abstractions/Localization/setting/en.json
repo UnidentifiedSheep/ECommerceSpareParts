@@ -1,6 +1,13 @@
 {
   "culture": "en",
   "messages": {
-    "setting.not.found": "Failed to find setting {Name|string}."
+    "setting.not.found": "Failed to find setting {Name|string}.",
+    "setting.input.invalid": "Invalid setting data was provided.",
+    "setting.field.required": "Field '{Field|string}' is required.",
+    "setting.field.empty": "Field '{Field|string}' cannot be empty.",
+    "setting.field.max.length": "Field '{Field|string}' must not exceed {MaxLength|int} characters.",
+    "setting.field.url.invalid": "Field '{Field|string}' must be an absolute http or https URL.",
+    "setting.field.value.invalid": "Field '{Field|string}' has an unsupported value.",
+    "setting.field.duplicate": "Field '{Field|string}' contains duplicate values."
   }
 }

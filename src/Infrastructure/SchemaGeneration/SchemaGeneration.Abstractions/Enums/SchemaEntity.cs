@@ -38,5 +38,7 @@ public enum SchemaEntity
 
 	AnalysisPeriodGranularity,
 
-	SaleState
+	SaleState,
+
+	DeliveryMode
 }
