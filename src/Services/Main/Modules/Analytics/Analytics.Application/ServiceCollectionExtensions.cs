@@ -5,6 +5,7 @@ using Main.Modules.Analytics.Abstractions.Analyzers;
 using Main.Modules.Analytics.Abstractions.Charts;
 using Main.Modules.Analytics.Abstractions.Interfaces;
 using Main.Modules.Analytics.Application.Analyzers.AbcXyz;
+using Main.Modules.Analytics.Application.Analyzers.CoPurchase;
 using Main.Modules.Analytics.Application.Configs;
 using Main.Modules.Analytics.Application.Interfaces;
 using Main.Modules.Analytics.Application.Services;
@@ -33,6 +34,7 @@ public static class ServiceCollectionExtensions
 		services.AddScoped<AbcXyzDataReader>();
 		services.AddScoped<IAbcXyzAnalyzer, AbcXyzAnalyzer>();
 		services.AddSingleton<IAbcXyzCalculator, AbcXyzCalculator>();
+		services.AddSingleton<ICoPurchaseCalculator, CoPurchaseCalculator>();
 
 		return services;
 	}
